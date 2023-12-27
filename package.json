@@ -9,7 +9,18 @@
 		"build": "concurrently \" tsc --project ./tsconfig.json\" \"tsc --project ./src/es6/tsconfig.es6.json\" ",
 		"start": "node ./dist/index.js"
 	},
-	"keywords": ["fileSnyc","file","sync","server","text","textSync","textSyncServer","fileSyncServer","fileSync","textSyncServer"],
+	"keywords": [
+		"fileSnyc",
+		"file",
+		"sync",
+		"server",
+		"text",
+		"textSync",
+		"textSyncServer",
+		"fileSyncServer",
+		"fileSync",
+		"textSyncServer"
+	],
 	"author": "NoRain",
 	"license": "MIT",
 	"devDependencies": {

@@ -123,7 +123,7 @@ export class httpServer {
         app.use('/uploadFile', express.static(path.join(__dirname, '../uploadFile')));
 
         server.listen(port, () => { // 使用变量
-            console.log(`HttpServer is running on port ${port}`);
+            console.log(`HttpServer is running on http://${config.URL}:${port}`);
         });
     }
 

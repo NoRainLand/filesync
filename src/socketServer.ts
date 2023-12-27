@@ -1,4 +1,5 @@
 import { Server as WebSocketServer } from 'ws';
+import { config } from './config';
 import { dataCtrl } from './dataCtrl';
 import { actionType, msgType } from './dataType';
 import { eventSystem } from './eventSystem';
@@ -12,7 +13,7 @@ export class socketServer {
     }
 
     static startSocketServer(port: number) {
-        console.log(`SocketServer is running on port ${port}`);
+        console.log(`SocketServer is running on ws://${config.URL}:${port}`);
         this.wss = new WebSocketServer({ port: port });
         this.wss.on('connection', (ws) => {
             console.log('A user connected');
