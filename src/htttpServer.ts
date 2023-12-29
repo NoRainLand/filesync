@@ -57,9 +57,9 @@ export class httpServer {
                 // 计算文件的 MD5 哈希值
                 const hash = crypto.createHash('md5');
                 const stream = fs.createReadStream(req.file.path);
-                console.log('req.file.path', req.file.path);
                 stream.on('data', (data) => hash.update(data));
                 stream.on('end', () => {
+                    console.log('req.file.path', req.file!.path);
                     const fileHash = hash.digest('hex');
                     req.file!.originalname = Buffer.from(req.file!.originalname, "latin1").toString('utf8');
                     if (this.fileHashes.indexOf(fileHash) !== -1) {
@@ -72,7 +72,8 @@ export class httpServer {
                         fileOrTextHash: fileHash,
                         timestamp: Date.now(),
                         fileName: req.file!.originalname,
-                        url: `${config.savePath.replace(".", "")}${req.file!.filename}`
+                        url: `${config.savePath.replace(".", "")}${req.file!.filename}`,
+                        size: (req.file!.size / 1024) > 0 ? (req.file!.size / 1024) : 0,
                     };
                     dataCtrl.saveMsg(msg);
                 });
@@ -127,7 +128,7 @@ export class httpServer {
         });
     }
 
-    static checkDir(){
+    static checkDir() {
         if (!fs.existsSync(config.savePath)) {
             fs.mkdirSync(config.savePath);
         }

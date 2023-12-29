@@ -6,6 +6,7 @@ export type msgType = {
     text?: string,
     url?: string,
     action?: "add" | "delete" | "update"
+    size: number,
 }
 export type actionType = {
     action: "delete" | "update",

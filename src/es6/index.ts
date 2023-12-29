@@ -26,7 +26,40 @@ export class index {
     private reconnectInterval = 3000; // 3 seconds
     private timer: any;
 
-    private inputLock = false;
+    private _inputLock = false;
+    get inputLock(): boolean {
+        return this._inputLock;
+    }
+    set inputLock(value: boolean) {
+        this._inputLock = value;
+        this.uploadButton.value = value ? "发送中" : "发送";
+        this.uploadButton.setAttribute('aria-busy', value.toString());
+        this.textInput.placeholder = value ? "发送中…" : "等待输入…";
+    }
+    sendTimeout: number = 500;
+
+
+    dialog: HTMLDialogElement;
+    dialogTitle: HTMLHeadingElement;
+    dialogContent: HTMLParagraphElement;
+    dialogCloseButton: HTMLButtonElement;
+
+    svg: HTMLElement;
+    private _isDark: boolean = false;
+    get isDark(): boolean {
+        return this._isDark;
+    }
+    set isDark(value: boolean) {
+        this._isDark = value;
+        if (value) {
+            this.svg.innerHTML = config.moonSVG;
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            this.svg.innerHTML = config.sunSVG;
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    }
+
     constructor() {
         this.init();
     }
@@ -36,14 +69,20 @@ export class index {
         this.textInput = document.getElementById('textInput');
         this.statusText = document.getElementById('statusText');
         this.uploadButton = document.getElementById('uploadButton') as HTMLButtonElement;
-        this.uploadButton.value = "发送";
-        this.textInput.placeholder = "等待输入……";
+        this.dialog = document.querySelector('dialog') as HTMLDialogElement;
+        this.dialogTitle = document.querySelector('dialog article header h6')!;
+        this.dialogContent = document.querySelector('dialog article p')!;
+        this.dialogCloseButton = document.querySelector('dialog article header a')!;
         this.fileList = document.getElementById('fileList') as HTMLUListElement;
+
+        this.svg = document.getElementById('themeButton') as HTMLElement;
+        this.isDark = false;
+
+        this.inputLock = false;
         this.msgList = [];
         this.msgHashArr = [];
         this.itemList = [];
         this.itemPool = new objectPool(() => new item());
-        // this.initSocket();
         this.getSocketInfo();
         this.addEvent();
         logger.tranLogger();
@@ -75,14 +114,14 @@ export class index {
 
         this.text = this.textInput.value;
         if (!this.fileInput!.files.length && !this.text) {
-            return alert('请选择文件或输入文本');
+            this.showAlertOrDialog('请选择文件或输入文本');
+            return;
         }
         this.inputLock = true;
         const file = this.fileInput!.files[0];
         const formData = new FormData();
         formData.append('file', file);
         formData.append('text', this.text);
-        this.showTips("发送中", "blue");
         this.fileInput.disabled = true;
         this.textInput.disabled = true;
         if (timeoutId !== null) {
@@ -99,18 +138,17 @@ export class index {
                 return response.text();
             })
             .then(data => {
-                this.inputLock = false;
-                this.showTips("发送成功", "green");
+                setTimeout(() => {
+                    this.inputLock = false;
+                }, this.sendTimeout);
                 // 清空文件输入元素和文本输入元素的值
                 this.fileInput.value = '';
                 this.textInput.value = '';
-                timeoutId = setTimeout(() => {
-                    this.showTips("等待发送...", "gray");
-                }, 3000);
+
             })
             .catch(error => {
                 console.warn(error);
-                this.showTips("发送失败,文件已存在", "red");
+                this.showAlertOrDialog("文件发送失败,可能因为服务器已经存在该文件", "发送失败");
                 if (error.message.startsWith('File already uploaded') || error.message.startsWith('Text already uploaded')) {
                     // 清空文件输入元素和文本输入元素的值
                     this.fileInput.value = '';
@@ -130,7 +168,6 @@ export class index {
             let data = event.data;
             data = JSON.parse(data);
             // console.log(data);
-            // console.log("收到消息")
             switch (data.action) {
                 case "add":
                     this.createItem(data);
@@ -162,7 +199,7 @@ export class index {
                     this.showTips("服务器已关闭", "red");
                     console.warn("服务器已关闭");
                 } else {
-                    this.showTips("连接失败，正在重连...", "blue");
+                    this.showTips("正在重连...", "blue");
                     this.initSocket();
                     this.reconnectAttempts++;
                 }
@@ -177,11 +214,19 @@ export class index {
         this.textInput.addEventListener('keydown', (event: KeyboardEvent) => {
             if (event.key === 'Enter') {
                 event.preventDefault();
-                // 在这里添加你的上传或发送文件的代码
                 if (!this.inputLock) {
                     this.sendMsg();
                 }
             }
+        });
+
+        this.dialogCloseButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.dialog.close();
+        });
+
+        this.svg.addEventListener('click', () => {
+            this.isDark = !this.isDark;
         });
     }
 
@@ -242,6 +287,12 @@ export class index {
             this.statusText.textContent = msg;
             this.statusText.style.color = color;
         }
+    }
+
+    showAlertOrDialog(content: string, title: string = "提示") {
+        this.dialogTitle.textContent = title;
+        this.dialogContent.textContent = content;
+        this.dialog.showModal();
     }
 }
 

@@ -6,7 +6,7 @@ export class dataHandler {
     static async openDatabase(dbPath: string, tableName: string) {
         this.db = await new sqlite3.Database(dbPath);
         this.tableName = tableName;
-        this.db.run(`CREATE TABLE IF NOT EXISTS ${tableName} (fileName TEXT, fileOrTextHash TEXT, timestamp INTEGER, text TEXT, msgType TEXT,url TEXT)`);
+        this.db.run(`CREATE TABLE IF NOT EXISTS ${tableName} (fileName TEXT, fileOrTextHash TEXT, timestamp INTEGER, text TEXT, msgType TEXT,url TEXT,size INTEGER)`);
         console.log(`Database ${dbPath} opened`);
     }
 
@@ -15,8 +15,8 @@ export class dataHandler {
         await this.writeToDatabase(msg);
     }
     static async writeToDatabase(msg: msgType) {
-        const { fileName, fileOrTextHash, timestamp, text, msgType, url } = msg;
-        this.db.run(`INSERT INTO ${this.tableName} (fileName, fileOrTextHash, timestamp, text, msgType, url) VALUES (?, ?, ?, ?, ? ,?)`, [fileName, fileOrTextHash, timestamp, text, msgType, url]);
+        const { fileName, fileOrTextHash, timestamp, text, msgType, url,size } = msg;
+        this.db.run(`INSERT INTO ${this.tableName} (fileName, fileOrTextHash, timestamp, text, msgType, url ,size) VALUES (?, ?, ?, ?, ? ,? ,?)`, [fileName, fileOrTextHash, timestamp, text, msgType, url ,size]);
     }
     static async deleteFromDatabase(hash: string) {
         this.db.run(`DELETE FROM ${this.tableName} WHERE fileOrTextHash = ?`, hash);

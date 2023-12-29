@@ -4,13 +4,14 @@ import { eventSystem } from "./eventSystem";
 
 export class item {
     private element: HTMLDivElement;
-    private text1: HTMLParagraphElement;
-    private text2: HTMLParagraphElement;
-    private button1: HTMLButtonElement;
-    private button2: HTMLButtonElement;
-    private button3: HTMLButtonElement;
+    private txtNameOrText: HTMLParagraphElement;
+    private txtDate: HTMLParagraphElement;
+    private btnDownload: HTMLButtonElement;
+    private btnCopy: HTMLButtonElement;
+    private btnDel: HTMLButtonElement;
     private data: msgType = null!;
     private onceInit: boolean = false;
+    private maxTextLength = 30;
     constructor() {
 
     }
@@ -20,28 +21,28 @@ export class item {
             this.element = document.createElement('div');
             this.element.className = 'item';
 
-            this.text1 = document.createElement('p');
-            this.text2 = document.createElement('p');
-            this.button1 = document.createElement('button');
-            this.button2 = document.createElement('button');
-            this.button3 = document.createElement('button');
+            this.txtNameOrText = document.createElement('p');
+            this.txtDate = document.createElement('p');
+            this.btnDownload = document.createElement('button');
+            this.btnCopy = document.createElement('button');
+            this.btnDel = document.createElement('button');
 
-            this.element.appendChild(this.text1);
+            this.element.appendChild(this.txtNameOrText);
             const buttonContainer = document.createElement('div');
-            buttonContainer.appendChild(this.text2);
-            buttonContainer.appendChild(this.button1);
-            buttonContainer.appendChild(this.button2);
-            buttonContainer.appendChild(this.button3);
+            buttonContainer.appendChild(this.txtDate);
+            buttonContainer.appendChild(this.btnDownload);
+            buttonContainer.appendChild(this.btnCopy);
+            buttonContainer.appendChild(this.btnDel);
             this.element.appendChild(buttonContainer);
-            this.button1.textContent = '下载';
-            this.button2.textContent = '复制';
-            this.button3.textContent = '删除';
+            this.btnDownload.textContent = '下载';
+            this.btnCopy.textContent = '复制';
+            this.btnDel.textContent = '删除';
             this.onceInit = true;
         }
 
-        this.button1.addEventListener('click', () => this.downloadFile());
-        this.button2.addEventListener('click', () => this.copyData());
-        this.button3.addEventListener('click', () => this.deleteData());
+        this.btnDownload.addEventListener('click', () => this.downloadFile());
+        this.btnCopy.addEventListener('click', () => this.copyData());
+        this.btnDel.addEventListener('click', () => this.deleteData());
     }
     downloadFile(): void {
         eventSystem.emit('downloadFile', this.data.url, this.data.fileName);
@@ -55,7 +56,6 @@ export class item {
     }
 
     deleteData(): void {
-        // 在这里实现删除数据的逻辑
         eventSystem.emit('deleteItem', this.data.fileOrTextHash!);
     }
 
@@ -64,35 +64,61 @@ export class item {
         this.initItem();
         // 显示 text 或 filename
         if (data.fileName) {
-            this.text1.textContent = data.fileName;
+            let str = data.fileName;
+            if (str.length > this.maxTextLength) {
+                let index = str.lastIndexOf('.');
+                if (index > 0) {
+                    let ext = str.slice(index);
+                    str = str.slice(0, this.maxTextLength - ext.length) + '[...]' + ext;
+                } else {
+                    str = str.slice(0, this.maxTextLength - 6) + '[...]' + str.slice(-6);
+                }
+            }
+            this.txtNameOrText.textContent = str;
         } else {
             let str = data.text!;
-            if (str.length > 45) {
-                str = str.slice(0, 45) + '[...]';
+            if (str.length > this.maxTextLength) {
+                str = str.slice(0, this.maxTextLength) + '[...]';
             }
-            this.text1.textContent = str;
+            this.txtNameOrText.textContent = str;
         }
         if (data.msgType === 'file') {
-            this.button1.style.display = 'block';
-            this.button2.style.display = 'none';
+            this.btnDownload.style.display = 'block';
+            this.btnCopy.style.display = 'none';
         } else {
-            this.button1.style.display = 'none';
-            this.button2.style.display = "block"
+            this.btnDownload.style.display = 'none';
+            this.btnCopy.style.display = "block"
+        }
+
+        if (data.size != void 0 && data.size >= 0) {
+            this.txtNameOrText.setAttribute("data-tooltip", "文件大小：" + this.reSize(data.size));
+            this.txtNameOrText.style.borderBottom = 'none';
+        } else {
+            this.txtNameOrText.removeAttribute("data-tooltip");
         }
 
         // 显示时间戳
         const date = new Date(data.timestamp);
         const formattedDate = `${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
-        this.text2.textContent = formattedDate;
-
-
+        this.txtDate.textContent = formattedDate;
     }
+
+    reSize(size: number): string {
+        if (size >= 1024 * 1024) {
+            return (size / 1024 / 1024).toFixed(2) + "GB";
+        } else if (size >= 1024) {
+            return (size / 1024).toFixed(2) + "MB";
+        } else {
+            return Math.ceil(size) + "KB";
+        }
+    }
+
 
     onRemoveItem(): void {
         this.element.parentNode!.removeChild(this.element);
-        this.button1.removeEventListener('click', this.downloadFile);
-        this.button2.removeEventListener('click', this.copyData);
-        this.button3.removeEventListener('click', this.deleteData);
+        this.btnDownload.removeEventListener('click', this.downloadFile);
+        this.btnCopy.removeEventListener('click', this.copyData);
+        this.btnDel.removeEventListener('click', this.deleteData);
     }
 
     setMyParnet(parent: HTMLElement) {
