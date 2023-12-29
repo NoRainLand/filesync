@@ -138,24 +138,18 @@ export class index {
                 return response.text();
             })
             .then(data => {
-                setTimeout(() => {
-                    this.inputLock = false;
-                }, this.sendTimeout);
-                // 清空文件输入元素和文本输入元素的值
-                this.fileInput.value = '';
-                this.textInput.value = '';
 
             })
             .catch(error => {
-                console.warn(error);
                 this.showAlertOrDialog("文件发送失败,可能因为服务器已经存在该文件", "发送失败");
-                if (error.message.startsWith('File already uploaded') || error.message.startsWith('Text already uploaded')) {
-                    // 清空文件输入元素和文本输入元素的值
-                    this.fileInput.value = '';
-                    this.textInput.value = '';
-                }
+                console.warn(error);
             })
             .finally(() => {
+                setTimeout(() => {
+                    this.inputLock = false;
+                }, this.sendTimeout);
+                this.fileInput.value = '';
+                this.textInput.value = '';
                 this.fileInput.disabled = false;
                 this.textInput.disabled = false;
             });
