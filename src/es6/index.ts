@@ -93,10 +93,10 @@ export class index {
 
     initTheme() {
         if (this.isDark) {
-            this.svg.innerHTML = config.moonSVG;
+            this.svg.innerHTML = config.sunSVG;
             document.documentElement.setAttribute('data-theme', 'dark');
         } else {
-            this.svg.innerHTML = config.sunSVG;
+            this.svg.innerHTML = config.moonSVG;
             document.documentElement.setAttribute('data-theme', 'light');
         }
     }
