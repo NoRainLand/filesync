@@ -1,5 +1,5 @@
 import { config } from "./config";
-import { actionType, colorType, msgType } from "./dataType";
+import { actionType, colorType, msgType, socketInfoType } from "./dataType";
 import { eventSystem } from "./eventSystem";
 import { item } from "./item";
 import { logger } from "./logger";
@@ -45,19 +45,22 @@ export class index {
     dialogCloseButton: HTMLButtonElement;
 
     svg: HTMLElement;
-    private _isDark: boolean = false;
+    private _isDark: number = -1;
     get isDark(): boolean {
-        return this._isDark;
+        if (this._isDark == -1) {
+            let dark = localStorage.getItem("isDark");
+            if (dark == null || dark == void 0) {
+                this._isDark = 0;
+                localStorage.setItem("isDark", "false");
+            } else {
+                this._isDark = ((dark == "true") ? 1 : 0);
+            }
+        }
+        return !!this._isDark;
     }
     set isDark(value: boolean) {
-        this._isDark = value;
-        if (value) {
-            this.svg.innerHTML = config.moonSVG;
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-            this.svg.innerHTML = config.sunSVG;
-            document.documentElement.setAttribute('data-theme', 'light');
-        }
+        this._isDark = value ? 1 : 0;
+        localStorage.setItem("isDark", value.toString());
     }
 
     constructor() {
@@ -76,7 +79,7 @@ export class index {
         this.fileList = document.getElementById('fileList') as HTMLUListElement;
 
         this.svg = document.getElementById('themeButton') as HTMLElement;
-        this.isDark = false;
+        this.initTheme();
 
         this.inputLock = false;
         this.msgList = [];
@@ -88,21 +91,31 @@ export class index {
         logger.tranLogger();
     }
 
+    initTheme() {
+        if (this.isDark) {
+            this.svg.innerHTML = config.moonSVG;
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            this.svg.innerHTML = config.sunSVG;
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    }
+
     getSocketInfo() {
         fetch('/getSocketInfo')
             .then(response => {
                 if (!response.ok) {
                     throw new Error(response.statusText);
                 }
-                console.log(response);
                 return response.text();
             })
             .then(data => {
-                console.log(data);
-                let socketInfo: { "socketURL": string, "socketPORT": number } = JSON.parse(data);
+                let socketInfo: socketInfoType = JSON.parse(data);
                 config.URL = socketInfo.socketURL;
                 config.SocketIOPORT = socketInfo.socketPORT;
+                config.version = socketInfo.version;
                 this.initSocket();
+                logger.log("当前版本" + config.version);
             })
             .catch(error => {
                 console.warn(error);
@@ -181,7 +194,6 @@ export class index {
             this.showTips("连接成功", "green");
             this.inputLock = false;
             this.reconnectAttempts = 0;
-            console.log("连接成功");
             if (this.timer) {
                 clearInterval(this.timer);
             }
@@ -221,6 +233,7 @@ export class index {
 
         this.svg.addEventListener('click', () => {
             this.isDark = !this.isDark;
+            this.initTheme();
         });
     }
 

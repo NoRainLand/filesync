@@ -8,7 +8,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import { config } from './config';
 import { dataCtrl } from './dataCtrl';
-import { msgType } from './dataType';
+import { msgType, socketInfoType } from './dataType';
 import { eventSystem } from './eventSystem';
 
 export class httpServer {
@@ -114,10 +114,12 @@ export class httpServer {
 
 
         app.get('/getSocketInfo', (req: Request, res: Response) => {
-            res.send({
+            let socketInfo: socketInfoType = {
                 socketURL: config.URL,
-                socketPORT: config.SocketIOPORT
-            });
+                socketPORT: config.SocketIOPORT,
+                version: config.version,
+            };
+            res.send(socketInfo);
         });
 
         app.use('/es6', express.static(path.join(__dirname, 'es6')));

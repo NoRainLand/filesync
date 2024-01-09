@@ -13,3 +13,5 @@ export type actionType = {
     fileOrTextHash?: string,
 }
 export type eventType = "deleteItem" | "msgSaved";
+
+export type socketInfoType = { "socketURL": string, "socketPORT": number, "version": string };

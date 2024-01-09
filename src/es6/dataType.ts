@@ -15,3 +15,5 @@ export type actionType = {
 export type eventType = "deleteItem" | "downloadFile";
 
 export type colorType = "red" | "blue" | "gray" | "green";
+
+export type socketInfoType = { "socketURL": string, "socketPORT": number, "version": string };
