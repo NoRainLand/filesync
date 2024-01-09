@@ -100,17 +100,11 @@ export class httpServer {
             res.status(500).send(err.message);
         });
 
-        app.get('/', (req: Request, res: Response) => {
-            res.sendFile(path.join(__dirname, 'es6/index.html'));
-        });
-
-        app.get('/favicon.ico', (req: Request, res: Response) => {
-            res.sendFile(path.join(__dirname, 'es6/favicon.ico'));
-        });
-
-        app.get('/pico.classless.min.css', (req: Request, res: Response) => {
-            res.sendFile(path.join(__dirname, 'es6/pico.classless.min.css'));
-        });
+        for (let key in config.loadConfig) {
+            app.get(key, (req: Request, res: Response) => {
+                res.sendFile(path.join(__dirname, 'es6/' + config.loadConfig[key]));
+            });
+        }
 
 
         app.get('/getSocketInfo', (req: Request, res: Response) => {

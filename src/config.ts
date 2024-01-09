@@ -6,4 +6,10 @@ export class config {
     static dbPath: string = './myDatabase.sqlite';
     static tableName: string = 'myTable';
     static version: string = "1.2.0"//版本号
+
+    static loadConfig: { [key: string]: string } = {
+        "/": "index.html",
+        "/favicon.ico": "favicon.ico",
+        "/pico.min.css": "pico.min.css",
+    }
 }
