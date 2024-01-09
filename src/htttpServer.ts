@@ -108,6 +108,11 @@ export class httpServer {
             res.sendFile(path.join(__dirname, 'es6/favicon.ico'));
         });
 
+        app.get('/pico.classless.min.css', (req: Request, res: Response) => {
+            res.sendFile(path.join(__dirname, 'es6/pico.classless.min.css'));
+        });
+
+
         app.get('/getSocketInfo', (req: Request, res: Response) => {
             res.send({
                 socketURL: config.URL,
