@@ -17,3 +17,5 @@ export type eventType = "deleteItem" | "downloadFile";
 export type colorType = "red" | "blue" | "gray" | "green";
 
 export type socketInfoType = { "socketURL": string, "socketPORT": number, "version": string };
+
+export type dialogType = "msg" | "qrcode";

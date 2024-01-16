@@ -1,5 +1,5 @@
 import { config } from "./config";
-import { actionType, colorType, msgType, socketInfoType } from "./dataType";
+import { actionType, colorType, dialogType, msgType, socketInfoType } from "./dataType";
 import { eventSystem } from "./eventSystem";
 import { item } from "./item";
 import { logger } from "./logger";
@@ -44,7 +44,15 @@ export class index {
     dialogContent: HTMLParagraphElement;
     dialogCloseButton: HTMLButtonElement;
 
-    svg: HTMLElement;
+    themeButtonSvg: HTMLElement;
+
+    qrcodeButtonSvg: HTMLElement;
+
+    qrcode: any;
+    qrcodeDiv: HTMLElement;
+
+    imgQrCode: HTMLImageElement;
+
     private _isDark: number = -1;
     get isDark(): boolean {
         if (this._isDark == -1) {
@@ -78,8 +86,14 @@ export class index {
         this.dialogCloseButton = document.querySelector('dialog article header a')!;
         this.fileList = document.getElementById('fileList') as HTMLUListElement;
 
-        this.svg = document.getElementById('themeButton') as HTMLElement;
+        this.themeButtonSvg = document.getElementById('themeButton') as HTMLElement;
         this.initTheme();
+
+        this.qrcodeButtonSvg = document.getElementById('qrcodeButton') as HTMLElement;
+
+        this.qrcodeDiv = document.getElementById('qrcodeDiv') as HTMLElement;
+        this.qrcode = new ((window as any).QRCode)("qrcodeDiv");
+        this.imgQrCode = this.qrcodeDiv.getElementsByTagName("img")[0] as HTMLImageElement;
 
         this.inputLock = false;
         this.msgList = [];
@@ -93,10 +107,10 @@ export class index {
 
     initTheme() {
         if (this.isDark) {
-            this.svg.innerHTML = config.sunSVG;
+            this.themeButtonSvg.innerHTML = config.sunSVG;
             document.documentElement.setAttribute('data-theme', 'dark');
         } else {
-            this.svg.innerHTML = config.moonSVG;
+            this.themeButtonSvg.innerHTML = config.moonSVG;
             document.documentElement.setAttribute('data-theme', 'light');
         }
     }
@@ -231,9 +245,13 @@ export class index {
             this.dialog.close();
         });
 
-        this.svg.addEventListener('click', () => {
+        this.themeButtonSvg.addEventListener('click', () => {
             this.isDark = !this.isDark;
             this.initTheme();
+        });
+
+        this.qrcodeButtonSvg.addEventListener('click', () => {
+            this.showAlertOrDialog(window.location.href, "当前网址", "qrcode");
         });
     }
 
@@ -296,9 +314,23 @@ export class index {
         }
     }
 
-    showAlertOrDialog(content: string, title: string = "提示") {
+    showAlertOrDialog(content: string, title: string = "提示", type: dialogType = "msg") {
         this.dialogTitle.textContent = title;
-        this.dialogContent.textContent = content;
+        if (type == "msg") {
+            this.dialogContent.textContent = content;
+            this.qrcode.clear();
+            this.qrcodeDiv.className = config.hideQrcodeDivClass;
+            if (this.imgQrCode) {
+                this.imgQrCode.style.display = "none";
+            }
+        } else if (type == "qrcode") {
+            this.dialogContent.textContent = "";
+            this.qrcode.makeCode(content);
+            this.qrcodeDiv.className = config.showQrcodeDivClass;
+            if (this.imgQrCode) {
+                this.imgQrCode.style.display = "block";
+            }
+        }
         this.dialog.showModal();
     }
 }

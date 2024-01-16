@@ -11,5 +11,6 @@ export class config {
         "/": "index.html",
         "/favicon.ico": "favicon.ico",
         "/pico.min.css": "pico.min.css",
+        "/qrcode.min.js": "qrcode.min.js",
     }
 }
