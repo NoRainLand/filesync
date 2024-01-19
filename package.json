@@ -1,13 +1,16 @@
 {
-	"version": "1.0.0",
+	"name": "file-sync",
+	"version": "1.4.0",
 	"description": "一个简单的文件/文字同步服务器",
+	"bin": "dist/index.js",
 	"main": "dist/index.js",
 	"scripts": {
 		"dev": "nodemon ./dist/index.js",
 		"watch": "concurrently \" tsc --project ./tsconfig.json -w\" \"tsc --project ./src/es6/tsconfig.es6.json -w\"",
 		"copy": "concurrently \"@powershell copy src/es6/index.html dist/es6/ \" \" @powershell copy src/es6/favicon.ico dist/es6/ \" \" @powershell copy src/es6/pico.min.css dist/es6/ \" \" @powershell copy src/es6/qrcode.min.js dist/es6/ \"",
 		"build": "concurrently \" tsc --project ./tsconfig.json\" \"tsc --project ./src/es6/tsconfig.es6.json\" ",
-		"start": "node ./dist/index.js"
+		"start": "node ./dist/index.js",
+		"exec": "concurrently \"pkg -t win package.json\" "
 	},
 	"keywords": [
 		"fileSnyc",
@@ -44,5 +47,12 @@
 		"socket.io-client": "^4.7.2",
 		"sqlite": "^5.1.1",
 		"sqlite3": "^5.1.6"
+	},
+	"pkg": {
+		"assets": [
+			"dist/**/*",
+			"node_modules/sqlite3/**/*"
+		],
+		"outputPath": "exec"
 	}
 }

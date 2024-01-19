@@ -5,7 +5,7 @@ export class config {
     static savePath: string = './uploadFile/'; // 上传文件的保存路径
     static dbPath: string = './myDatabase.sqlite';
     static tableName: string = 'myTable';
-    static version: string = "1.3.0"//版本号
+    static version: string = "1.4.0"//版本号
 
     static loadConfig: { [key: string]: string } = {
         "/": "index.html",
