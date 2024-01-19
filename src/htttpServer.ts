@@ -124,9 +124,24 @@ export class httpServer {
 
         app.use('/uploadFile', express.static(path.join(__dirname, '../uploadFile')));
 
-        server.listen(port, () => { // 使用变量
-            console.log(`HttpServer is running on http://${config.URL}:${port}`);
-        });
+        let onListening = () => {
+            console.log("http服务器已启动：");
+            console.log(`http://${config.URL}:${config.HTTPPORT}`);
+        };
+
+        let startServer = (server: any, port: number) => {
+            server.listen(port).on('listening', onListening).on('error', (err: any) => {
+                if (err.code === 'EADDRINUSE') {
+                    console.log(`端口${port}已被占用，尝试使用端口${port + 10}`);
+                    server.removeListener('listening', onListening);
+                    config.HTTPPORT = port + 10;
+                    startServer(server, port + 10);
+                } else {
+                    console.log(err);
+                }
+            });
+        }
+        startServer(server, port);
     }
 
     static checkDir() {

@@ -1,3 +1,4 @@
+import * as net from 'net';
 import { Server as WebSocketServer } from 'ws';
 import { config } from './config';
 import { dataCtrl } from './dataCtrl';
@@ -13,22 +14,36 @@ export class socketServer {
     }
 
     static startSocketServer(port: number) {
-        console.log(`SocketServer is running on ws://${config.URL}:${port}`);
-        this.wss = new WebSocketServer({ port: port });
-        this.wss.on('connection', (ws) => {
-            console.log('A user connected');
-
-            ws.on('close', () => {
-                console.log('A user disconnected');
-            });
-
-            ws.on('message', (message: string) => {
-                let data = JSON.parse(message);
-                this.selectAction(data, ws);
-
-            });
+        const server = net.createServer();
+        server.once('error', (err: any) => {
+            if (err.code === 'EADDRINUSE') {
+                console.log(`端口${port}已被占用，尝试使用端口${port + 10}`);
+                socketServer.startSocketServer(port + 10);
+            } else {
+                console.error(err);
+            }
         });
-        eventSystem.on('msgSaved', this.sendMsg.bind(this));
+        server.once('listening', () => {
+            server.close();
+            this.wss = new WebSocketServer({ port: port });
+            config.SocketIOPORT = port;
+            console.log("socket服务器已启动：");
+            console.log(`ws://${config.URL}:${port}`);
+            this.wss.on('connection', (ws) => {
+                console.log('A user connected');
+                ws.on('close', () => {
+                    console.log('A user disconnected');
+                });
+
+                ws.on('message', (message: string) => {
+                    let data = JSON.parse(message);
+                    this.selectAction(data, ws);
+
+                });
+            });
+            eventSystem.on('msgSaved', this.sendMsg.bind(this));
+        });
+        server.listen(port);
     }
 
     static sendMsg(msg: msgType) {
