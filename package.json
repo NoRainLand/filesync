@@ -1,6 +1,6 @@
 {
 	"name": "file-sync",
-	"version": "1.5.0",
+	"version": "1.6.0",
 	"description": "一个简单的文件/文字同步服务器",
 	"bin": "dist/index.js",
 	"main": "dist/index.js",

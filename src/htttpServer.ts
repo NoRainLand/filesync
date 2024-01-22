@@ -122,7 +122,15 @@ export class httpServer {
             res.sendFile(path.join(__dirname, 'es6', req.params.file + '.js'));
         });
 
-        app.use('/uploadFile', express.static(path.join(__dirname, '../uploadFile')));
+        let filePath = "";
+        if ((<any>process).pkg) {
+            // 如果在 pkg 打包的可执行文件中运行
+            filePath = path.join(process.cwd(), config.savePath);
+        } else {
+            // 如果在 Node.js 环境中运行
+            filePath = path.join(__dirname, "." + config.savePath);
+        }
+        app.use('/uploadFile', express.static(filePath));
 
         let onListening = () => {
             console.log("http服务器已启动：");
