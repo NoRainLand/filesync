@@ -28,8 +28,20 @@
 
 可能的错误:
 
-- 数据库安装失败,多执行```npm install```几次试试.
 - 第一次运行提示乱七八糟的,能运行就别管.
+- 数据库安装失败,多执行```npm install```几次试试，实在不行就下载[我打包好的文件](https://github.com/NoRainLand/filesync/releases/tag/untagged-effc87f7dee701d8da7f)，但是你解压之后还是要执行一次```npm install```，因为我后面有添加了新的库（主要是sqlite3库下载可能会出问题）
+- 打包报错的话如下所示的话，可以参考[这里](https://segmentfault.com/a/1190000041958374),项目目录下提供了我下载好的文件。
+
+```txt
+[0] > pkg@5.8.1
+[0] > Fetching base Node.js binaries to PKG_CACHE_PATH
+[0] > Not found in remote cache:
+[0]   {"tag":"v3.4","name":"node-v14.20.0-win-x64"}
+[0] > Building base binary from source:
+[0]   built-v14.20.0-win-x64
+[0] > Fetching Node.js source archive from nodejs.org...
+[0] > Error! AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+```
 
 ### version
 
