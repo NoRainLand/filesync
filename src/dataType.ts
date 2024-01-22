@@ -15,3 +15,5 @@ export type actionType = {
 export type eventType = "deleteItem" | "msgSaved";
 
 export type socketInfoType = { "socketURL": string, "socketPORT": number, "version": string };
+
+export type configType = { "ps1": string, "ps2": string, "http_port": number, "socket_port": number }

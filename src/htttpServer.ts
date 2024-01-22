@@ -138,18 +138,25 @@ export class httpServer {
         };
 
         let startServer = (server: any, port: number) => {
-            server.listen(port).on('listening', onListening).on('error', (err: any) => {
-                if (err.code === 'EADDRINUSE') {
-                    console.log(`端口${port}已被占用，尝试使用端口${port + 10}`);
-                    server.removeListener('listening', onListening);
-                    config.HTTPPORT = port + 10;
-                    startServer(server, port + 10);
-                } else {
-                    console.log(err);
-                }
+            return new Promise((resolve, reject) => {
+                server.listen(port).on('listening', () => {
+                    console.log("http服务器已启动：");
+                    console.log(`http://${config.URL}:${config.HTTPPORT}`);
+                    resolve(true);
+                }).on('error', (err: any) => {
+                    if (err.code === 'EADDRINUSE') {
+                        console.log(`端口${port}已被占用，尝试使用端口${port + 10}`);
+                        server.removeListener('listening', onListening);
+                        config.HTTPPORT = port + 10;
+                        resolve(startServer(server, port + 10));
+                    } else {
+                        console.log(err);
+                        reject(err);
+                    }
+                });
             });
         }
-        startServer(server, port);
+        return startServer(server, port);
     }
 
     static checkDir() {

@@ -1,6 +1,6 @@
 {
 	"name": "file-sync",
-	"version": "1.6.0",
+	"version": "1.7.0",
 	"description": "一个简单的文件/文字同步服务器",
 	"bin": "dist/index.js",
 	"main": "dist/index.js",
@@ -43,6 +43,7 @@
 		"common-js": "^0.3.8",
 		"express": "^4.18.2",
 		"multer": "^1.4.5-lts.1",
+		"open": "^6.4.0",
 		"rcedit": "^4.0.1",
 		"socket.io": "^4.7.2",
 		"socket.io-client": "^4.7.2",

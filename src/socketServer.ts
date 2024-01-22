@@ -14,36 +14,38 @@ export class socketServer {
     }
 
     static startSocketServer(port: number) {
-        const server = net.createServer();
-        server.once('error', (err: any) => {
-            if (err.code === 'EADDRINUSE') {
-                console.log(`端口${port}已被占用，尝试使用端口${port + 10}`);
-                socketServer.startSocketServer(port + 10);
-            } else {
-                console.error(err);
-            }
-        });
-        server.once('listening', () => {
-            server.close();
-            this.wss = new WebSocketServer({ port: port });
-            config.SocketIOPORT = port;
-            console.log("socket服务器已启动：");
-            console.log(`ws://${config.URL}:${port}`);
-            this.wss.on('connection', (ws) => {
-                console.log('A user connected');
-                ws.on('close', () => {
-                    console.log('A user disconnected');
-                });
-
-                ws.on('message', (message: string) => {
-                    let data = JSON.parse(message);
-                    this.selectAction(data, ws);
-
-                });
+        return new Promise((resolve, reject) => {
+            const server = net.createServer();
+            server.once('error', (err: any) => {
+                if (err.code === 'EADDRINUSE') {
+                    console.log(`端口${port}已被占用，尝试使用端口${port + 10}`);
+                    resolve(socketServer.startSocketServer(port + 10));
+                } else {
+                    reject(err);
+                }
             });
-            eventSystem.on('msgSaved', this.sendMsg.bind(this));
+            server.once('listening', () => {
+                server.close();
+                this.wss = new WebSocketServer({ port: port });
+                config.SocketIOPORT = port;
+                console.log("socket服务器已启动：");
+                console.log(`ws://${config.URL}:${port}`);
+                this.wss.on('connection', (ws) => {
+                    console.log('A user connected');
+                    ws.on('close', () => {
+                        console.log('A user disconnected');
+                    });
+
+                    ws.on('message', (message: string) => {
+                        let data = JSON.parse(message);
+                        this.selectAction(data, ws);
+                    });
+                });
+                eventSystem.on('msgSaved', this.sendMsg.bind(this));
+                resolve(true);
+            });
+            server.listen(port);
         });
-        server.listen(port);
     }
 
     static sendMsg(msg: msgType) {
