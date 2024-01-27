@@ -3,10 +3,11 @@ import { actionType, colorType, dialogType, msgType, socketInfoType } from "./da
 import { eventSystem } from "./eventSystem";
 import { item } from "./item";
 import { logger } from "./logger";
+import { myHttp } from "./myHttp";
+import { mySocket } from "./mySocket";
 import { objectPool } from "./objectPool";
 
 export class index {
-    private socket: WebSocket;
     fileInput: any;
     textInput: any;
     statusText: any;
@@ -20,11 +21,6 @@ export class index {
     itemList: item[];
 
     private aHref: HTMLAnchorElement;
-
-    private maxReconnectAttempts = 3;
-    private reconnectAttempts = 0;
-    private reconnectInterval = 3000; // 3 seconds
-    private timer: any;
 
     private _inputLock = false;
     get inputLock(): boolean {
@@ -115,30 +111,63 @@ export class index {
         }
     }
 
+    onSocketMessage(event: MessageEvent) {
+        let data = event.data;
+        data = JSON.parse(data);
+        switch (data.action) {
+            case "add":
+                this.createItem(data);
+                break;
+            case "delete":
+                this.removeItem(data.fileOrTextHash);
+                break;
+            case "update":
+                this.updateItem(data);
+                break;
+        }
+    }
+
+    onSocketOpen() {
+        this.showTips("连接成功", "green");
+        this.inputLock = false;
+        // 向服务器发送一个请求所有数据的消息
+        let data: actionType = { action: 'update' };
+        this.sendSocketMsg(JSON.stringify(data));
+    }
+
+    onSocketClose(isReconnect: boolean) {
+        this.inputLock = true;
+        if (!isReconnect) {
+            this.showTips("服务器已关闭", "red");
+        } else {
+            this.showTips("正在重连...", "blue");
+        }
+    }
+
+    sendSocketMsg(msg: string) {
+        mySocket.send(msg);
+    }
+
+
+
+
     getSocketInfo() {
-        fetch('/getSocketInfo')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(response.statusText);
-                }
-                return response.text();
-            })
-            .then(data => {
-                let socketInfo: socketInfoType = JSON.parse(data);
+
+        myHttp.getSocketInfo<socketInfoType>()
+            .then((socketInfo) => {
                 config.URL = socketInfo.socketURL;
                 config.SocketIOPORT = socketInfo.socketPORT;
                 config.version = socketInfo.version;
-                this.initSocket();
+                mySocket.initSocket(this.onSocketMessage.bind(this), this.onSocketOpen.bind(this), this.onSocketClose.bind(this));
                 logger.log("当前版本" + config.version);
             })
-            .catch(error => {
+            .catch((error) => {
                 console.warn(error);
                 this.showTips("获取socket信息失败", "red");
-            })
+            });
     }
     sendMsg() {
         let timeoutId: any = null;
-
         this.text = this.textInput.value;
         if (!this.fileInput!.files.length && !this.text) {
             this.showAlertOrDialog('请选择文件或输入文本');
@@ -154,20 +183,12 @@ export class index {
         if (timeoutId !== null) {
             clearTimeout(timeoutId);
         }
-        fetch('/upload', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(response.statusText);
-                }
-                return response.text();
-            })
-            .then(data => {
 
+        myHttp.sendMsg(formData)
+            .then((data) => {
+                console.log(data);
             })
-            .catch(error => {
+            .catch((error) => {
                 this.showAlertOrDialog("文件发送失败,可能因为服务器已经存在该文件", "发送失败");
                 console.warn(error);
             })
@@ -180,53 +201,8 @@ export class index {
                 this.fileInput.disabled = false;
                 this.textInput.disabled = false;
             });
-
     }
-    initSocket() {
-        this.socket = new WebSocket(`ws://${config.URL}:${config.SocketIOPORT}`);
 
-        this.socket.onmessage = (event) => {
-            let data = event.data;
-            data = JSON.parse(data);
-            // console.log(data);
-            switch (data.action) {
-                case "add":
-                    this.createItem(data);
-                    break;
-                case "delete":
-                    this.removeItem(data.fileOrTextHash);
-                    break;
-                case "update":
-                    this.updateItem(data);
-                    break;
-            }
-        }
-        this.socket.onopen = () => {
-            // 向服务器发送一个请求所有数据的消息
-            let data: actionType = { action: 'update' };
-            this.socket.send(JSON.stringify(data));
-            this.showTips("连接成功", "green");
-            this.inputLock = false;
-            this.reconnectAttempts = 0;
-            if (this.timer) {
-                clearInterval(this.timer);
-            }
-        }
-        this.socket.onclose = () => {
-            this.inputLock = true;
-            setTimeout(() => {
-                if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-                    this.showTips("服务器已关闭", "red");
-                    console.warn("服务器已关闭");
-                } else {
-                    this.showTips("正在重连...", "blue");
-                    this.initSocket();
-                    this.reconnectAttempts++;
-                }
-            }, this.reconnectInterval);
-        }
-
-    }
     addEvent() {
         eventSystem.on('deleteItem', this.deleteItem.bind(this));
         eventSystem.on('downloadFile', this.downloadFile.bind(this));
@@ -291,7 +267,7 @@ export class index {
 
     deleteItem(fileOrTextHash: string) {
         let data: actionType = { action: 'delete', fileOrTextHash: fileOrTextHash };
-        this.socket?.send(JSON.stringify(data));
+        this.sendSocketMsg(JSON.stringify(data));
     }
 
     downloadFile(url: string, fileName: string) {
