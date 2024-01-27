@@ -1,9 +1,11 @@
-export class myHttp {
+import { config } from "./config";
+
+export class httpMgr {
     constructor() {
 
     }
     static getSocketInfo<T>(): Promise<T> {
-        return fetch('/getSocketInfo')
+        return fetch(config.httpApi.getSocketInfo)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(response.statusText);
@@ -13,7 +15,7 @@ export class myHttp {
     }
 
     static sendMsg(formData: FormData): Promise<string> {
-        return fetch('/upload', {
+        return fetch(config.httpApi.upload, {
             method: 'POST',
             body: formData
         })

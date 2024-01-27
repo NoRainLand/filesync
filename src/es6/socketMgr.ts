@@ -1,6 +1,6 @@
 import { config } from "./config";
 
-export class mySocket {
+export class socketMgr {
     constructor() {
 
     }
@@ -10,8 +10,14 @@ export class mySocket {
     private static _onSocketMessage: Function;
     private static maxReconnectAttempts = 3;
     private static reconnectAttempts = 0;
-    private static reconnectInterval = 3000; // 3 seconds
+    private static reconnectInterval = 3000;
     private static socketTimer: any;
+
+    private static lostConnectTime: number = 40000;
+    private static heartBeatTime: number = 30000;
+    private static heartBeatTimer: any;
+    private static reconnectTimes: number = 4;
+    private static reconnectTime: number = 3000;
 
 
     static initSocket(onSocketMessage?: Function, onSocketOpen?: Function, onSocketClose?: Function) {

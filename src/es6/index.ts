@@ -1,11 +1,12 @@
 import { config } from "./config";
 import { actionType, colorType, dialogType, msgType, socketInfoType } from "./dataType";
 import { eventSystem } from "./eventSystem";
+import { httpMgr } from "./httpMgr";
 import { item } from "./item";
 import { logger } from "./logger";
-import { myHttp } from "./myHttp";
-import { mySocket } from "./mySocket";
 import { objectPool } from "./objectPool";
+import { socketMgr } from "./socketMgr";
+import { tipsMgr } from "./tipsMgr";
 
 export class index {
     fileInput: any;
@@ -35,19 +36,12 @@ export class index {
     sendTimeout: number = 500;
 
 
-    dialog: HTMLDialogElement;
-    dialogTitle: HTMLHeadingElement;
-    dialogContent: HTMLParagraphElement;
-    dialogCloseButton: HTMLButtonElement;
 
     themeButtonSvg: HTMLElement;
 
     qrcodeButtonSvg: HTMLElement;
 
-    qrcode: any;
-    qrcodeDiv: HTMLElement;
 
-    imgQrCode: HTMLImageElement;
 
     private _isDark: number = -1;
     get isDark(): boolean {
@@ -72,34 +66,31 @@ export class index {
     }
 
     init() {
-        this.fileInput = document.getElementById('fileInput');
-        this.textInput = document.getElementById('textInput');
-        this.statusText = document.getElementById('statusText');
-        this.uploadButton = document.getElementById('uploadButton') as HTMLButtonElement;
-        this.dialog = document.querySelector('dialog') as HTMLDialogElement;
-        this.dialogTitle = document.querySelector('dialog article header h6')!;
-        this.dialogContent = document.querySelector('dialog article p')!;
-        this.dialogCloseButton = document.querySelector('dialog article header a')!;
-        this.fileList = document.getElementById('fileList') as HTMLUListElement;
-
-        this.themeButtonSvg = document.getElementById('themeButton') as HTMLElement;
-        this.initTheme();
-
-        this.qrcodeButtonSvg = document.getElementById('qrcodeButton') as HTMLElement;
-
-        this.qrcodeDiv = document.getElementById('qrcodeDiv') as HTMLElement;
-        this.qrcode = new ((window as any).QRCode)("qrcodeDiv");
-        this.imgQrCode = this.qrcodeDiv.getElementsByTagName("img")[0] as HTMLImageElement;
-
+        this.getUI();
         this.inputLock = false;
         this.msgList = [];
         this.msgHashArr = [];
         this.itemList = [];
         this.itemPool = new objectPool(() => new item());
+        this.initTheme();
+
         this.getSocketInfo();
         this.addEvent();
         logger.tranLogger();
     }
+
+    getUI() {
+        this.fileInput = document.getElementById('fileInput');
+        this.textInput = document.getElementById('textInput');
+        this.statusText = document.getElementById('statusText');
+        this.uploadButton = document.getElementById('uploadButton') as HTMLButtonElement;
+
+        this.fileList = document.getElementById('fileList') as HTMLUListElement;
+        this.themeButtonSvg = document.getElementById('themeButton') as HTMLElement;
+        this.qrcodeButtonSvg = document.getElementById('qrcodeButton') as HTMLElement;
+
+    }
+
 
     initTheme() {
         if (this.isDark) {
@@ -122,11 +113,6 @@ export class index {
                     this.sendMsg();
                 }
             }
-        });
-
-        this.dialogCloseButton.addEventListener('click', (event) => {
-            event.preventDefault();
-            this.dialog.close();
         });
 
         this.themeButtonSvg.addEventListener('click', () => {
@@ -223,35 +209,19 @@ export class index {
     }
 
     showAlertOrDialog(content: string, title: string = "提示", type: dialogType = "msg") {
-        this.dialogTitle.textContent = title;
-        if (type == "msg") {
-            this.dialogContent.textContent = content;
-            this.qrcode.clear();
-            this.qrcodeDiv.className = config.hideQrcodeDivClass;
-            if (this.imgQrCode) {
-                this.imgQrCode.style.display = "none";
-            }
-        } else if (type == "qrcode") {
-            this.dialogContent.textContent = "";
-            this.qrcode.makeCode(content);
-            this.qrcodeDiv.className = config.showQrcodeDivClass;
-            if (this.imgQrCode) {
-                this.imgQrCode.style.display = "block";
-            }
-        }
-        this.dialog.showModal();
+        tipsMgr.showAlert(content, title, type);
     }
 
 
     //-------------http-----------------
 
     getSocketInfo() {
-        myHttp.getSocketInfo<socketInfoType>()
+        httpMgr.getSocketInfo<socketInfoType>()
             .then((socketInfo) => {
                 config.URL = socketInfo.socketURL;
                 config.SocketIOPORT = socketInfo.socketPORT;
                 config.version = socketInfo.version;
-                mySocket.initSocket(this.onSocketMessage.bind(this), this.onSocketOpen.bind(this), this.onSocketClose.bind(this));
+                socketMgr.initSocket(this.onSocketMessage.bind(this), this.onSocketOpen.bind(this), this.onSocketClose.bind(this));
                 logger.log("当前版本" + config.version);
             })
             .catch((error) => {
@@ -261,7 +231,7 @@ export class index {
     }
 
     sendHttpMsg(formData: FormData) {
-        myHttp.sendMsg(formData)
+        httpMgr.sendMsg(formData)
             .then((data) => {
                 console.log(data);
             })
@@ -317,7 +287,7 @@ export class index {
     }
 
     sendSocketMsg(msg: string) {
-        mySocket.send(msg);
+        socketMgr.send(msg);
     }
 }
 
