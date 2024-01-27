@@ -111,98 +111,6 @@ export class index {
         }
     }
 
-    onSocketMessage(event: MessageEvent) {
-        let data = event.data;
-        data = JSON.parse(data);
-        switch (data.action) {
-            case "add":
-                this.createItem(data);
-                break;
-            case "delete":
-                this.removeItem(data.fileOrTextHash);
-                break;
-            case "update":
-                this.updateItem(data);
-                break;
-        }
-    }
-
-    onSocketOpen() {
-        this.showTips("连接成功", "green");
-        this.inputLock = false;
-        // 向服务器发送一个请求所有数据的消息
-        let data: actionType = { action: 'update' };
-        this.sendSocketMsg(JSON.stringify(data));
-    }
-
-    onSocketClose(isReconnect: boolean) {
-        this.inputLock = true;
-        if (!isReconnect) {
-            this.showTips("服务器已关闭", "red");
-        } else {
-            this.showTips("正在重连...", "blue");
-        }
-    }
-
-    sendSocketMsg(msg: string) {
-        mySocket.send(msg);
-    }
-
-
-
-
-    getSocketInfo() {
-
-        myHttp.getSocketInfo<socketInfoType>()
-            .then((socketInfo) => {
-                config.URL = socketInfo.socketURL;
-                config.SocketIOPORT = socketInfo.socketPORT;
-                config.version = socketInfo.version;
-                mySocket.initSocket(this.onSocketMessage.bind(this), this.onSocketOpen.bind(this), this.onSocketClose.bind(this));
-                logger.log("当前版本" + config.version);
-            })
-            .catch((error) => {
-                console.warn(error);
-                this.showTips("获取socket信息失败", "red");
-            });
-    }
-    sendMsg() {
-        let timeoutId: any = null;
-        this.text = this.textInput.value;
-        if (!this.fileInput!.files.length && !this.text) {
-            this.showAlertOrDialog('请选择文件或输入文本');
-            return;
-        }
-        this.inputLock = true;
-        const file = this.fileInput!.files[0];
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('text', this.text);
-        this.fileInput.disabled = true;
-        this.textInput.disabled = true;
-        if (timeoutId !== null) {
-            clearTimeout(timeoutId);
-        }
-
-        myHttp.sendMsg(formData)
-            .then((data) => {
-                console.log(data);
-            })
-            .catch((error) => {
-                this.showAlertOrDialog("文件发送失败,可能因为服务器已经存在该文件", "发送失败");
-                console.warn(error);
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    this.inputLock = false;
-                }, this.sendTimeout);
-                this.fileInput.value = '';
-                this.textInput.value = '';
-                this.fileInput.disabled = false;
-                this.textInput.disabled = false;
-            });
-    }
-
     addEvent() {
         eventSystem.on('deleteItem', this.deleteItem.bind(this));
         eventSystem.on('downloadFile', this.downloadFile.bind(this));
@@ -230,6 +138,29 @@ export class index {
             this.showAlertOrDialog(window.location.href, "当前网址", "qrcode");
         });
     }
+
+
+    sendMsg() {
+        let timeoutId: any = null;
+        this.text = this.textInput.value;
+        if (!this.fileInput!.files.length && !this.text) {
+            this.showAlertOrDialog('请选择文件或输入文本');
+            return;
+        }
+        this.inputLock = true;
+        const file = this.fileInput!.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('text', this.text);
+        this.fileInput.disabled = true;
+        this.textInput.disabled = true;
+        if (timeoutId !== null) {
+            clearTimeout(timeoutId);
+        }
+        this.sendHttpMsg(formData);
+    }
+
+    //-------------item-----------------
 
     createItem(msg: msgType) {
         if (this.msgList.length > 100) {
@@ -282,6 +213,7 @@ export class index {
         document.body.removeChild(this.aHref);
     }
 
+    //-------------提示-----------------
 
     showTips(msg: string, color: colorType) {
         if (this.statusText) {
@@ -308,6 +240,84 @@ export class index {
             }
         }
         this.dialog.showModal();
+    }
+
+
+    //-------------http-----------------
+
+    getSocketInfo() {
+        myHttp.getSocketInfo<socketInfoType>()
+            .then((socketInfo) => {
+                config.URL = socketInfo.socketURL;
+                config.SocketIOPORT = socketInfo.socketPORT;
+                config.version = socketInfo.version;
+                mySocket.initSocket(this.onSocketMessage.bind(this), this.onSocketOpen.bind(this), this.onSocketClose.bind(this));
+                logger.log("当前版本" + config.version);
+            })
+            .catch((error) => {
+                console.warn(error);
+                this.showTips("获取socket信息失败", "red");
+            });
+    }
+
+    sendHttpMsg(formData: FormData) {
+        myHttp.sendMsg(formData)
+            .then((data) => {
+                console.log(data);
+            })
+            .catch((error) => {
+                this.showAlertOrDialog("文件发送失败,可能因为服务器已经存在该文件", "发送失败");
+                console.warn(error);
+            })
+            .finally(() => {
+                setTimeout(() => {
+                    this.inputLock = false;
+                }, this.sendTimeout);
+                this.fileInput.value = '';
+                this.textInput.value = '';
+                this.fileInput.disabled = false;
+                this.textInput.disabled = false;
+            });
+    }
+
+
+    //-------------socket-----------------
+
+    onSocketMessage(event: MessageEvent) {
+        let data = event.data;
+        data = JSON.parse(data);
+        switch (data.action) {
+            case "add":
+                this.createItem(data);
+                break;
+            case "delete":
+                this.removeItem(data.fileOrTextHash);
+                break;
+            case "update":
+                this.updateItem(data);
+                break;
+        }
+    }
+
+    onSocketOpen() {
+        this.showTips("连接成功", "green");
+        this.inputLock = false;
+        // 向服务器发送一个请求所有数据的消息
+        let data: actionType = { action: 'update' };
+        this.sendSocketMsg(JSON.stringify(data));
+    }
+
+    onSocketClose(isReconnect: boolean) {
+        this.inputLock = true;
+        if (!isReconnect) {
+            this.showTips("服务器已关闭", "red");
+        } else {
+            this.showTips("正在重连...", "blue");
+        }
+    }
+
+    sendSocketMsg(msg: string) {
+        mySocket.send(msg);
     }
 }
 
