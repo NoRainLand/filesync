@@ -15,8 +15,13 @@ export class tipsMgr {
 
     private static _myDialog: myDialog;
 
-    static showTips(msg: string) {
+    private static _myTips: myTips;
 
+    static showTips(msg: string) {
+        if (!this._myTips) {
+            this._myTips = new myTips(this.body);
+        }
+        this._myTips.showTips(msg);
     }
 
     static showDialog(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示",) {
@@ -154,5 +159,55 @@ class myAlert {
             }
         }
         this.dialog.showModal();
+    }
+}
+
+class myTips {
+    private parent: HTMLElement;
+    private tipsPoor: HTMLElement[];
+    constructor(parent: HTMLElement) {
+        this.parent = parent;
+        this.tipsPoor = [];
+    }
+
+    showTips(msg: string) {
+        let tips = this.createTips();
+        tips.textContent = msg;
+
+
+        tips.style.position = 'fixed';
+        tips.style.left = '50%';
+        tips.style.top = '50%';
+        tips.style.transform = 'translate(-50%, -50%)';
+        tips.style.transition = 'all 1.5s ease-in-out';
+
+        tips.style.opacity = '1';
+        let self = this;
+        setTimeout(() => {
+            tips.style.top = '30%';
+            tips.style.opacity = '0';
+            setTimeout(() => {
+                self.recoverTips(tips);
+            }, 1500);
+        }, 1500);
+
+    }
+
+    private createTips(): HTMLElement {
+        let tips = this.tipsPoor.pop();
+        if (!tips) {
+            tips = document.createElement("article");
+            tips.className = "tips";
+            tips.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
+            tips.style.borderRadius = "10px";
+            tips.style.color = "white";
+            this.parent.appendChild(tips);
+        }
+        return tips;
+    }
+    private recoverTips(tips: HTMLElement) {
+        this.parent.removeChild(tips);
+        tips.textContent = "";
+        this.tipsPoor.push(tips);
     }
 }

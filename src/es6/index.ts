@@ -130,7 +130,7 @@ export class index {
         let timeoutId: any = null;
         this.text = this.textInput.value;
         if (!this.fileInput!.files.length && !this.text) {
-            this.showAlertOrDialog('请选择文件或输入文本');
+            tipsMgr.showTips('请选择文件或输入文本');
             return;
         }
         this.inputLock = true;
