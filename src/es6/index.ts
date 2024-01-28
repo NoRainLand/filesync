@@ -239,7 +239,7 @@ export class index {
     sendHttpMsg(formData: FormData) {
         httpMgr.sendMsg(formData)
             .then((data) => {
-                // console.log(data);
+                console.log(data);
             })
             .catch((error) => {
                 tipsMgr.showAlert("文件发送失败,可能因为服务器已经存在该文件", "发送失败");
