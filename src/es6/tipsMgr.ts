@@ -24,11 +24,11 @@ export class tipsMgr {
         this._myTips.showTips(msg);
     }
 
-    static showDialog(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示",) {
+    static showDialog(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示", onlySure: boolean = false) {
         if (!this._myDialog) {
             this._myDialog = new myDialog(this.body);
         }
-        this._myDialog.showDialog(content, caller, sure, cancel, title);
+        this._myDialog.showDialog(content, caller, sure, cancel, title, onlySure);
     }
     static showAlert(content: string, title: string = "提示", type: dialogType = "msg", caller: any = null, callback: Function | null = null) {
         if (!this._myAlert) {
@@ -90,12 +90,19 @@ class myDialog {
             this._caller = null;
         });
     }
-    showDialog(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示",) {
+    showDialog(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示", onlySure: boolean = false) {
         this._caller = caller;
         this._sure = sure;
         this._cancel = cancel;
         this.dialogTitle.textContent = title;
         this.dialogContent.textContent = content;
+        if (onlySure) {
+            this.dialogCancelButton.style.display = "none";
+            this.dialogCloseButton.style.display = "none";
+        } else {
+            this.dialogCancelButton.style.display = "inline-block";
+            this.dialogCloseButton.style.display = "inline-block";
+        }
         this.dialog.showModal();
     }
 
@@ -198,9 +205,7 @@ class myTips {
         if (!tips) {
             tips = document.createElement("article");
             tips.className = "tips";
-            tips.style.backgroundColor = "rgba(0, 0, 0, 0.5)";
             tips.style.borderRadius = "10px";
-            tips.style.color = "white";
             this.parent.appendChild(tips);
         }
         return tips;

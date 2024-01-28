@@ -1,5 +1,5 @@
 import { config } from "./config";
-import { actionType, colorType, dialogType, msgType, socketInfoType } from "./dataType";
+import { actionType, colorType, msgType, socketInfoType } from "./dataType";
 import { eventSystem } from "./eventSystem";
 import { httpMgr } from "./httpMgr";
 import { item } from "./item";
@@ -12,7 +12,6 @@ export class index {
     fileInput: any;
     textInput: any;
     statusText: any;
-    text = '';
     uploadButton: HTMLButtonElement;
     fileList: HTMLElement;
     msgList: msgType[];
@@ -34,13 +33,8 @@ export class index {
         this.textInput.placeholder = value ? "发送中…" : "等待输入…";
     }
     sendTimeout: number = 500;
-
-
-
     themeButtonSvg: HTMLElement;
-
     qrcodeButtonSvg: HTMLElement;
-
 
 
     private _isDark: number = -1;
@@ -121,15 +115,15 @@ export class index {
         });
 
         this.qrcodeButtonSvg.addEventListener('click', () => {
-            this.showAlertOrDialog(window.location.href, "当前网址", "qrcode");
+            tipsMgr.showAlert(window.location.href, "当前网址", "qrcode");
         });
     }
 
 
     sendMsg() {
         let timeoutId: any = null;
-        this.text = this.textInput.value;
-        if (!this.fileInput!.files.length && !this.text) {
+        let text = this.textInput.value;
+        if (!this.fileInput!.files.length && !text) {
             tipsMgr.showTips('请选择文件或输入文本');
             return;
         }
@@ -137,7 +131,7 @@ export class index {
         const file = this.fileInput!.files[0];
         const formData = new FormData();
         formData.append('file', file);
-        formData.append('text', this.text);
+        formData.append('text', text);
         this.fileInput.disabled = true;
         this.textInput.disabled = true;
         if (timeoutId !== null) {
@@ -201,17 +195,12 @@ export class index {
 
     //-------------提示-----------------
 
-    showTips(msg: string, color: colorType) {
+    showMsg(msg: string, color: colorType) {
         if (this.statusText) {
             this.statusText.textContent = msg;
             this.statusText.style.color = color;
         }
     }
-
-    showAlertOrDialog(content: string, title: string = "提示", type: dialogType = "msg") {
-        tipsMgr.showAlert(content, title, type);
-    }
-
 
     //-------------http-----------------
 
@@ -226,7 +215,7 @@ export class index {
             })
             .catch((error) => {
                 console.warn(error);
-                this.showTips("获取socket信息失败", "red");
+                this.showMsg("获取socket信息失败", "red");
             });
     }
 
@@ -236,7 +225,7 @@ export class index {
                 console.log(data);
             })
             .catch((error) => {
-                this.showAlertOrDialog("文件发送失败,可能因为服务器已经存在该文件", "发送失败");
+                tipsMgr.showAlert("文件发送失败,可能因为服务器已经存在该文件", "发送失败");
                 console.warn(error);
             })
             .finally(() => {
@@ -270,7 +259,7 @@ export class index {
     }
 
     onSocketOpen() {
-        this.showTips("连接成功", "green");
+        this.showMsg("连接成功", "green");
         this.inputLock = false;
         // 向服务器发送一个请求所有数据的消息
         let data: actionType = { action: 'update' };
@@ -280,9 +269,9 @@ export class index {
     onSocketClose(isReconnect: boolean) {
         this.inputLock = true;
         if (!isReconnect) {
-            this.showTips("服务器已关闭", "red");
+            this.showMsg("服务器已关闭", "red");
         } else {
-            this.showTips("正在重连...", "blue");
+            this.showMsg("正在重连...", "blue");
         }
     }
 
