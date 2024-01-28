@@ -2,7 +2,7 @@ import * as net from 'net';
 import { Server as WebSocketServer } from 'ws';
 import { config } from './config';
 import { dataCtrl } from './dataCtrl';
-import { actionType, msgType } from './dataType';
+import { actionType, heartBeatType, msgType } from './dataType';
 import { eventSystem } from './eventSystem';
 import { fileCtrl } from './fileCtrl';
 
@@ -30,23 +30,25 @@ export class socketServer {
                 config.SocketIOPORT = port;
                 console.log("socket服务器已启动：");
                 console.log(`ws://${config.URL}:${port}`);
-                this.wss.on('connection', (ws) => {
-                    console.log('A user connected');
-                    ws.on('close', () => {
-                        console.log('A user disconnected');
-                    });
-
-                    ws.on('message', (message: string) => {
-                        let data = JSON.parse(message);
-                        this.selectAction(data, ws);
-                    });
-                });
+                this.wss.on('connection', socketServer.onSocketConnection.bind(socketServer));
                 eventSystem.on('msgSaved', this.sendMsg.bind(this));
                 resolve(true);
             });
             server.listen(port);
         });
     }
+
+    static onSocketConnection(ws: any) {
+        ws.on('close', () => {
+            console.log('A user disconnected');
+        });
+
+        ws.on('message', (message: string) => {
+            let data = JSON.parse(message);
+            this.selectAction(data, ws);
+        });
+    }
+
 
     static sendMsg(msg: msgType) {
         msg.action = 'add';
@@ -55,8 +57,11 @@ export class socketServer {
         });
     }
 
-    static selectAction(data: actionType, ws: any) {
+    static selectAction(data: actionType | heartBeatType, ws: any) {
         switch (data.action) {
+            case 'heartBeat':
+                ws.send(JSON.stringify({ action: 'heartBeat', salt: data.salt }));
+                break;
             case 'delete':
                 dataCtrl.getMsgTypeByHash(data.fileOrTextHash!).then((msgType: msgType) => {
                     if (msgType.msgType === 'file') {

@@ -1,5 +1,5 @@
 import { config } from "./config";
-import { actionType, colorType, msgType, socketInfoType } from "./dataType";
+import { actionType, colorType, msgType, socketInfoType, updateMsgType } from "./dataType";
 import { eventSystem } from "./eventSystem";
 import { httpMgr } from "./httpMgr";
 import { item } from "./item";
@@ -117,6 +117,23 @@ export class index {
         this.qrcodeButtonSvg.addEventListener('click', () => {
             tipsMgr.showAlert(window.location.href, "当前网址", "qrcode");
         });
+
+        eventSystem.on('socketEvent', (msg: { event: "onmessage" | "onopen" | "onclose" | "onerror", data: any }) => {
+            switch (msg.event) {
+                case "onmessage":
+                    this.onSocketMessage(msg.data);
+                    break;
+                case "onopen":
+                    this.onSocketOpen();
+                    break;
+                case "onclose":
+                    this.onSocketClose(msg.data);
+                    break;
+                case "onerror":
+                    this.onSocketError(msg.data);
+                    break;
+            }
+        });
     }
 
 
@@ -169,7 +186,7 @@ export class index {
         }
     }
 
-    updateItem(msgs: { action: string, msgs: msgType[] }) {
+    updateItem(msgs: updateMsgType) {
         msgs.msgs.forEach((msg) => {
             this.createItem(msg);
         });
@@ -210,7 +227,7 @@ export class index {
                 config.URL = socketInfo.socketURL;
                 config.SocketIOPORT = socketInfo.socketPORT;
                 config.version = socketInfo.version;
-                socketMgr.initSocket(this.onSocketMessage.bind(this), this.onSocketOpen.bind(this), this.onSocketClose.bind(this));
+                socketMgr.initSocket();
                 logger.log("当前版本" + config.version);
             })
             .catch((error) => {
@@ -222,7 +239,7 @@ export class index {
     sendHttpMsg(formData: FormData) {
         httpMgr.sendMsg(formData)
             .then((data) => {
-                console.log(data);
+                // console.log(data);
             })
             .catch((error) => {
                 tipsMgr.showAlert("文件发送失败,可能因为服务器已经存在该文件", "发送失败");
@@ -242,9 +259,7 @@ export class index {
 
     //-------------socket-----------------
 
-    onSocketMessage(event: MessageEvent) {
-        let data = event.data;
-        data = JSON.parse(data);
+    onSocketMessage(data: msgType) {
         switch (data.action) {
             case "add":
                 this.createItem(data);
@@ -253,7 +268,7 @@ export class index {
                 this.removeItem(data.fileOrTextHash);
                 break;
             case "update":
-                this.updateItem(data);
+                this.updateItem(data as any);//updateMsgType
                 break;
         }
     }
@@ -270,9 +285,16 @@ export class index {
         this.inputLock = true;
         if (!isReconnect) {
             this.showMsg("服务器已关闭", "red");
+            tipsMgr.showDialog("断开连接", this, () => {
+                location.reload();
+            }, null, "提示", true);
         } else {
             this.showMsg("正在重连...", "blue");
         }
+    }
+
+    onSocketError(event: Event) {
+
     }
 
     sendSocketMsg(msg: string) {
