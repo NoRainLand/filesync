@@ -1,12 +1,21 @@
+import fs from 'fs';
 import sqlite3 from 'sqlite3';
+import { config } from './config';
 import { msgType } from './dataType';
 export class dataHandler {
     private static db: sqlite3.Database;
     private static tableName: string;
+
     static async openDatabase(dbPath: string, tableName: string) {
-        this.db = await new sqlite3.Database(dbPath);
+        const dbExists = fs.existsSync(dbPath);
+        console.warn("数据库存在" + dbExists);
         this.tableName = tableName;
-        this.db.run(`CREATE TABLE IF NOT EXISTS ${tableName} (fileName TEXT, fileOrTextHash TEXT, timestamp INTEGER, text TEXT, msgType TEXT,url TEXT,size INTEGER)`);
+        this.db = await new sqlite3.Database(dbPath);
+        await this.db.run(`CREATE TABLE IF NOT EXISTS ${tableName} (fileName TEXT, fileOrTextHash TEXT, timestamp INTEGER, text TEXT, msgType TEXT,url TEXT,size INTEGER)`, () => {
+            if (!dbExists) {
+                this.writeToDatabase((config.wellcomeMsg as any));
+            }
+        });
         console.log(`Database ${dbPath} opened`);
     }
 
@@ -15,8 +24,8 @@ export class dataHandler {
         await this.writeToDatabase(msg);
     }
     static async writeToDatabase(msg: msgType) {
-        const { fileName, fileOrTextHash, timestamp, text, msgType, url,size } = msg;
-        this.db.run(`INSERT INTO ${this.tableName} (fileName, fileOrTextHash, timestamp, text, msgType, url ,size) VALUES (?, ?, ?, ?, ? ,? ,?)`, [fileName, fileOrTextHash, timestamp, text, msgType, url ,size]);
+        const { fileName, fileOrTextHash, timestamp, text, msgType, url, size } = msg;
+        this.db.run(`INSERT INTO ${this.tableName} (fileName, fileOrTextHash, timestamp, text, msgType, url ,size) VALUES (?, ?, ?, ?, ? ,? ,?)`, [fileName, fileOrTextHash, timestamp, text, msgType, url, size]);
     }
     static async deleteFromDatabase(hash: string) {
         this.db.run(`DELETE FROM ${this.tableName} WHERE fileOrTextHash = ?`, hash);

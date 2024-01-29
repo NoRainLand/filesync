@@ -59,7 +59,6 @@ export class httpServer {
                 const stream = fs.createReadStream(req.file.path);
                 stream.on('data', (data) => hash.update(data));
                 stream.on('end', () => {
-                    console.log('req.file.path', req.file!.path);
                     const fileHash = hash.digest('hex');
                     req.file!.originalname = Buffer.from(req.file!.originalname, "latin1").toString('utf8');
                     if (this.fileHashes.indexOf(fileHash) !== -1) {

@@ -14,7 +14,7 @@ export class config {
         "/favicon.ico": "favicon.ico",
         "/pico.min.css": "pico.min.css",
         "/qrcode.min.js": "qrcode.min.js",
-        "/vconsole.min.js":"vconsole.min.js"
+        "/vconsole.min.js": "vconsole.min.js"
     }
 
     static serverConfigPath = "./serverConfig.json";
@@ -26,6 +26,14 @@ export class config {
             "http_port": config.HTTPPORT,
             "socket_port": config.SocketIOPORT
         };
+    }
+
+    static wellcomeMsg = {
+        msgType: 'text',
+        fileOrTextHash: '850f3be40c4b93f7dd0910942d1e5a23',
+        timestamp: 1706526142353,
+        text: '是信息，好耶！<copyright by NoRain>',
+        size: 0
     }
 
 }
