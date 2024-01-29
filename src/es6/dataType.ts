@@ -1,3 +1,11 @@
+export type socketActionType = "add" | "delete" | "full" | "heartBeat";
+
+export type socketMsgType = {
+    action: socketActionType,
+    timeStamp?: number,
+    data?: any,
+}
+
 export type msgType = {
     msgType: 'file' | 'text',
     fileOrTextHash: string,
@@ -5,27 +13,24 @@ export type msgType = {
     fileName?: string,
     text?: string,
     url?: string,
-    action?: "add" | "delete" | "update"
     size: number,
 }
 
-export type updateMsgType = { action: string, msgs: msgType[] };
+export type actionFullMsgType = { msgs: msgType[] };
 
-export type heartBeatType = { action: "heartBeat", salt: string };
+export type actionDelteType = { fileOrTextHash: string }
 
-export type actionType = {
-    action: "delete" | "update",
-    fileOrTextHash?: string,
-}
+export type actionAddType = { msg: msgType }
+
 
 export type socketInfoType = { "socketURL": string, "socketPORT": number, "version": string };
 
 
 //---------------本地-------------
 
-export type socketMsgType = { event: "onmessage" | "onopen" | "onclose" | "onerror", data: any }
+export type socketEventType = { event: "onmessage" | "onopen" | "onclose" | "onerror", data: any }
 
-export type eventType = "deleteItem" | "downloadFile" | "socketEvent";
+export type eventType = "deleteItem" | "downloadFile" | "socketEvent" | "visibilitychange";
 
 export type colorType = "red" | "blue" | "gray" | "green";
 

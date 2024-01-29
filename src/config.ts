@@ -14,6 +14,7 @@ export class config {
         "/favicon.ico": "favicon.ico",
         "/pico.min.css": "pico.min.css",
         "/qrcode.min.js": "qrcode.min.js",
+        "/vconsole.min.js":"vconsole.min.js"
     }
 
     static serverConfigPath = "./serverConfig.json";

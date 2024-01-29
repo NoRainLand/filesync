@@ -7,6 +7,8 @@ export class config {
     static showQrcodeDivClass: string = "showQrcodeDiv";
     static hideQrcodeDivClass: string = "hideQrcodeDiv";
 
+    static openVconsole: boolean = false;
+
     static httpApi = {
         getSocketInfo: "/getSocketInfo",
         upload: "/upload",

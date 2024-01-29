@@ -1,5 +1,5 @@
 import { config } from "./config";
-import { actionType, colorType, msgType, socketInfoType, updateMsgType } from "./dataType";
+import { actionAddType, actionDelteType, actionFullMsgType, colorType, msgType, socketInfoType, socketMsgType } from "./dataType";
 import { eventSystem } from "./eventSystem";
 import { httpMgr } from "./httpMgr";
 import { item } from "./item";
@@ -36,6 +36,7 @@ export class index {
     themeButtonSvg: HTMLElement;
     qrcodeButtonSvg: HTMLElement;
 
+    vConsole: any;
 
     private _isDark: number = -1;
     get isDark(): boolean {
@@ -71,6 +72,9 @@ export class index {
         this.getSocketInfo();
         this.addEvent();
         logger.tranLogger();
+        if (config.openVconsole) {
+            this.vConsole = new (window as any).VConsole();
+        }
     }
 
     getUI() {
@@ -118,21 +122,10 @@ export class index {
             tipsMgr.showAlert(window.location.href, "当前网址", "qrcode");
         });
 
-        eventSystem.on('socketEvent', (msg: { event: "onmessage" | "onopen" | "onclose" | "onerror", data: any }) => {
-            switch (msg.event) {
-                case "onmessage":
-                    this.onSocketMessage(msg.data);
-                    break;
-                case "onopen":
-                    this.onSocketOpen();
-                    break;
-                case "onclose":
-                    this.onSocketClose(msg.data);
-                    break;
-                case "onerror":
-                    this.onSocketError(msg.data);
-                    break;
-            }
+        eventSystem.on('socketEvent', this.onSocketEvent.bind(this));
+
+        document.addEventListener('visibilitychange', () => {
+            eventSystem.emit("visibilitychange", document.hidden);
         });
     }
 
@@ -157,26 +150,45 @@ export class index {
         this.sendHttpMsg(formData);
     }
 
-    //-------------item-----------------
 
-    createItem(msg: msgType) {
+    onSocketEvent(msg: { event: "onmessage" | "onopen" | "onclose" | "onerror", data: any }) {
+        switch (msg.event) {
+            case "onmessage":
+                this.onSocketMessage(msg.data);
+                break;
+            case "onopen":
+                this.onSocketOpen();
+                break;
+            case "onclose":
+                this.onSocketClose(msg.data);
+                break;
+            case "onerror":
+                this.onSocketError(msg.data);
+                break;
+        }
+    }
+
+    //-------------服务器下发-----------------
+
+    createItem(data: actionAddType | null, msg?: msgType) {
+        let itemData = data?.msg || msg;
         if (this.msgList.length > 100) {
             this.msgList.shift();
         }
-        if (this.msgHashArr.indexOf(msg.fileOrTextHash) == -1) {
+        if (this.msgHashArr.indexOf(itemData!.fileOrTextHash) == -1) {
             let item = this.itemPool.get();
-            item.setData(msg);
+            item.setData(itemData!);
             item.setMyParnet(this.fileList);
-            this.msgHashArr.push(msg.fileOrTextHash);
-            this.msgList.unshift(msg);
+            this.msgHashArr.push(itemData!.fileOrTextHash);
+            this.msgList.unshift(itemData!);
             this.itemList.unshift(item);
         }
     }
 
 
-    removeItem(fileOrTextHash: string) {
+    removeItem(data: actionDelteType) {
         for (let i = 0; i < this.msgList.length; i++) {
-            if (this.msgList[i].fileOrTextHash == fileOrTextHash) {
+            if (this.msgList[i].fileOrTextHash == data.fileOrTextHash) {
                 this.itemList[i].onRemoveItem();
                 this.msgList.splice(i, 1);
                 this.itemList.splice(i, 1);
@@ -186,15 +198,16 @@ export class index {
         }
     }
 
-    updateItem(msgs: updateMsgType) {
-        msgs.msgs.forEach((msg) => {
-            this.createItem(msg);
+    fullItem(data: actionFullMsgType) {
+        data.msgs.forEach((msg) => {
+            this.createItem(null, msg);
         });
     }
 
+    //--------------客户端操作----------------
 
     deleteItem(fileOrTextHash: string) {
-        let data: actionType = { action: 'delete', fileOrTextHash: fileOrTextHash };
+        let data: socketMsgType = { action: 'delete', data: fileOrTextHash };
         this.sendSocketMsg(JSON.stringify(data));
     }
 
@@ -259,16 +272,19 @@ export class index {
 
     //-------------socket-----------------
 
-    onSocketMessage(data: msgType) {
+    onSocketMessage(data: socketMsgType) {
         switch (data.action) {
             case "add":
-                this.createItem(data);
+                this.createItem(data.data);
                 break;
             case "delete":
-                this.removeItem(data.fileOrTextHash);
+                this.removeItem(data.data);
                 break;
-            case "update":
-                this.updateItem(data as any);//updateMsgType
+            case "full":
+                this.fullItem(data.data);//updateMsgType
+                break;
+            default:
+                console.warn("消息类型错误", data);
                 break;
         }
     }
@@ -277,7 +293,7 @@ export class index {
         this.showMsg("连接成功", "green");
         this.inputLock = false;
         // 向服务器发送一个请求所有数据的消息
-        let data: actionType = { action: 'update' };
+        let data: socketMsgType = { action: "full" }
         this.sendSocketMsg(JSON.stringify(data));
     }
 
@@ -285,7 +301,7 @@ export class index {
         this.inputLock = true;
         if (!isReconnect) {
             this.showMsg("服务器已关闭", "red");
-            tipsMgr.showDialog("断开连接", this, () => {
+            tipsMgr.showDialog("服务器已关闭，点击确定刷新页面", this, () => {
                 location.reload();
             }, null, "提示", true);
         } else {

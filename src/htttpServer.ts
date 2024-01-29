@@ -91,7 +91,8 @@ export class httpServer {
                     msgType: "text",
                     fileOrTextHash: textHash,
                     timestamp: Date.now(),
-                    text: text
+                    text: text,
+                    size: 0
                 };
                 dataCtrl.saveMsg(msg);
             }

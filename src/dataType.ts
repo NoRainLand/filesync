@@ -1,3 +1,11 @@
+export type socketActionType = "add" | "delete" | "full" | "heartBeat";
+
+export type socketMsgType = {
+    action: socketActionType,
+    timeStamp?: number,
+    data?: any,
+}
+
 export type msgType = {
     msgType: 'file' | 'text',
     fileOrTextHash: string,
@@ -5,16 +13,16 @@ export type msgType = {
     fileName?: string,
     text?: string,
     url?: string,
-    action?: "add" | "delete" | "update"
-    size?: number,
+    size: number,
 }
 
-export type heartBeatType = { action: "heartBeat", salt: string };
+export type actionFullMsgType = { msgs: msgType[] };
 
-export type actionType = {
-    action: "delete" | "update",
-    fileOrTextHash?: string,
-}
+export type actionDelteType = { fileOrTextHash: string }
+
+export type actionAddType = { msg: msgType }
+
+
 export type socketInfoType = { "socketURL": string, "socketPORT": number, "version": string };
 
 //---------------本地-------------

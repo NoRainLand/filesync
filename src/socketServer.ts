@@ -2,7 +2,7 @@ import * as net from 'net';
 import { Server as WebSocketServer } from 'ws';
 import { config } from './config';
 import { dataCtrl } from './dataCtrl';
-import { actionType, heartBeatType, msgType } from './dataType';
+import { actionAddType, actionDelteType, actionFullMsgType, msgType, socketMsgType } from './dataType';
 import { eventSystem } from './eventSystem';
 import { fileCtrl } from './fileCtrl';
 
@@ -31,7 +31,7 @@ export class socketServer {
                 console.log("socket服务器已启动：");
                 console.log(`ws://${config.URL}:${port}`);
                 this.wss.on('connection', socketServer.onSocketConnection.bind(socketServer));
-                eventSystem.on('msgSaved', this.sendMsg.bind(this));
+                eventSystem.on('msgSaved', this.sendSaveMsg.bind(this));
                 resolve(true);
             });
             server.listen(port);
@@ -50,34 +50,44 @@ export class socketServer {
     }
 
 
-    static sendMsg(msg: msgType) {
-        msg.action = 'add';
+    static sendSaveMsg(msg: msgType) {
+        let data: actionAddType = { msg: msg };
+        let socketMsg: socketMsgType = { action: 'add', timeStamp: Date.now(), data: data };
+        let str = JSON.stringify(socketMsg);
         this.wss.clients.forEach((client) => {
-            client.send(JSON.stringify(msg));
+            client.send(str);
         });
     }
 
-    static selectAction(data: actionType | heartBeatType, ws: any) {
-        switch (data.action) {
+    static selectAction(socketMsgFromClient: socketMsgType, ws: any) {
+        switch (socketMsgFromClient.action) {
             case 'heartBeat':
-                ws.send(JSON.stringify({ action: 'heartBeat', salt: data.salt }));
+                ws.send(JSON.stringify({ action: 'heartBeat', timeStamp: Date.now() }));
                 break;
             case 'delete':
-                dataCtrl.getMsgTypeByHash(data.fileOrTextHash!).then((msgType: msgType) => {
-                    if (msgType.msgType === 'file') {
-                        fileCtrl.deleteFile(msgType.url!);
-                    }
-                    dataCtrl.deleteMsg(data.fileOrTextHash!).then(() => {
-                        eventSystem.emit('deleteItem', data.fileOrTextHash!);
-                        this.wss.clients.forEach((client) => {
-                            client.send(JSON.stringify(data));
+                let fileOrTextHash: string = socketMsgFromClient.data!;
+                dataCtrl.getMsgTypeByHash(fileOrTextHash).then((msgType: msgType) => {
+                    if (msgType != null && msgType.msgType != null) {//防止重复删除
+                        if (msgType.msgType === 'file') {
+                            fileCtrl.deleteFile(msgType.url!);
+                        }
+                        dataCtrl.deleteMsg(fileOrTextHash).then(() => {
+                            eventSystem.emit('deleteItem', fileOrTextHash);
+                            let data: actionDelteType = { fileOrTextHash: fileOrTextHash };
+                            let socketMsg: socketMsgType = { action: 'delete', timeStamp: Date.now(), data: data };
+                            let str = JSON.stringify(socketMsg);
+                            this.wss.clients.forEach((client) => {
+                                client.send(str);
+                            });
                         });
-                    });
+                    }
                 });
                 break;
-            case 'update':
+            case 'full':
                 dataCtrl.getAllMsgs().then((msgs: msgType[]) => {
-                    ws.send(JSON.stringify({ action: 'update', msgs: msgs }));
+                    let data: actionFullMsgType = { msgs: msgs };
+                    let socketMsg: socketMsgType = { action: 'full', timeStamp: Date.now(), data: data };
+                    ws.send(JSON.stringify(socketMsg));
                 });
                 break;
         }
