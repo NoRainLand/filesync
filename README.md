@@ -8,7 +8,7 @@
 
 ### 使用方式
 
-注意:基于node版本14.21.3,版本太低可能会导致报错.
+注意:本人基于node版本14.21.3开发，版本太低可能会导致编译/运行报错。
 
 初始化：
 
@@ -29,7 +29,7 @@
 可能的错误:
 
 - 第一次运行提示乱七八糟的,能运行就别管.
-- 数据库安装失败,多执行```npm install```几次试试，实在不行就下载[我打包好的文件](https://github.com/NoRainLand/filesync/releases/tag/untagged-effc87f7dee701d8da7f)，但是你解压之后还是要执行一次```npm install```，因为我后面有添加了新的库（主要是sqlite3库下载可能会出问题）
+- 数据库安装失败,多执行```npm install```几次试试，实在不行就下载[我打包好的文件](https://github.com/NoRainLand/filesync/releases/tag/untagged-effc87f7dee701d8da7f)，但是你解压之后还是要执行一次```npm install```（并且记得不要把package-lock.json，package.json两个文件给覆盖了），因为我后面有添加了新的库（主要是sqlite3库下载可能会出问题）
 - 如果打包报错类似如下所示的话，可以参考[这里](https://segmentfault.com/a/1190000041958374),项目目录下提供了我下载好的文件。
 
 ```txt
