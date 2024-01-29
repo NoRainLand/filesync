@@ -9,6 +9,8 @@ import { fileCtrl } from './fileCtrl';
 export class socketServer {
     private static wss: WebSocketServer;
 
+    private static _lastActionTimestamp: number = 0;
+
     constructor() {
 
     }
@@ -52,7 +54,8 @@ export class socketServer {
 
     static sendSaveMsg(msg: msgType) {
         let data: actionAddType = { msg: msg };
-        let socketMsg: socketMsgType = { action: 'add', timeStamp: Date.now(), data: data };
+        this._lastActionTimestamp = Date.now();
+        let socketMsg: socketMsgType = { action: 'add', timeStamp: this._lastActionTimestamp, data: data };
         let str = JSON.stringify(socketMsg);
         this.wss.clients.forEach((client) => {
             client.send(str);
@@ -73,8 +76,9 @@ export class socketServer {
                         }
                         dataCtrl.deleteMsg(fileOrTextHash).then(() => {
                             eventSystem.emit('deleteItem', fileOrTextHash);
+                            this._lastActionTimestamp = Date.now();
                             let data: actionDelteType = { fileOrTextHash: fileOrTextHash };
-                            let socketMsg: socketMsgType = { action: 'delete', timeStamp: Date.now(), data: data };
+                            let socketMsg: socketMsgType = { action: 'delete', timeStamp: this._lastActionTimestamp, data: data };
                             let str = JSON.stringify(socketMsg);
                             this.wss.clients.forEach((client) => {
                                 client.send(str);
@@ -89,6 +93,9 @@ export class socketServer {
                     let socketMsg: socketMsgType = { action: 'full', timeStamp: Date.now(), data: data };
                     ws.send(JSON.stringify(socketMsg));
                 });
+            case "refresh":
+                let data: socketMsgType = { action: "refresh", timeStamp: this._lastActionTimestamp };
+                ws.send(JSON.stringify(data));
                 break;
         }
     }

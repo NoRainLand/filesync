@@ -1,4 +1,4 @@
-export type socketActionType = "add" | "delete" | "full" | "heartBeat";
+export type socketActionType = "add" | "delete" | "full" | "heartBeat" | "refresh";
 
 export type socketMsgType = {
     action: socketActionType,

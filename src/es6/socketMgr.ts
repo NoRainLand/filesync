@@ -32,6 +32,16 @@ export class socketMgr {
         eventSystem.on("visibilitychange", this._onVisibilityChange.bind(this));
     }
 
+
+    private static _onVisibilityChange(hide: boolean) {
+        if (!hide) {
+            this.tryRefresh();
+        }
+    }
+
+    //--------------socket------------
+
+
     static initSocket() {
         this.init();
         this.socket = new WebSocket(`ws://${config.URL}:${config.SocketIOPORT}`);
@@ -51,6 +61,8 @@ export class socketMgr {
         let data: socketMsgType = JSON.parse(event.data);
         if (data.action == "heartBeat") {
             this.getHeartBeat(data);
+        } else if (data.action == "refresh") {
+            this.getRefresh(data);
         } else {
             this._lastActionTimestamp = data.timeStamp!;
             this._onSocketEvent({ event: "onmessage", data })
@@ -73,8 +85,23 @@ export class socketMgr {
     private static _onSocketEvent(msg: socketEventType) {
         eventSystem.emit("socketEvent", msg);
     }
+    //--------------手机浏览器且后台回来刷新----------------
+
+    private static tryRefresh() {
+        let data: socketMsgType = { action: "refresh" };
+        this.send(JSON.stringify(data));
+    }
+
+    private static getRefresh(data: socketMsgType) {
+        if (data.timeStamp != this._lastActionTimestamp) {
+            console.warn("数据不一致，刷新");
+            this._onSocketEvent({ event: "onopen", data: null });
+        }
+    }
+
 
     //--------------断线重连----------------
+
 
     private static resetConfig() {
         this.reconnectTimer && clearTimeout(this.reconnectTimer);
@@ -84,12 +111,10 @@ export class socketMgr {
         this.lostConnectTime = 40000;
         this.heartBeatTime = 30000;
         this.reconnectTime = 3000;
-        this._lastActionTimestamp = Date.now();
     }
 
     private static sendHeartBeat() {
         this.lastHeartBeatTime = Date.now();
-        this._lastActionTimestamp = Date.now();
         this.send(JSON.stringify({ action: "heartBeat" }));
     }
     private static getHeartBeat(data: socketMsgType) {
@@ -121,20 +146,5 @@ export class socketMgr {
             this._onSocketEvent({ event: "onclose", data: false });
         }
     }
-
-
-    private static _onVisibilityChange(isHide: boolean) {
-        if (!isHide) {
-            let now = Date.now();
-            if (now - this.lastHeartBeatTime > this.lostConnectTime) {
-                // this.close();
-                this.tryReConnect();
-            } else {
-
-            }
-        }
-    }
-
-
 
 }

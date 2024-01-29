@@ -199,9 +199,19 @@ export class index {
     }
 
     fullItem(data: actionFullMsgType) {
+        this.clearAllItem();
         data.msgs.forEach((msg) => {
             this.createItem(null, msg);
         });
+    }
+
+    private clearAllItem() {
+        this.msgList.length = 0;
+        this.msgHashArr.length = 0;
+        this.itemList.forEach((item) => {
+            item.onRemoveItem();
+        });
+        this.itemList.length = 0;
     }
 
     //--------------客户端操作----------------

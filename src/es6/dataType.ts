@@ -1,4 +1,4 @@
-export type socketActionType = "add" | "delete" | "full" | "heartBeat";
+export type socketActionType = "add" | "delete" | "full" | "heartBeat" | "refresh";
 
 export type socketMsgType = {
     action: socketActionType,
@@ -21,7 +21,6 @@ export type actionFullMsgType = { msgs: msgType[] };
 export type actionDelteType = { fileOrTextHash: string }
 
 export type actionAddType = { msg: msgType }
-
 
 export type socketInfoType = { "socketURL": string, "socketPORT": number, "version": string };
 
