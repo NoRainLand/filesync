@@ -21,7 +21,7 @@ export class socketServer {
             server.once('error', (err: any) => {
                 if (err.code === 'EADDRINUSE') {
                     console.log(`端口${port}已被占用，尝试使用端口${port + 10}`);
-                    resolve(socketServer.startSocketServer(port + 10));
+                    reject(socketServer.startSocketServer(port + 10));
                 } else {
                     reject(err);
                 }
@@ -49,6 +49,10 @@ export class socketServer {
         ws.on('message', (message: string) => {
             let data = JSON.parse(message);
             this.selectAction(data, ws);
+        });
+
+        ws.on('error', (err: any) => {
+            console.warn(err);
         });
     }
 
@@ -98,6 +102,12 @@ export class socketServer {
             case "refresh":
                 let data: socketMsgType = { action: "refresh", timeStamp: this._lastActionTimestamp };
                 ws.send(JSON.stringify(data));
+                break;
+            default:
+                let msg = "未知的action:" + socketMsgFromClient.action;
+                console.warn(msg)
+                let err: socketMsgType = { action: "error", timeStamp: this._lastActionTimestamp, data: { error: msg } };
+                ws.send(JSON.stringify(err));
                 break;
         }
     }

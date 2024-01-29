@@ -63,6 +63,8 @@ export class socketMgr {
             this.getHeartBeat(data);
         } else if (data.action == "refresh") {
             this.getRefresh(data);
+        } else if (data.action == "error") {
+            eventSystem.emit("socketEvent", { event: "onerror", data: data.data });
         } else {
             this._lastActionTimestamp = data.timeStamp!;
             this._onSocketEvent({ event: "onmessage", data })
@@ -79,7 +81,7 @@ export class socketMgr {
     }
     private static _onSocketError(event: Event) {
         console.warn(event);
-        this._onSocketEvent({ event: "onerror", data: event });
+        // this._onSocketEvent({ event: "onerror", data: event });
     }
 
     private static _onSocketEvent(msg: socketEventType) {

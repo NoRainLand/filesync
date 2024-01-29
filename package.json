@@ -10,6 +10,7 @@
 		"copy": "concurrently \"@powershell copy src/es6/index.html dist/es6/ \" \" @powershell copy src/es6/favicon.ico dist/es6/ \" \" @powershell copy src/es6/pico.min.css dist/es6/ \" \" @powershell copy src/es6/qrcode.min.js dist/es6/ \" \" @powershell copy src/es6/vconsole.min.js dist/es6/ \"",
 		"build": "concurrently \" tsc --project ./tsconfig.json\" \"tsc --project ./src/es6/tsconfig.es6.json\" ",
 		"start": "node ./dist/index.js",
+		"debug": "node --trace-warnings ./dist/index.js",
 		"exec": "concurrently \"pkg -t win package.json\" "
 	},
 	"keywords": [

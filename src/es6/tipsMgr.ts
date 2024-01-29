@@ -103,6 +103,9 @@ class myDialog {
             this.dialogCancelButton.style.display = "inline-block";
             this.dialogCloseButton.style.display = "inline-block";
         }
+        if (this.dialog.open) {
+            this.dialog.close();
+        }
         this.dialog.showModal();
     }
 
@@ -164,6 +167,9 @@ class myAlert {
             if (this.imgQrCode) {
                 this.imgQrCode.style.display = "block";
             }
+        }
+        if (this.dialog.open) {
+            this.dialog.close();
         }
         this.dialog.showModal();
     }

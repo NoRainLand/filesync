@@ -58,6 +58,7 @@ export class index {
 
     constructor() {
         this.init();
+        (<any>window).NiarApp = this;
     }
 
     init() {
@@ -320,7 +321,7 @@ export class index {
     }
 
     onSocketError(event: Event) {
-
+        tipsMgr.showAlert(JSON.stringify(event), "socket错误");
     }
 
     sendSocketMsg(msg: string) {
