@@ -7,7 +7,7 @@
 		"strict": true,
 		"skipLibCheck": true,
 		"sourceMap": false,
-		"outDir": "../../dist/es6",
+		"outDir": "../../dist/client",
 		"moduleResolution":"Node",
 		"strictPropertyInitialization":false
 	},

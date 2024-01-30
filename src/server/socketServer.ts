@@ -11,39 +11,37 @@ export class socketServer {
 
     private static _lastActionTimestamp: number = 0;
 
-    constructor() {
+    private static server: net.Server;//辅助用
 
-    }
-
-    static startSocketServer(port: number) {
-        return new Promise((resolve, reject) => {
-            const server = net.createServer();
-            server.once('error', (err: any) => {
+    static async startSocketServer(port: number) {
+        await new Promise((resolve, reject) => {
+            this.server = net.createServer();
+            this.server.once('error', (err: any) => {
                 if (err.code === 'EADDRINUSE') {
                     console.log(`端口${port}已被占用，尝试使用端口${port + 10}`);
-                    reject(socketServer.startSocketServer(port + 10));
+                    resolve(socketServer.startSocketServer(port + 10));
                 } else {
-                    reject(err);
+                    console.error(err);
                 }
             });
-            server.once('listening', () => {
-                server.close();
+            this.server.once('listening', () => {
+                this.server.close();
                 this.wss = new WebSocketServer({ port: port });
-                config.SocketIOPORT = port;
+                config.socketPort = port;
                 console.log("socket服务器已启动：");
                 console.log(`ws://${config.URL}:${port}`);
                 this._lastActionTimestamp = Date.now();
                 this.wss.on('connection', socketServer.onSocketConnection.bind(socketServer));
                 eventSystem.on('msgSaved', this.sendSaveMsg.bind(this));
-                resolve(true);
+                resolve(null);
             });
-            server.listen(port);
+            this.server.listen(port);
         });
     }
 
-    static onSocketConnection(ws: any) {
+    private static onSocketConnection(ws: any) {
         ws.on('close', () => {
-            console.log('A user disconnected');
+            console.log('用户断开连接');
         });
 
         ws.on('message', (message: string) => {
@@ -57,7 +55,7 @@ export class socketServer {
     }
 
 
-    static sendSaveMsg(msg: msgType) {
+    private static sendSaveMsg(msg: msgType) {
         let data: actionAddType = { msg: msg };
         this._lastActionTimestamp = Date.now();
         let socketMsg: socketMsgType = { action: 'add', timeStamp: this._lastActionTimestamp, data: data };
@@ -67,7 +65,7 @@ export class socketServer {
         });
     }
 
-    static selectAction(socketMsgFromClient: socketMsgType, ws: any) {
+    private static selectAction(socketMsgFromClient: socketMsgType, ws: any) {
         switch (socketMsgFromClient.action) {
             case 'heartBeat':
                 ws.send(JSON.stringify({ action: 'heartBeat', timeStamp: Date.now() }));

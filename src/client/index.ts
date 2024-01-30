@@ -266,8 +266,12 @@ export class index {
                 console.log(data);
             })
             .catch((error) => {
-                tipsMgr.showAlert("文件发送失败,可能因为服务器已经存在该文件", "发送失败");
                 console.warn(error);
+                if (error.response) {
+                    tipsMgr.showAlert(error.response.data, "发送失败");
+                } else {
+                    tipsMgr.showAlert(error.message, "发送失败");
+                }
             })
             .finally(() => {
                 setTimeout(() => {

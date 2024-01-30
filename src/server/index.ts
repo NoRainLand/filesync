@@ -1,14 +1,29 @@
 import open from 'open';
 import * as os from 'os';
 import { config } from './config';
-import { dataHandler } from './dataHandler';
-import { httpServer } from './htttpServer';
+import { dbHandler } from './dbHandler';
+import { httpServer } from './httpServer';
 import { serverConfig } from './serverConfig';
 import { socketServer } from './socketServer';
 export default class main {
+
+    webUrl: string = '';
+
     constructor() {
         this.init();
     }
+
+    async init() {
+        config.URL = this.getLocalIP();
+        serverConfig.readConfig(config.serverConfigPath);
+        await dbHandler.openDatabase(config.dbPath, config.tableName);
+        await socketServer.startSocketServer(config.socketPort);
+        await httpServer.startHttpServer(config.HTTPPORT);
+        this.webUrl = `http://${config.URL}:${config.HTTPPORT}`;
+        await open(this.webUrl);
+        await serverConfig.writeConfig(config.serverConfigPath);
+    }
+
     getLocalIP() {
         const interfaces = os.networkInterfaces();
         for (let devName in interfaces) {
@@ -21,17 +36,7 @@ export default class main {
             }
         }
         console.warn("无法获取本机IP地址");
-        return '';
-    }
-    async init() {
-        config.URL = this.getLocalIP();
-        await serverConfig.readConfig();
-        await dataHandler.openDatabase(config.dbPath, config.tableName);
-        await socketServer.startSocketServer(config.SocketIOPORT);
-        await httpServer.startHttpServer(config.HTTPPORT);
-        let url = `http://${config.URL}:${config.HTTPPORT}`;
-        await open(url);
-        await serverConfig.writeConfig();
+        return '127.0.0.1';
     }
 }
 
