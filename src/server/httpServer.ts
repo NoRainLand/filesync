@@ -126,14 +126,13 @@ export class httpServer {
                 }
                 this.fileHashes.push(fileHash);
                 res.send('文件上传成功');
-                let savePath = `${config.savePath}/${req.file!.filename}`
-                console.warn(savePath);
+                let savePath = `${config.savePath}/${req.file!.filename}`;
                 const msg: msgType = {
                     msgType: "file",
                     fileOrTextHash: fileHash,
                     timestamp: Date.now(),
                     fileName: req.file!.originalname,
-                    url: `${config.savePath}/${req.file!.filename}`,
+                    url: savePath,
                     size: (req.file!.size / 1024) > 0 ? (req.file!.size / 1024) : 0,
                 };
                 dataCtrl.writeToDatabase(msg).then(() => {

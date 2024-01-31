@@ -17,6 +17,8 @@ export class tipsMgr {
 
     private static _myTips: myTips;
 
+    private static _myProgress: myProgress;
+
     static showTips(msg: string) {
         if (!this._myTips) {
             this._myTips = new myTips(this.body);
@@ -28,15 +30,46 @@ export class tipsMgr {
         if (!this._myDialog) {
             this._myDialog = new myDialog(this.body);
         }
-        this._myDialog.showDialog(content, caller, sure, cancel, title, onlySure);
+        this.hideAll();
+        this._myDialog.show(content, caller, sure, cancel, title, onlySure);
     }
+
+    static hideDialog() {
+        if (this._myDialog) {
+            this._myDialog.close();
+        }
+    }
+
     static showAlert(content: string, title: string = "提示", type: dialogType = "msg", caller: any = null, callback: Function | null = null) {
         if (!this._myAlert) {
             this._myAlert = new myAlert(this.body);
         }
-        this._myAlert.showAlert(content, title, type);
+        this._myAlert.show(content, title, type);
     }
 
+    static hideAlert() {
+        if (this._myAlert) {
+            this._myAlert.close();
+        }
+    }
+
+    static showProgress(value: number, autoClose: boolean = false) {
+        if (!this._myProgress) {
+            this._myProgress = new myProgress(this.body);
+        }
+        this._myProgress.show(value, autoClose);
+    }
+    static hideProgress() {
+        if (this._myProgress) {
+            this._myProgress.close();
+        }
+    }
+
+    static hideAll(){
+        this.hideDialog();
+        this.hideAlert();
+        this.hideProgress();
+    }
 }
 
 class myDialog {
@@ -90,7 +123,7 @@ class myDialog {
             this._caller = null;
         });
     }
-    showDialog(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示", onlySure: boolean = false) {
+    show(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示", onlySure: boolean = false) {
         this._caller = caller;
         this._sure = sure;
         this._cancel = cancel;
@@ -103,12 +136,12 @@ class myDialog {
             this.dialogCancelButton.style.display = "inline-block";
             this.dialogCloseButton.style.display = "inline-block";
         }
-        if (this.dialog.open) {
-            this.dialog.close();
-        }
         this.dialog.showModal();
     }
 
+    close() {
+        this.dialog.close();
+    }
 }
 
 class myAlert {
@@ -149,7 +182,7 @@ class myAlert {
     }
 
 
-    showAlert(content: string, title: string = "提示", type: dialogType = "msg", caller: any = null, callback: Function | null = null) {
+    show(content: string, title: string = "提示", type: dialogType = "msg", caller: any = null, callback: Function | null = null) {
         this._caller = caller;
         this._callback = callback;
         this.dialogTitle.textContent = title;
@@ -168,10 +201,11 @@ class myAlert {
                 this.imgQrCode.style.display = "block";
             }
         }
-        if (this.dialog.open) {
-            this.dialog.close();
-        }
         this.dialog.showModal();
+    }
+
+    close() {
+        this.dialog.close();
     }
 }
 
@@ -220,5 +254,53 @@ class myTips {
         this.parent.removeChild(tips);
         tips.textContent = "";
         this.tipsPoor.push(tips);
+    }
+}
+
+class myProgress {
+    private _html: string;
+    private parent: HTMLElement;
+    private progress: HTMLDialogElement;
+    private progressCard: HTMLElement;
+    private progressValue: HTMLProgressElement;
+    private myProgressText: HTMLSpanElement;
+    constructor(parent: HTMLElement) {
+        this.parent = parent;
+        this._html = config.myProgress;
+        this.init();
+    }
+    private init() {
+        this.parent.insertAdjacentHTML("afterbegin", this._html);
+        this.progress = document.getElementById('myProgress') as HTMLDialogElement;
+        this.progressCard = this.progress.querySelector('#myProgressCard') as HTMLDListElement;
+        this.progressValue = this.progress.querySelector('#myProgressValue') as HTMLProgressElement;
+        this.myProgressText = this.progress.querySelector('#myProgressText') as HTMLSpanElement;
+
+        this.progressCard.style.position = 'fixed';
+        this.progressCard.style.left = '50%';
+        this.progressCard.style.top = '50%';
+        this.progressCard.style.transform = 'translate(-50%, -50%)';
+        this.progressCard.style.width = "30%";
+    }
+
+    show(value: number, autoClose: boolean = false) {
+        value = value * 100;
+        value = value > 99.9 ? 99.9 : value;
+        value = value < 0 ? 0 : value;
+        this.progressValue.value = value;
+        this.myProgressText.textContent = `文件上传中，进度：${value.toFixed(1)}%`;
+        if (!this.progress.open) {
+            this.progress.showModal();
+        }
+        if (autoClose) {
+            if (value == 100) {
+                this.close();
+            }
+        }
+    }
+    close() {
+        this.myProgressText.textContent = "0%";
+        this.progressValue.value = 0;
+        this.progress.close();
     }
 }

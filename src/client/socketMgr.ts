@@ -20,8 +20,6 @@ export class socketMgr {
 
     private static _lastActionTimestamp: number;
 
-    private static lastHeartBeatTime: number = 0;
-
     private static isInit: boolean = false;
 
     private static init() {
@@ -116,7 +114,6 @@ export class socketMgr {
     }
 
     private static sendHeartBeat() {
-        this.lastHeartBeatTime = Date.now();
         this.send(JSON.stringify({ action: "heartBeat" }));
     }
     private static getHeartBeat(data: socketMsgType) {

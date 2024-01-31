@@ -261,7 +261,14 @@ export class index {
     }
 
     sendHttpMsg(formData: FormData) {
-        httpMgr.sendMsg(formData)
+        httpMgr.sendMsg(formData, (event: ProgressEvent) => {
+            if (event.lengthComputable) {
+                if (event.total > config.showProgressMinSize) {
+                    tipsMgr.showProgress(event.loaded / event.total);
+                }
+            }
+            return {};
+        })
             .then((data) => {
                 console.log(data);
             })
@@ -276,6 +283,7 @@ export class index {
             .finally(() => {
                 setTimeout(() => {
                     this.inputLock = false;
+                    tipsMgr.hideProgress();
                 }, this.sendTimeout);
                 this.fileInput.value = '';
                 this.textInput.value = '';

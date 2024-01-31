@@ -60,7 +60,6 @@ export class dbHandler {
                 if (err) {
                     reject(err);
                 } else {
-                    console.log(`已写入数据库：${fileOrTextHash}`);
                     resolve();
                 }
             });

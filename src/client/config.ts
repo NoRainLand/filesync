@@ -14,6 +14,20 @@ export class config {
         upload: "/upload",
     }
 
+    static showProgressMinSize: number = 1024 * 1024 * 100;//测试100M以上的文件大小才会有明显的上传感觉。
+
+
+    static myProgress =
+        `
+        <dialog close id = "myProgress">
+            <article id = "myProgressCard">
+                <progress id = "myProgressValue" value="25" max="100"></progress>
+                <p id="myProgressText">25%</p>
+            </article>
+        </dialog>
+    `
+
+
     static myAlert =
         `
         <dialog close id = "myAlert">
