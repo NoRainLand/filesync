@@ -1,12 +1,11 @@
 {
 	"name": "file-sync",
-	"version": "2.3.0",
+	"version": "2.4.0",
 	"description": "一个简单的文件/文字同步服务器",
 	"bin": "dist/server/index.js",
 	"main": "dist/server/index.js",
 	"scripts": {
-		"dev": "nodemon ./dist/server/index.js",
-		"watch": "concurrently \" tsc --project ./tsconfig.json -w\" \"tsc --project ./src/client/tsconfig.es6.json -w\"",
+		"watch": "concurrently \" tsc --project ./tsconfig.json -w\" \"tsc --project ./src/client/tsconfig.es6.json -w\" \"nodemon ./dist/server/index.js\"",
 		"copy": "concurrently \"@powershell -Command Copy-Item -Path .\\src\\html\\* -Destination .\\dist\\client -Recurse -Force\"",
 		"build": "concurrently \" tsc --project ./tsconfig.json\" \"tsc --project ./src/client/tsconfig.es6.json\" ",
 		"start": "node ./dist/server/index.js",

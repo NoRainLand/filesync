@@ -93,7 +93,7 @@ export class item {
             this.btnCopy.style.display = "block"
         }
 
-        if (data.size != void 0 && data.size >= 0) {
+        if (data.size != void 0 && data.size > 0) {
             this.txtNameOrText.setAttribute("data-tooltip", "文件大小：" + this.reSize(data.size));
             this.txtNameOrText.style.borderBottom = 'none';
         } else {
