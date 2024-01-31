@@ -225,6 +225,7 @@ class myTips {
 
     showTips(msg: string) {
         let tips = this.createTips();
+        this.parent.appendChild(tips);
         tips.textContent = msg;
 
 
@@ -232,17 +233,17 @@ class myTips {
         tips.style.left = '50%';
         tips.style.top = '50%';
         tips.style.transform = 'translate(-50%, -50%)';
-        tips.style.transition = 'all 1.5s ease-in-out';
+        tips.style.transition = 'all 1.0s ease-in-out';//平滑过渡
 
-        tips.style.opacity = '1';
+        tips.style.opacity = '0.75';
         let self = this;
         setTimeout(() => {
             tips.style.top = '30%';
             tips.style.opacity = '0';
             setTimeout(() => {
                 self.recoverTips(tips);
-            }, 1500);
-        }, 1500);
+            }, 1000);
+        }, 1000);
 
     }
 
@@ -252,12 +253,13 @@ class myTips {
             tips = document.createElement("article");
             tips.className = "tips";
             tips.style.borderRadius = "10px";
-            this.parent.appendChild(tips);
         }
         return tips;
     }
     private recoverTips(tips: HTMLElement) {
-        this.parent.removeChild(tips);
+        if (this.parent.contains(tips)) {
+            this.parent.removeChild(tips);
+        }
         tips.textContent = "";
         this.tipsPoor.push(tips);
     }

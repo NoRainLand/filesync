@@ -14,7 +14,7 @@ export class config {
         upload: "/upload",
     }
 
-    static showProgressMinSize: number = 1024 * 1024 * 100;//测试100M以上的文件大小才会有明显的上传感觉。
+    static showProgressMinSize: number = 1024 * 1024 * 64;//显示进度条的最小文件体积
 
 
     static myProgress =
