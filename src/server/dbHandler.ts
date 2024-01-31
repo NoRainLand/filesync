@@ -34,7 +34,7 @@ export class dbHandler {
     private static async createTable() {
         let self = this;
         await new Promise((resolve, reject) => {
-            self.db.run(self.getSqlCammand("createTable"), (err) => {
+            self.db.run(self.getSqlCommand("createTable"), (err) => {
                 if (err) {
                     self.db.close();
                     reject(err);
@@ -56,7 +56,7 @@ export class dbHandler {
         if (!this.dbIsOpen) return Promise.resolve();
         return new Promise((resolve, reject) => {
             const { fileName, fileOrTextHash, timestamp, text, msgType, url, size } = msg;
-            this.db.run(this.getSqlCammand("writeToDatabase"), [fileName, fileOrTextHash, timestamp, text, msgType, url, size], (err) => {
+            this.db.run(this.getSqlCommand("writeToDatabase"), [fileName, fileOrTextHash, timestamp, text, msgType, url, size], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -69,7 +69,7 @@ export class dbHandler {
     static deleteFromDatabase(hash: string): Promise<void> {
         if (!this.dbIsOpen) return Promise.resolve();
         return new Promise((resolve, reject) => {
-            this.db.run(this.getSqlCammand("deleteFromDatabase"), hash, (err) => {
+            this.db.run(this.getSqlCommand("deleteFromDatabase"), hash, (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -82,7 +82,7 @@ export class dbHandler {
     static getAllMsgs(): Promise<msgType[]> {
         if (!this.dbIsOpen) return Promise.resolve([]);
         return new Promise((resolve, reject) => {
-            this.db.all(this.getSqlCammand("getAllMsgs"), (err, rows) => {
+            this.db.all(this.getSqlCommand("getAllMsgs"), (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -95,7 +95,7 @@ export class dbHandler {
     static getAllFileOrTextHashes(): Promise<string[]> {
         if (!this.dbIsOpen) return Promise.resolve([]);
         return new Promise((resolve, reject) => {
-            this.db.all(this.getSqlCammand("getAllFileOrTextHashes"), [], (err, rows) => {
+            this.db.all(this.getSqlCommand("getAllFileOrTextHashes"), [], (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -109,7 +109,7 @@ export class dbHandler {
     static getMsgTypeByHash(hash: string): Promise<msgType> {//Function.prototype.name实际编译压缩后可能会变
         if (!this.dbIsOpen) return Promise.resolve({} as msgType);
         return new Promise((resolve, reject) => {
-            this.db.get(this.getSqlCammand("getMsgTypeByHash"), hash, (err: any, row: msgType) => {
+            this.db.get(this.getSqlCommand("getMsgTypeByHash"), hash, (err: any, row: msgType) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -119,7 +119,7 @@ export class dbHandler {
         });
     }
 
-    private static getSqlCammand(cammand: string, tableName?: string): string {
+    private static getSqlCommand(cammand: string, tableName?: string): string {
         tableName = tableName ? tableName : this.tableName;
         switch (cammand) {
             case "createTable":
