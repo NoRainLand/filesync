@@ -7,14 +7,15 @@ export class config {
     static savePath: string = '../uploadFile'; // 上传文件的保存路径
     static dbPath: string = '../fsDatabase.sqlite';
     static tableName: string = 'fsTable';
-    static version: string = "2.2.0"//版本号
+    static version: string = "2.3.0"//版本号
 
     static loadConfig: { [key: string]: string } = {
         "/": "index.html",
         "/favicon.ico": "favicon.ico",
         "/pico.min.css": "pico.min.css",
         "/qrcode.min.js": "qrcode.min.js",
-        "/vconsole.min.js": "vconsole.min.js"
+        "/vconsole.min.js": "vconsole.min.js",
+        "/clipboard.min.js": "clipboard.min.js"
     }
 
     static serverConfigPath = "../serverConfig.json";

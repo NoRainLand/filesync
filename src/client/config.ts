@@ -7,7 +7,7 @@ export class config {
     static showQrcodeDivClass: string = "showQrcodeDiv";
     static hideQrcodeDivClass: string = "hideQrcodeDiv";
 
-    static openVconsole: boolean = false;
+    static openVconsole: boolean = false;//是否开启vconsole
 
     static httpApi = {
         getSocketInfo: "/getSocketInfo",
@@ -16,6 +16,7 @@ export class config {
 
     static showProgressMinSize: number = 1024 * 1024 * 64;//显示进度条的最小文件体积
 
+    static copyBtnClass = "btnCopy";//复制按钮的class
 
     static myProgress =
         `

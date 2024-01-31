@@ -1,4 +1,5 @@
 export class copyData {
+    //已经废弃
     static async copyToClipboard(text: string): Promise<void> {
         try {
             // await navigator.clipboard.writeText(text);

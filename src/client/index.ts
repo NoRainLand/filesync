@@ -38,6 +38,8 @@ export class index {
 
     vConsole: any;
 
+    clipboard: any;
+
     private _isDark: number = -1;
     get isDark(): boolean {
         if (this._isDark == -1) {
@@ -76,6 +78,9 @@ export class index {
         if (config.openVconsole) {
             this.vConsole = new (window as any).VConsole();
         }
+
+        this.clipboard = new (window as any).ClipboardJS("." + config.copyBtnClass);
+
     }
 
     getUI() {

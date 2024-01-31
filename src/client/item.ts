@@ -1,4 +1,3 @@
-import { copyData } from "./copyData";
 import { msgType } from "./dataType";
 import { eventSystem } from "./eventSystem";
 
@@ -25,6 +24,8 @@ export class item {
             this.txtDate = document.createElement('p');
             this.btnDownload = document.createElement('button');
             this.btnCopy = document.createElement('button');
+            this.btnCopy.className = "btnCopy";
+
             this.btnDel = document.createElement('button');
 
             this.element.appendChild(this.txtNameOrText);
@@ -40,9 +41,9 @@ export class item {
             this.onceInit = true;
         }
 
-        this.btnDownload.addEventListener('click', () => this.downloadFile());
-        this.btnCopy.addEventListener('click', () => this.copyData());
-        this.btnDel.addEventListener('click', () => this.deleteData());
+        this.btnDownload.addEventListener('click', this.downloadFile.bind(this));
+        this.btnCopy.addEventListener('click', this.copyData.bind(this));
+        this.btnDel.addEventListener('click', this.deleteData.bind(this));
     }
     downloadFile(): void {
         eventSystem.emit('downloadFile', this.data.url, this.data.fileName);
@@ -51,7 +52,7 @@ export class item {
     copyData() {
         if (this.data) {
             const text = (this.data.text || this.data.url)!.toString();
-            copyData.copyToClipboard(text);
+            this.btnCopy.setAttribute('data-clipboard-text', text);
         }
     }
 
@@ -62,6 +63,7 @@ export class item {
     setData(data: msgType): void {
         this.data = data;
         this.initItem();
+
         // 显示 text 或 filename
         if (data.fileName) {
             let str = data.fileName;
@@ -82,6 +84,7 @@ export class item {
             }
             this.txtNameOrText.textContent = str;
         }
+
         if (data.msgType === 'file') {
             this.btnDownload.style.display = 'block';
             this.btnCopy.style.display = 'none';

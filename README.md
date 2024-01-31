@@ -53,6 +53,8 @@ node模组不在其内
 
 [qrcodejs](https://github.com/davidshimjs/qrcodejs):QRCode.js是一个制作二维码的JS库. #还有别的选择么
 
+[clipboard.js](https://github.com/zenorocha/clipboard.js):现代粘贴板复制，无需Flash，gzip压缩后只有3kb的JS库
+
 [heroicons](https://heroicons.dev/):来自[@steveschoger](https://twitter.com/steveschoger)的基于MIT协议的开源图标库
 
 ### version
@@ -71,6 +73,7 @@ node模组不在其内
 |2.0.0|尝试修复手机浏览器切后台消息没同步BUG，添加欢迎语，统一数据格式|
 |2.1.0|优化代码，大修|
 |2.2.0|添加上传进度条，可配置显示的最小文件体积|
+|2.3.0|接入clipboard.min.js|
 
 ### 运行截图
 
