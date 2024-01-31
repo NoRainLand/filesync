@@ -43,6 +43,16 @@
 [0] > Error! AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
 ```
 
+### 使用的开源库
+
+node模组不在其内
+
+[picocss](https://picocss.com/):用于语义化HTML的极简CSS框架. #强烈推荐，本应用的样式基本都是靠这个。
+
+[vConsole](https://github.com/Tencent/vConsole):一个轻量、可拓展、针对手机网页的前端开发者调试面板。 #无需多言
+
+[qrcodejs](https://github.com/davidshimjs/qrcodejs):QRCode.js是一个制作二维码的JS库. #还有别的选择么
+
 ### version
 
 |版本|说明|
@@ -60,7 +70,7 @@
 |2.1.0|优化代码，大修|
 |2.2.0|添加上传进度条，可配置显示的最小文件体积|
 
-运行截图:
+### 运行截图
 
 ![screenshot](screenshot.png)
 
