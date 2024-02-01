@@ -55,8 +55,8 @@ export class dbHandler {
     static writeToDatabase(msg: msgType): Promise<void> {
         if (!this.dbIsOpen) return Promise.resolve();
         return new Promise((resolve, reject) => {
-            const { fileName, fileOrTextHash, timestamp, text, msgType, url, size } = msg;
-            this.db.run(this.getSqlCommand("writeToDatabase"), [fileName, fileOrTextHash, timestamp, text, msgType, url, size], (err) => {
+            const { fileName, fileOrTextHash, timestamp, text, msgType, url, size, hashName: originalname } = msg;
+            this.db.run(this.getSqlCommand("writeToDatabase"), [fileName, fileOrTextHash, timestamp, text, msgType, url, size, originalname], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -119,13 +119,31 @@ export class dbHandler {
         });
     }
 
+
+    static getFileName2HashNameMap(): Promise<Map<string, string>> {
+        if (!this.dbIsOpen) return Promise.resolve(new Map<string, string>());
+        return new Promise((resolve, reject) => {
+            this.db.all(this.getSqlCommand("getFileName2HashNameMap"), (err: any, rows: Array<{ fileName: string, originalname: string }>) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const map = new Map<string, string>();
+                    for (const row of rows) {
+                        map.set(row.fileName, row.originalname);
+                    }
+                    resolve(map);
+                }
+            });
+        });
+    }
+
     private static getSqlCommand(cammand: string, tableName?: string): string {
         tableName = tableName ? tableName : this.tableName;
         switch (cammand) {
             case "createTable":
-                return `CREATE TABLE IF NOT EXISTS ${tableName} (fileName TEXT, fileOrTextHash TEXT, timestamp INTEGER, text TEXT, msgType TEXT,url TEXT,size INTEGER)`;
+                return `CREATE TABLE IF NOT EXISTS ${tableName} (fileName TEXT, fileOrTextHash TEXT, timestamp INTEGER, text TEXT, msgType TEXT,url TEXT,size INTEGER,originalname TEXT)`;
             case "writeToDatabase":
-                return `INSERT INTO ${tableName} (fileName, fileOrTextHash, timestamp, text, msgType, url ,size) VALUES (?, ?, ?, ?, ? ,? ,?)`;
+                return `INSERT INTO ${tableName} (fileName, fileOrTextHash, timestamp, text, msgType, url ,size,originalname) VALUES (?, ?, ?, ?, ? ,? ,?,?)`;
             case "deleteFromDatabase":
                 return `DELETE FROM ${tableName} WHERE fileOrTextHash = ?`;
             case "getAllMsgs":
@@ -134,6 +152,8 @@ export class dbHandler {
                 return `SELECT fileOrTextHash FROM ${tableName}`;
             case "getMsgTypeByHash":
                 return `SELECT * FROM ${tableName} WHERE fileOrTextHash = ?`;
+            case "getFileName2HashNameMap":
+                return `SELECT fileName, originalname FROM ${tableName} WHERE msgType = 'file'`;
             default:
                 return "";
         }

@@ -17,4 +17,9 @@ export class dataCtrl {
     static getMsgTypeByHash(hash: string): Promise<msgType> {
         return dbHandler.getMsgTypeByHash(hash);
     }
+
+
+    static getFileName2HashNameMap(): Promise<Map<string, string>> {
+        return dbHandler.getFileName2HashNameMap();
+    }
 }

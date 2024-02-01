@@ -13,18 +13,11 @@ import { eventSystem } from './eventSystem';
 import { getRelativePath } from './getRelativePath';
 
 export class httpServer {
-    private static deleteFileOrText(fileOrTextHash: string) {
-        if (this.fileHashes) {
-            for (let i = 0; i < this.fileHashes.length; i++) {
-                if (this.fileHashes[i] === fileOrTextHash) {
-                    this.fileHashes.splice(i, 1);
-                    break;
-                }
-            }
-        }
-    }
+    private static fileHashes: string[];
 
-    private static fileHashes: string[] = [];
+    private static fileName2HashNameMap: Map<string, string>;
+    private static hashName2FileNameMap: Map<string, string>;
+
 
     private static app: express.Express;
     private static server: http.Server;
@@ -39,6 +32,17 @@ export class httpServer {
             this.fileHashes = hashes;
             this.fileHashes = this.fileHashes ? this.fileHashes : [];
         });
+
+        await dataCtrl.getFileName2HashNameMap().then((map) => {
+            this.fileName2HashNameMap = map;
+            this.hashName2FileNameMap = new Map();
+            if (this.fileName2HashNameMap) {
+                this.fileName2HashNameMap.forEach((value, key) => {
+                    this.hashName2FileNameMap.set(value, key);
+                });
+            }
+        });
+
         await new Promise((resolve, reject) => {
             this.savePath = getRelativePath.tranPath(config.savePath);
             this.checkUploadFileDir();
@@ -93,6 +97,25 @@ export class httpServer {
         eventSystem.on("deleteItem", this.deleteFileOrText.bind(this));
     }
 
+    private static deleteFileOrText(fileOrTextHash: string) {
+        if (this.fileHashes) {
+            for (let i = 0; i < this.fileHashes.length; i++) {
+                if (this.fileHashes[i] === fileOrTextHash) {
+                    this.fileHashes.splice(i, 1);
+                    break;
+                }
+            }
+        }
+
+        if (this.fileName2HashNameMap) {
+            let fileName = this.hashName2FileNameMap.get(fileOrTextHash);
+            if (fileName) {
+                this.fileName2HashNameMap.delete(fileName);
+            }
+            this.hashName2FileNameMap.delete(fileOrTextHash);
+        }
+    }
+
     private static onServerApi() {
         this.onUploadApi();
         this.onGetSocketInfoApi();
@@ -115,6 +138,7 @@ export class httpServer {
 
     private static onFileUpload(req: Request, res: Response, next: NextFunction) {
         if (req.file) {
+            let self = this;
             const hash = crypto.createHash('md5');
             const stream = fs.createReadStream(req.file.path);
             stream.on('data', (data) => hash.update(data));
@@ -124,7 +148,6 @@ export class httpServer {
                 if (this.fileHashes.indexOf(fileHash) !== -1) {
                     return res.status(409).send('文件已存在' + req.file!.originalname);
                 }
-                this.fileHashes.push(fileHash);
                 res.send('文件上传成功');
                 let savePath = `${config.savePath}/${req.file!.filename}`;
                 const msg: msgType = {
@@ -134,9 +157,13 @@ export class httpServer {
                     fileName: req.file!.originalname,
                     url: savePath,
                     size: (req.file!.size / 1024) > 0 ? (req.file!.size / 1024) : 0,
+                    hashName: req.file!.filename
                 };
                 dataCtrl.writeToDatabase(msg).then(() => {
                     eventSystem.emit('msgSaved', msg);
+                    this.fileHashes.push(fileHash);
+                    this.fileName2HashNameMap.set(req.file!.originalname, req.file!.filename);
+                    this.hashName2FileNameMap.set(req.file!.filename, req.file!.originalname);
                 }).catch((err) => {
                     res.status(500).send(err);
                 });
@@ -154,7 +181,8 @@ export class httpServer {
                 fileOrTextHash: textHash,
                 timestamp: Date.now(),
                 text: text,
-                size: 0
+                size: 0,
+                hashName: ""
             };
             dataCtrl.writeToDatabase(msg).then(() => {
                 eventSystem.emit('msgSaved', msg);
@@ -189,6 +217,11 @@ export class httpServer {
     }
 
     private static onGetUploadFileApi() {
-        this.app.use('/uploadFile', express.static(this.savePath));
+        let self = this;
+        this.app.get('/uploadFile/:filename', function (req, res) {
+            const file = `${self.savePath}/${req.params.filename}`;
+            const fileName = self.hashName2FileNameMap.get(req.params.filename);
+            res.download(file, fileName!);
+        });
     }
 }

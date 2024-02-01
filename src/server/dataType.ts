@@ -10,10 +10,11 @@ export type msgType = {
     msgType: 'file' | 'text',
     fileOrTextHash: string,
     timestamp: number,
+    size: number,
     fileName?: string,
+    hashName?: string,
     text?: string,
     url?: string,
-    size: number,
 }
 
 export type actionFullMsgType = { msgs: msgType[] };

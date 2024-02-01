@@ -80,7 +80,10 @@ export class index {
         }
 
         this.clipboard = new (window as any).ClipboardJS("." + config.copyBtnClass);
-
+        this.clipboard.on('error', function (e: any) {
+            tipsMgr.showTips("复制失败，可能是权限不足或者浏览器不支持");
+            console.error(e);
+        });
     }
 
     getUI() {
@@ -266,7 +269,7 @@ export class index {
     }
 
     sendHttpMsg(formData: FormData) {
-        httpMgr.sendMsg(formData, (event: ProgressEvent) => {
+        httpMgr.uploadMsg(formData, (event: ProgressEvent) => {
             if (event.lengthComputable) {
                 if (event.total > config.showProgressMinSize) {
                     tipsMgr.showProgress(event.loaded / event.total);

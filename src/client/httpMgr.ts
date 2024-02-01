@@ -14,14 +14,11 @@ export class httpMgr {
             });
     }
 
-    static sendMsg(formData: FormData, onprogress: (event: ProgressEvent) => {}): Promise<string> {
+    static uploadMsg(formData: FormData, onprogress: (event: ProgressEvent) => {}): Promise<string> {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-
             xhr.open('POST', config.httpApi.upload, true);
-
             xhr.upload.onprogress = onprogress;
-
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     resolve(xhr.response);
@@ -29,11 +26,9 @@ export class httpMgr {
                     reject(new Error(xhr.statusText));
                 }
             };
-
             xhr.onerror = function () {
                 reject(new Error('An error occurred while uploading the file.'));
             };
-
             xhr.send(formData);
         });
     }
