@@ -28,6 +28,7 @@
 运行：
 
 - 执行```npm run start```开启服务器
+- 执行```npm run debug```开启带```--trace-warnings```参数的服务器
 - 根据运行窗口，网页输入 HttpServer 后面的IP地址。
 
 可能的错误:
