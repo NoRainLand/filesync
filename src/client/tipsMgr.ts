@@ -301,7 +301,7 @@ class myProgress {
             this.progress.showModal();
         }
         if (autoClose) {
-            if (value == 100) {
+            if (value >= 99.9) {
                 this.close();
             }
         }
