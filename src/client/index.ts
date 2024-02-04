@@ -112,30 +112,36 @@ export class index {
     addEvent() {
         eventSystem.on('deleteItem', this.deleteItem.bind(this));
         eventSystem.on('downloadFile', this.downloadFile.bind(this));
-        this.uploadButton!.addEventListener('click', this.sendMsg.bind(this));
-        this.textInput.addEventListener('keydown', (event: KeyboardEvent) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                if (!this.inputLock) {
-                    this.sendMsg();
-                }
-            }
-        });
+        this.uploadButton.addEventListener('click', this.sendMsg.bind(this));
+        this.textInput.addEventListener('keydown', this.onKeyDown.bind(this));
 
-        this.themeButtonSvg.addEventListener('click', () => {
-            this.isDark = !this.isDark;
-            this.initTheme();
-        });
+        this.themeButtonSvg.addEventListener('click', this.onChangeTheme.bind(this));
 
-        this.qrcodeButtonSvg.addEventListener('click', () => {
-            tipsMgr.showAlert(window.location.href, "当前网址", "qrcode");
-        });
+        this.qrcodeButtonSvg.addEventListener('click', this.onShowLocalQrcode.bind(this));
 
         eventSystem.on('socketEvent', this.onSocketEvent.bind(this));
 
         document.addEventListener('visibilitychange', () => {
             eventSystem.emit("visibilitychange", document.hidden);
         });
+    }
+
+    onKeyDown(event: KeyboardEvent) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (!this.inputLock) {
+                this.sendMsg();
+            }
+        }
+    }
+
+    onChangeTheme() {
+        this.isDark = !this.isDark;
+        this.initTheme();
+    }
+
+    onShowLocalQrcode() {
+        tipsMgr.showAlert(window.location.href, "当前网址", "qrcode");
     }
 
 
@@ -345,7 +351,24 @@ export class index {
     }
 
     sendSocketMsg(msg: string) {
-        socketMgr.send(msg);
+        let readyState = socketMgr.send(msg);
+        if (readyState != WebSocket.OPEN) {
+            tipsMgr.showAlert("消息发送失败，socket状态异常，状态码:" + readyState, "socket错误");
+            switch (readyState) {
+                case -1:
+                    console.warn("socket未初始化");//怎么会出现这个情况？
+                    break;
+                case WebSocket.CONNECTING:
+                    console.warn("socket正在连接");
+                    break;
+                case WebSocket.CLOSING:
+                    console.warn("socket正在关闭");
+                    break;
+                case WebSocket.CLOSED:
+                    console.warn("socket已关闭");
+                    break;
+            }
+        }
     }
 }
 
