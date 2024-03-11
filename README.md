@@ -10,11 +10,16 @@
 
 注意:本人基于node版本14.21.3开发，版本太低可能会导致编译/运行报错。
 
+2024/3/11：由于使用pnpm，初始化的时候需要切到```16.14```版本及以上的node
+
 初始化：
 
-- 执行```npm install```初始化
-- 执行```npm run build```构建
+- 执行```pnpm install```初始化
 - 执行```npm run copy```复制网页和图标到对应位置
+
+构建：
+
+- 执行```npm run build```构建，注意必须先执行copy，否则webpack会报错
 
 开发：
 
@@ -29,9 +34,12 @@
 
 运行：
 
-- 执行```npm run start```开启服务器
 - 执行```npm run debug```开启带```--trace-warnings```参数的服务器
 - 根据运行窗口，网页输入 HttpServer 后面的IP地址。
+
+dist文件目录说明：
+
+实际运行的是client以及server目录下的JS代码，_temp文件只是为了webpack中转
 
 可能的错误:
 
@@ -83,6 +91,7 @@ node模组不在其内
 |2.3.0|接入clipboard.min.js|
 |2.4.0|修复```npm run watch```BUG|
 |3.0.0|完善打包流程，兼容浏览器不支持download属性|
+|4.0.0|把npm包管理改为pnpm，请使用16.14版本及以上的node，添加webpack打包|
 
 ### 运行截图
 

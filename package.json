@@ -1,14 +1,13 @@
 {
 	"name": "file-sync",
-	"version": "3.0.0",
+	"version": "4.0.0",
 	"description": "一个简单的文件/文字同步服务器",
 	"bin": "dist/server/index.js",
 	"main": "dist/server/index.js",
 	"scripts": {
-		"watch": "concurrently \" tsc --project ./tsconfig.json -w\" \"tsc --project ./src/client/tsconfig.es6.json -w\" \"nodemon ./dist/server/index.js\"",
-		"copy": "concurrently \"@powershell -Command Copy-Item -Path .\\src\\html\\* -Destination .\\dist\\client -Recurse -Force\"",
-		"build": "concurrently \" tsc --project ./tsconfig.json\" \"tsc --project ./src/client/tsconfig.es6.json\" ",
-		"start": "node ./dist/server/index.js",
+		"watch": "concurrently \"npx webpack -w\" \"tsc --project ./tsconfig.json -w\" \"tsc --project ./src/client/tsconfig.es6.json -w\" \"nodemon ./dist/server/index.js\"",
+		"copy": "concurrently \"@powershell -Command if (!(Test-Path .\\dist\\client_temp)) {New-Item .\\dist\\client_temp -Type Directory}; Copy-Item -Path .\\src\\html\\* -Destination .\\dist\\client_temp -Recurse -Force\" \"@powershell -Command if (!(Test-Path .\\dist\\client)) {New-Item .\\dist\\client -Type Directory}; Copy-Item -Path .\\src\\html\\* -Destination .\\dist\\client -Recurse -Force\"",
+		"build": "concurrently \" tsc --project ./tsconfig.json\" \"tsc --project ./src/client/tsconfig.es6.json\" \"npx webpack\"",
 		"debug": "node --trace-warnings ./dist/server/index.js",
 		"rcedit": "node ./rcedit.js",
 		"exec": "concurrently \"pkg -t win package.json\" "
@@ -38,6 +37,9 @@
 		"ts-node": "^10.9.2",
 		"ts-node-dev": "^2.0.0",
 		"typescript": "^5.0.4",
+		"webpack": "^5.90.3",
+		"webpack-cli": "^5.1.4",
+		"webpack-node-externals": "^3.0.0",
 		"ws": "^8.15.1"
 	},
 	"dependencies": {
@@ -49,13 +51,13 @@
 		"socket.io": "^4.7.2",
 		"socket.io-client": "^4.7.2",
 		"sqlite": "^5.1.1",
-		"sqlite3": "^5.1.6"
+		"sqlite3": "^5.1.7"
 	},
 	"pkg": {
 		"assets": [
 			"dist/client/**/*",
 			"dist/server/**/*",
-			"node_modules/sqlite3/**/*"
+			"node_modules/sqlite3/build/Release/node_sqlite3.node"
 		],
 		"outputPath": "exec"
 	}

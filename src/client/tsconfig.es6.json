@@ -7,7 +7,7 @@
 		"strict": true,
 		"skipLibCheck": true,
 		"sourceMap": false,
-		"outDir": "../../dist/client",
+		"outDir": "../../dist/client_temp",
 		"moduleResolution":"Node",
 		"strictPropertyInitialization":false
 	},

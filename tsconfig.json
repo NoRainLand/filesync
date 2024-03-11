@@ -7,7 +7,7 @@
 		"strict": true,
 		"skipLibCheck": true,
 		"sourceMap": false,
-		"outDir": "./dist/server",
+		"outDir": "./dist/server_temp",
 		"strictPropertyInitialization": false
 	},
 	"exclude": ["node_modules", "src/client/*.ts"]
