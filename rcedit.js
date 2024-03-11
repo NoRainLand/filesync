@@ -16,7 +16,7 @@ const options = {
 	icon: "./dist/client/favicon.ico",
 };
 
-const exePath = ".pkg-cache/v3.4/built-v14.20.0-win-x64";
+const exePath = ".pkg-cache/v3.4/built-v16.16.0-win-x64";
 
 async function main() {
 	try {
