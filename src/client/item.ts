@@ -28,23 +28,36 @@ export class item {
 
             this.btnDel = document.createElement('button');
 
+
             this.element.appendChild(this.txtNameOrText);
             const buttonContainer = document.createElement('div');
+
             buttonContainer.appendChild(this.txtDate);
             buttonContainer.appendChild(this.btnDownload);
             buttonContainer.appendChild(this.btnCopy);
             buttonContainer.appendChild(this.btnDel);
+
             this.element.appendChild(buttonContainer);
+
             this.btnDownload.textContent = '下载';
             this.btnCopy.textContent = '复制';
             this.btnDel.textContent = '删除';
             this.onceInit = true;
         }
 
+        this.addEvent();
+    }
+    addEvent() {
         this.btnDownload.addEventListener('click', this.downloadFile.bind(this));
         this.btnCopy.addEventListener('click', this.copyData.bind(this));
         this.btnDel.addEventListener('click', this.deleteData.bind(this));
     }
+    removeEvent() {
+        this.btnDownload.removeEventListener('click', this.downloadFile);
+        this.btnCopy.removeEventListener('click', this.copyData);
+        this.btnDel.removeEventListener('click', this.deleteData);
+    }
+
     downloadFile(): void {
         eventSystem.emit('downloadFile', this.data.url, this.data.fileName);
     }
@@ -129,9 +142,7 @@ export class item {
 
     onRemoveItem(): void {
         this.element.parentNode!.removeChild(this.element);
-        this.btnDownload.removeEventListener('click', this.downloadFile);
-        this.btnCopy.removeEventListener('click', this.copyData);
-        this.btnDel.removeEventListener('click', this.deleteData);
+        this.removeEvent();
     }
 
     setMyParnet(parent: HTMLElement) {
