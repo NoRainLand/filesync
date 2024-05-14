@@ -1,12 +1,12 @@
-import { config } from "./config";
+import { Config } from "./Config";
 
-export class logger {
+export class Logger {
     private static sLog: Function;
     private static iLog: Function;
     private static wLog: Function;
     private static eLog: Function;
     static tranLogger() {
-        if (!config.isDebug) {
+        if (!Config.isDebug) {
             this.sLog = console.log;
             this.iLog = console.info;
             this.wLog = console.warn;
@@ -18,7 +18,7 @@ export class logger {
         }
     }
     static log(...args: any[]) {
-        if (!config.isDebug) {
+        if (!Config.isDebug) {
             this.sLog(...args);
         } else {
             console.log(...args);

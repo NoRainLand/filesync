@@ -1,6 +1,6 @@
-import { configType } from "./dataType";
+import { configType } from "./DataType";
 
-export class config {
+export class Config {
     static URL: string = '127.0.0.1'; // 服务器的 URL
     static HTTPPORT: number = 4100; // HTTP 服务器的端口号 注意，如果端口被占用，会自动加10直到找到空闲端口
     static socketPort: number = 4200; // Socket.IO 服务器的端口号 注意，如果端口被占用，会自动加10直到找到空闲端口
@@ -24,8 +24,8 @@ export class config {
         return {
             "ps1": "这里主要是端口号，默认http服务器4100，socket服务器4200",
             "ps2": "如果你要修改，请修改下面的端口号之后重启服务器",
-            "http_port": config.HTTPPORT,
-            "socket_port": config.socketPort
+            "http_port": Config.HTTPPORT,
+            "socket_port": Config.socketPort
         };
     }
 

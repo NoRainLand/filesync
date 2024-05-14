@@ -1,8 +1,8 @@
 import fs from 'fs';
-import { getRelativePath } from './getRelativePath';
-export class fileCtrl {
+import { GetRelativePath } from './GetRelativePath';
+export class FileCtrl {
     static async deleteFile(filePath: string): Promise<void> {
-        filePath = getRelativePath.tranPath(filePath);
+        filePath = GetRelativePath.tranPath(filePath);
         return new Promise((resolve, reject) => {
             if (!filePath) return Promise.reject();
             fs.unlink(filePath, (err) => {

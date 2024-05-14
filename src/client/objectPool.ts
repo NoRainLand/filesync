@@ -1,6 +1,6 @@
 type CreateObjectFunc<T> = () => T;
 
-export class objectPool<T> {
+export class ObjectPool<T> {
     private createObject: CreateObjectFunc<T>;
     private pool: Array<T>;
 

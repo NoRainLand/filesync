@@ -1,11 +1,11 @@
-import { config } from "./config";
+import { Config } from "./Config";
 
-export class httpMgr {
+export class HttpMgr {
     constructor() {
 
     }
     static getSocketInfo<T>(): Promise<T> {
-        return fetch(config.httpApi.getSocketInfo)
+        return fetch(Config.httpApi.getSocketInfo)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(response.statusText);
@@ -17,7 +17,7 @@ export class httpMgr {
     static uploadMsg(formData: FormData, onprogress: (event: ProgressEvent) => {}): Promise<string> {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', config.httpApi.upload, true);
+            xhr.open('POST', Config.httpApi.upload, true);
             xhr.upload.onprogress = onprogress;
             xhr.onload = function () {
                 if (xhr.status === 200) {

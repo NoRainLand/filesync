@@ -1,8 +1,8 @@
-import { config } from "./config";
-import { socketEventType, socketMsgType } from "./dataType";
-import { eventSystem } from "./eventSystem";
+import { Config } from "./Config";
+import { socketEventType, SocketMsgType } from "./DataType";
+import { EventSystem } from "./EventSystem";
 
-export class socketMgr {
+export class SocketMgr {
     constructor() {
 
     }
@@ -28,7 +28,7 @@ export class socketMgr {
         }
         this.isInit = true;
         this.resetConfig();
-        eventSystem.on("visibilitychange", this._onVisibilityChange.bind(this));
+        EventSystem.on("visibilitychange", this._onVisibilityChange.bind(this));
     }
 
 
@@ -44,7 +44,7 @@ export class socketMgr {
     static initSocket() {
         this.close();
         this.init();
-        this.socket = new WebSocket(`ws://${config.URL}:${config.SocketIOPORT}`);
+        this.socket = new WebSocket(`ws://${Config.URL}:${Config.SocketIOPORT}`);
         this.socket.onmessage = this._onSocketMessage.bind(this);
         this.socket.onopen = this._onSocketOpen.bind(this);
         this.socket.onclose = this._onSocketClose.bind(this);
@@ -77,13 +77,13 @@ export class socketMgr {
         }
     }
     private static _onSocketMessage(event: MessageEvent) {
-        let data: socketMsgType = JSON.parse(event.data);
+        let data: SocketMsgType = JSON.parse(event.data);
         if (data.action == "heartBeat") {
             this.getHeartBeat(data);
         } else if (data.action == "refresh") {
             this.getRefresh(data);
         } else if (data.action == "error") {
-            eventSystem.emit("socketEvent", { event: "onerror", data: data.data });
+            EventSystem.emit("socketEvent", { event: "onerror", data: data.data });
         } else {
             this._lastActionTimestamp = data.timeStamp!;
             this._onSocketEvent({ event: "onmessage", data })
@@ -104,16 +104,16 @@ export class socketMgr {
     }
 
     private static _onSocketEvent(msg: socketEventType) {
-        eventSystem.emit("socketEvent", msg);
+        EventSystem.emit("socketEvent", msg);
     }
     //--------------手机浏览器且后台回来刷新----------------
 
     private static tryRefresh() {
-        let data: socketMsgType = { action: "refresh" };
+        let data: SocketMsgType = { action: "refresh" };
         this.send(JSON.stringify(data));
     }
 
-    private static getRefresh(data: socketMsgType) {
+    private static getRefresh(data: SocketMsgType) {
         if (data.timeStamp != this._lastActionTimestamp) {
             console.warn("数据不一致，刷新");
             this._onSocketEvent({ event: "onopen", data: null });
@@ -137,7 +137,7 @@ export class socketMgr {
     private static sendHeartBeat() {
         this.send(JSON.stringify({ action: "heartBeat" }));
     }
-    private static getHeartBeat(data: socketMsgType) {
+    private static getHeartBeat(data: SocketMsgType) {
         if (data.action == "heartBeat") {
             this.lostConnectTimer && clearTimeout(this.lostConnectTimer);
             this.heartBeatTimer && clearTimeout(this.heartBeatTimer);

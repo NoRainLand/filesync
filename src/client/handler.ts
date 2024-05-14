@@ -1,25 +1,25 @@
-export class handler {
+export class Handler {
 
-    static createHandler(caller: any, callback: Function, isOnce: boolean = true): handler {
+    static createHandler(caller: any, callback: Function, isOnce: boolean = true): Handler {
         let hd = this.getHandler();
         hd._caller = caller;
         hd._callback = callback;
         hd._isOnce = isOnce;
         return hd;
     }
-    private static _poor: handler[] = [];
-    private static getHandler(): handler {
+    private static _poor: Handler[] = [];
+    private static getHandler(): Handler {
         if (this._poor.length > 0) {
             let hd = this._poor.pop()!;
             hd._isRecover = false;
             return hd;
         } else {
-            let hd = new handler();
+            let hd = new Handler();
             hd._isRecover = false;
             return hd;
         }
     }
-    static recoverdHandler(handler: handler) {
+    static recoverdHandler(handler: Handler) {
         if (handler) {
             handler._reset();
             this._poor.push(handler);
@@ -50,7 +50,7 @@ export class handler {
         if (!this._isRecover) {
             this._callback?.call(this._caller);
             if (this._isOnce) {
-                handler.recoverdHandler(this);
+                Handler.recoverdHandler(this);
             }
         }
     }
@@ -58,7 +58,7 @@ export class handler {
         if (!this._isRecover) {
             this._callback?.call(this._caller, parms);
             if (this._isOnce) {
-                handler.recoverdHandler(this);
+                Handler.recoverdHandler(this);
             }
         }
     }

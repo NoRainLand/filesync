@@ -1,7 +1,7 @@
-import { config } from "./config";
-import { dialogType } from "./dataType";
+import { Config } from "./Config";
+import { dialogType } from "./DataType";
 
-export class tipsMgr {
+export class TipsMgr {
     private static _body: HTMLElement;
     private static get body() {
         if (!this._body) {
@@ -86,7 +86,7 @@ class myDialog {
     private _cancel: Function | null;
     constructor(parent: HTMLElement) {
         this.parent = parent;
-        this._html = config.myDialog;
+        this._html = Config.myDialog;
         this.init();
     }
     private init() {
@@ -161,7 +161,7 @@ class myAlert {
     private _callback: Function | null;
     constructor(parent: HTMLElement) {
         this.parent = parent;
-        this._html = config.myAlert;
+        this._html = Config.myAlert;
         this.init();
     }
     private init() {
@@ -192,14 +192,14 @@ class myAlert {
         if (type == "msg") {
             this.dialogContent.textContent = content;
             this.qrcode.clear();
-            this.qrcodeDiv.className = config.hideQrcodeDivClass;
+            this.qrcodeDiv.className = Config.hideQrcodeDivClass;
             if (this.imgQrCode) {
                 this.imgQrCode.style.display = "none";
             }
         } else if (type == "qrcode") {
             this.dialogContent.textContent = "";
             this.qrcode.makeCode(content);
-            this.qrcodeDiv.className = config.showQrcodeDivClass;
+            this.qrcodeDiv.className = Config.showQrcodeDivClass;
             if (this.imgQrCode) {
                 this.imgQrCode.style.display = "block";
             }
@@ -274,7 +274,7 @@ class myProgress {
     private myProgressText: HTMLSpanElement;
     constructor(parent: HTMLElement) {
         this.parent = parent;
-        this._html = config.myProgress;
+        this._html = Config.myProgress;
         this.init();
     }
     private init() {

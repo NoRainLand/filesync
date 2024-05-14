@@ -1,7 +1,7 @@
-import { handler } from "./handler";
+import { Handler } from "./Handler";
 
-export class update {
-    private static _handlers: handler[] = [];
+export class Update {
+    private static _handlers: Handler[] = [];
     private static _lastTime: number;
     private static _isStartLoop: boolean = false;
     private static _loop() {
@@ -25,7 +25,7 @@ export class update {
             this._lastTime = Date.now();
             window.requestAnimationFrame(this._loop.bind(this));
         }
-        let hd = handler.createHandler(caller, update, false)
+        let hd = Handler.createHandler(caller, update, false)
         this._handlers.push(hd);
     }
 }

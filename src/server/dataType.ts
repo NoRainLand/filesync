@@ -26,10 +26,9 @@ export type actionAddType = { msg: msgType }
 
 export type socketInfoType = { "socketURL": string, "socketPORT": number, "version": string };
 
-//---------------本地-------------
 
+/**事件类型 */
 export type eventType = "deleteItem" | "msgSaved";
 
-//---------------对外配置-------------
-
+/**服务器配置 */
 export type configType = { "ps1": string, "ps2": string, "http_port": number, "socket_port": number }

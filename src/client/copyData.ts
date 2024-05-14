@@ -1,4 +1,4 @@
-export class copyData {
+export class CopyData {
     //已经废弃
     static async copyToClipboard(text: string): Promise<void> {
         try {

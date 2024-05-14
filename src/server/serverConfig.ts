@@ -1,15 +1,15 @@
 import fs from 'fs';
-import { config } from './config';
-import { getRelativePath } from './getRelativePath';
-export class serverConfig {
+import { Config } from './Config';
+import { GetRelativePath } from './GetRelativePath';
+export class ServerConfig {
     private static configPath: string;
     static readConfig(configPath: string) {
-        this.configPath = getRelativePath.tranPath(configPath);
+        this.configPath = GetRelativePath.tranPath(configPath);
         if (fs.existsSync(this.configPath)) {
             try {
                 let serverConfig = JSON.parse(fs.readFileSync(this.configPath, 'utf-8'));
-                config.HTTPPORT = serverConfig.http_port;
-                config.socketPort = serverConfig.socket_port;
+                Config.HTTPPORT = serverConfig.http_port;
+                Config.socketPort = serverConfig.socket_port;
                 console.log("配置文件读取成功");
             } catch (e) {
                 console.warn(e);
@@ -19,6 +19,6 @@ export class serverConfig {
         }
     }
     static writeConfig(configPath: string) {
-        fs.writeFileSync(this.configPath, JSON.stringify(config.serverConfig, null, 2));
+        fs.writeFileSync(this.configPath, JSON.stringify(Config.serverConfig, null, 2));
     }
 }

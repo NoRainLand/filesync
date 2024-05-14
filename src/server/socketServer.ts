@@ -1,12 +1,12 @@
 import * as net from 'net';
 import { WebSocketServer } from 'ws';
-import { config } from './config';
-import { dataCtrl } from './dataCtrl';
-import { actionAddType, actionDelteType, actionFullMsgType, msgType, socketMsgType } from './dataType';
-import { eventSystem } from './eventSystem';
-import { fileCtrl } from './fileCtrl';
+import { Config } from './Config';
+import { DataCtrl } from './DataCtrl';
+import { actionAddType, actionDelteType, actionFullMsgType, msgType, socketMsgType } from './DataType';
+import { EventSystem } from './EventSystem';
+import { FileCtrl } from './FileCtrl';
 
-export class socketServer {
+export class SocketServer {
     private static wss: WebSocketServer;
 
     private static _lastActionTimestamp: number = 0;
@@ -19,7 +19,7 @@ export class socketServer {
             this.server.once('error', (err: any) => {
                 if (err.code === 'EADDRINUSE') {
                     console.log(`端口${port}已被占用，尝试使用端口${port + 10}`);
-                    resolve(socketServer.startSocketServer(port + 10));
+                    resolve(SocketServer.startSocketServer(port + 10));
                 } else {
                     console.error(err);
                 }
@@ -27,12 +27,12 @@ export class socketServer {
             this.server.once('listening', () => {
                 this.server.close();
                 this.wss = new WebSocketServer({ port: port });
-                config.socketPort = port;
+                Config.socketPort = port;
                 console.log("socket服务器已启动：");
-                console.log(`ws://${config.URL}:${port}`);
+                console.log(`ws://${Config.URL}:${port}`);
                 this._lastActionTimestamp = Date.now();
-                this.wss.on('connection', socketServer.onSocketConnection.bind(socketServer));
-                eventSystem.on('msgSaved', this.sendSaveMsg.bind(this));
+                this.wss.on('connection', SocketServer.onSocketConnection.bind(SocketServer));
+                EventSystem.on('msgSaved', this.sendSaveMsg.bind(this));
                 resolve(null);
             });
             this.server.listen(port);
@@ -72,13 +72,13 @@ export class socketServer {
                 break;
             case 'delete':
                 let fileOrTextHash: string = socketMsgFromClient.data!;
-                dataCtrl.getMsgTypeByHash(fileOrTextHash).then((msgType: msgType) => {
+                DataCtrl.getMsgTypeByHash(fileOrTextHash).then((msgType: msgType) => {
                     if (msgType != null && msgType.msgType != null) {//防止重复删除
                         if (msgType.msgType === 'file') {
-                            fileCtrl.deleteFile(msgType.url!);
+                            FileCtrl.deleteFile(msgType.url!);
                         }
-                        dataCtrl.deleteMsg(fileOrTextHash).then(() => {
-                            eventSystem.emit('deleteItem', fileOrTextHash);
+                        DataCtrl.deleteMsg(fileOrTextHash).then(() => {
+                            EventSystem.emit('deleteItem', fileOrTextHash);
                             this._lastActionTimestamp = Date.now();
                             let data: actionDelteType = { fileOrTextHash: fileOrTextHash };
                             let socketMsg: socketMsgType = { action: 'delete', timeStamp: this._lastActionTimestamp, data: data };
@@ -91,7 +91,7 @@ export class socketServer {
                 });
                 break;
             case 'full':
-                dataCtrl.getAllMsgs().then((msgs: msgType[]) => {
+                DataCtrl.getAllMsgs().then((msgs: msgType[]) => {
                     let data: actionFullMsgType = { msgs: msgs };
                     let socketMsg: socketMsgType = { action: 'full', timeStamp: this._lastActionTimestamp, data: data };
                     ws.send(JSON.stringify(socketMsg));

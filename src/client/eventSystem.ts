@@ -1,8 +1,8 @@
-import { eventType } from "./dataType";
+import { eventType } from "./DataType";
 
 type Callback = (...args: any[]) => void;
 
-export class eventSystem {
+export class EventSystem {
     private static _events: { [key: string]: Callback[] } = {};
     private static get events() {
         return this._events;

@@ -1,6 +1,6 @@
 export type socketActionType = "add" | "delete" | "full" | "heartBeat" | "refresh" | "error";
 
-export type socketMsgType = {
+export type SocketMsgType = {
     action: socketActionType,
     timeStamp?: number,
     data?: any,

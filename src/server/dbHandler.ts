@@ -1,10 +1,10 @@
 import fs from 'fs';
 import sqlite3 from 'sqlite3';
-import { config } from './config';
-import { msgType } from './dataType';
-import { getRelativePath } from './getRelativePath';
+import { Config } from './Config';
+import { msgType } from './DataType';
+import { GetRelativePath } from './GetRelativePath';
 
-export class dbHandler {
+export class DbHandler {
     private static db: sqlite3.Database;
     private static tableName: string = "";
 
@@ -17,7 +17,7 @@ export class dbHandler {
 
     static async openDatabase(dbPath: string, tableName: string) {
         if (this.dbIsOpen) return Promise.resolve();
-        this.dbPath = getRelativePath.tranPath(dbPath);
+        this.dbPath = GetRelativePath.tranPath(dbPath);
         this.dbExists = fs.existsSync(this.dbPath);
         await new Promise((resolve, reject) => {
             this.tableName = tableName;
@@ -41,7 +41,7 @@ export class dbHandler {
                 } else {
                     self.dbIsOpen = true;
                     if (!self.dbExists) {
-                        resolve(self.writeToDatabase((config.wellcomeMsg as any)));
+                        resolve(self.writeToDatabase((Config.wellcomeMsg as any)));
                     } else {
                         console.log(`数据库 ${this.dbPath} 已开启`);
                         resolve(null);

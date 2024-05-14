@@ -1,6 +1,6 @@
 import path from "path";
 
-export class getRelativePath {
+export class GetRelativePath {
     /**获取相对代码运行的路径 */
     static tranPath(sourcePath: string, extraPath: string = "") {
         if ((<any>process).pkg) {

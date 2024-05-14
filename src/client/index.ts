@@ -1,13 +1,12 @@
-import { TestClass } from '../common/TestClass';
-import { config } from "./config";
-import { actionAddType, actionDelteType, actionFullMsgType, colorType, msgType, socketInfoType, socketMsgType } from "./dataType";
-import { eventSystem } from "./eventSystem";
-import { httpMgr } from "./httpMgr";
-import { item } from "./item";
-import { logger } from "./logger";
-import { objectPool } from "./objectPool";
-import { socketMgr } from "./socketMgr";
-import { tipsMgr } from "./tipsMgr";
+import { Config } from "./Config";
+import { actionAddType, actionDelteType, actionFullMsgType, colorType, msgType, socketInfoType, SocketMsgType } from "./DataType";
+import { EventSystem } from "./EventSystem";
+import { HttpMgr } from "./HttpMgr";
+import { Item } from "./Item";
+import { Logger } from "./Logger";
+import { ObjectPool } from "./ObjectPool";
+import { SocketMgr } from "./SocketMgr";
+import { TipsMgr } from "./TipsMgr";
 
 export class index {
     fileInput: any;
@@ -16,10 +15,10 @@ export class index {
     uploadButton: HTMLButtonElement;
     fileList: HTMLElement;
     msgList: msgType[];
-    itemPool: objectPool<item>;
+    itemPool: ObjectPool<Item>;
     msgHashArr: Array<string>;
 
-    itemList: item[];
+    itemList: Item[];
 
     private aHref: HTMLAnchorElement;
 
@@ -62,7 +61,6 @@ export class index {
     constructor() {
         this.init();
         (<any>window).NiarApp = this;
-        new TestClass();
     }
 
     init() {
@@ -71,19 +69,19 @@ export class index {
         this.msgList = [];
         this.msgHashArr = [];
         this.itemList = [];
-        this.itemPool = new objectPool(() => new item());
+        this.itemPool = new ObjectPool(() => new Item());
         this.initTheme();
 
         this.getSocketInfo();
         this.addEvent();
-        logger.tranLogger();
-        if (config.openVconsole) {
+        Logger.tranLogger();
+        if (Config.openVconsole) {
             this.vConsole = new (window as any).VConsole();
         }
 
-        this.clipboard = new (window as any).ClipboardJS("." + config.copyBtnClass);
+        this.clipboard = new (window as any).ClipboardJS("." + Config.copyBtnClass);
         this.clipboard.on('error', function (e: any) {
-            tipsMgr.showTips("复制失败，可能是权限不足或者浏览器不支持");
+            TipsMgr.showTips("复制失败，可能是权限不足或者浏览器不支持");
             console.error(e);
         });
     }
@@ -103,17 +101,17 @@ export class index {
 
     initTheme() {
         if (this.isDark) {
-            this.themeButtonSvg.innerHTML = config.sunSVG;
+            this.themeButtonSvg.innerHTML = Config.sunSVG;
             document.documentElement.setAttribute('data-theme', 'dark');
         } else {
-            this.themeButtonSvg.innerHTML = config.moonSVG;
+            this.themeButtonSvg.innerHTML = Config.moonSVG;
             document.documentElement.setAttribute('data-theme', 'light');
         }
     }
 
     addEvent() {
-        eventSystem.on('deleteItem', this.deleteItem.bind(this));
-        eventSystem.on('downloadFile', this.downloadFile.bind(this));
+        EventSystem.on('deleteItem', this.deleteItem.bind(this));
+        EventSystem.on('downloadFile', this.downloadFile.bind(this));
         this.uploadButton.addEventListener('click', this.sendMsg.bind(this));
         this.textInput.addEventListener('keydown', this.onKeyDown.bind(this));
 
@@ -121,10 +119,10 @@ export class index {
 
         this.qrcodeButtonSvg.addEventListener('click', this.onShowLocalQrcode.bind(this));
 
-        eventSystem.on('socketEvent', this.onSocketEvent.bind(this));
+        EventSystem.on('socketEvent', this.onSocketEvent.bind(this));
 
         document.addEventListener('visibilitychange', () => {
-            eventSystem.emit("visibilitychange", document.hidden);
+            EventSystem.emit("visibilitychange", document.hidden);
         });
     }
 
@@ -143,7 +141,7 @@ export class index {
     }
 
     onShowLocalQrcode() {
-        tipsMgr.showAlert(window.location.href, "当前网址", "qrcode");
+        TipsMgr.showAlert(window.location.href, "当前网址", "qrcode");
     }
 
 
@@ -151,7 +149,7 @@ export class index {
         let timeoutId: any = null;
         let text = this.textInput.value;
         if (!this.fileInput!.files.length && !text) {
-            tipsMgr.showTips('请选择文件或输入文本');
+            TipsMgr.showTips('请选择文件或输入文本');
             return;
         }
         this.inputLock = true;
@@ -234,7 +232,7 @@ export class index {
     //--------------客户端操作----------------
 
     deleteItem(fileOrTextHash: string) {
-        let data: socketMsgType = { action: 'delete', data: fileOrTextHash };
+        let data: SocketMsgType = { action: 'delete', data: fileOrTextHash };
         this.sendSocketMsg(JSON.stringify(data));
     }
 
@@ -262,13 +260,13 @@ export class index {
     //-------------http-----------------
 
     getSocketInfo() {
-        httpMgr.getSocketInfo<socketInfoType>()
+        HttpMgr.getSocketInfo<socketInfoType>()
             .then((socketInfo) => {
-                config.URL = socketInfo.socketURL;
-                config.SocketIOPORT = socketInfo.socketPORT;
-                config.version = socketInfo.version;
-                socketMgr.initSocket();
-                logger.log("当前版本" + config.version);
+                Config.URL = socketInfo.socketURL;
+                Config.SocketIOPORT = socketInfo.socketPORT;
+                Config.version = socketInfo.version;
+                SocketMgr.initSocket();
+                Logger.log("当前版本" + Config.version);
             })
             .catch((error) => {
                 console.warn(error);
@@ -277,10 +275,10 @@ export class index {
     }
 
     sendHttpMsg(formData: FormData) {
-        httpMgr.uploadMsg(formData, (event: ProgressEvent) => {
+        HttpMgr.uploadMsg(formData, (event: ProgressEvent) => {
             if (event.lengthComputable) {
-                if (event.total > config.showProgressMinSize) {
-                    tipsMgr.showProgress(event.loaded / event.total);
+                if (event.total > Config.showProgressMinSize) {
+                    TipsMgr.showProgress(event.loaded / event.total);
                 }
             }
             return {};
@@ -291,15 +289,15 @@ export class index {
             .catch((error) => {
                 console.warn(error);
                 if (error.response) {
-                    tipsMgr.showAlert(error.response.data, "发送失败");
+                    TipsMgr.showAlert(error.response.data, "发送失败");
                 } else {
-                    tipsMgr.showAlert(error.message, "发送失败");
+                    TipsMgr.showAlert(error.message, "发送失败");
                 }
             })
             .finally(() => {
                 setTimeout(() => {
                     this.inputLock = false;
-                    tipsMgr.hideProgress();
+                    TipsMgr.hideProgress();
                 }, this.sendTimeout);
                 this.fileInput.value = '';
                 this.textInput.value = '';
@@ -311,7 +309,7 @@ export class index {
 
     //-------------socket-----------------
 
-    onSocketMessage(data: socketMsgType) {
+    onSocketMessage(data: SocketMsgType) {
         switch (data.action) {
             case "add":
                 this.createItem(data.data);
@@ -332,7 +330,7 @@ export class index {
         this.showMsg("连接成功", "green");
         this.inputLock = false;
         // 向服务器发送一个请求所有数据的消息
-        let data: socketMsgType = { action: "full" }
+        let data: SocketMsgType = { action: "full" }
         this.sendSocketMsg(JSON.stringify(data));
     }
 
@@ -340,7 +338,7 @@ export class index {
         this.inputLock = true;
         if (!isReconnect) {
             this.showMsg("服务器已关闭", "red");
-            tipsMgr.showDialog("服务器已关闭，点击确定刷新页面", this, () => {
+            TipsMgr.showDialog("服务器已关闭，点击确定刷新页面", this, () => {
                 location.reload();
             }, null, "提示", true);
         } else {
@@ -349,13 +347,13 @@ export class index {
     }
 
     onSocketError(event: Event) {
-        tipsMgr.showAlert(JSON.stringify(event), "socket错误");
+        TipsMgr.showAlert(JSON.stringify(event), "socket错误");
     }
 
     sendSocketMsg(msg: string) {
-        let readyState = socketMgr.send(msg);
+        let readyState = SocketMgr.send(msg);
         if (readyState != WebSocket.OPEN) {
-            tipsMgr.showAlert("消息发送失败，socket状态异常，状态码:" + readyState, "socket错误");
+            TipsMgr.showAlert("消息发送失败，socket状态异常，状态码:" + readyState, "socket错误");
             switch (readyState) {
                 case -1:
                     console.warn("socket未初始化");//怎么会出现这个情况？

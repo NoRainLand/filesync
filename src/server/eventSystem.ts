@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
-import { eventType } from './dataType';
+import { eventType } from './DataType';
 
-export class eventSystem {
+export class EventSystem {
     private static _eventEmitter: EventEmitter;
     static get eventEmitter(): EventEmitter {
         if (!this._eventEmitter) {

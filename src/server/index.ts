@@ -1,29 +1,27 @@
 import open from 'open';
 import * as os from 'os';
-import { TestClass } from '../common/TestClass';
-import { config } from './config';
-import { dbHandler } from './dbHandler';
-import { httpServer } from './httpServer';
-import { serverConfig } from './serverConfig';
-import { socketServer } from './socketServer';
+import { Config } from './Config';
+import { DbHandler } from './DbHandler';
+import { HttpServer } from './HttpServer';
+import { ServerConfig } from './ServerConfig';
+import { SocketServer } from './SocketServer';
 export default class main {
 
     webUrl: string = '';
 
     constructor() {
         this.init();
-        new TestClass();
     }
 
     async init() {
-        config.URL = this.getLocalIP();
-        serverConfig.readConfig(config.serverConfigPath);
-        await dbHandler.openDatabase(config.dbPath, config.tableName);
-        await socketServer.startSocketServer(config.socketPort);
-        await httpServer.startHttpServer(config.HTTPPORT);
-        this.webUrl = `http://${config.URL}:${config.HTTPPORT}`;
+        Config.URL = this.getLocalIP();
+        ServerConfig.readConfig(Config.serverConfigPath);
+        await DbHandler.openDatabase(Config.dbPath, Config.tableName);
+        await SocketServer.startSocketServer(Config.socketPort);
+        await HttpServer.startHttpServer(Config.HTTPPORT);
+        this.webUrl = `http://${Config.URL}:${Config.HTTPPORT}`;
         await open(this.webUrl);
-        await serverConfig.writeConfig(config.serverConfigPath);
+        await ServerConfig.writeConfig(Config.serverConfigPath);
     }
 
     getLocalIP() {

@@ -1,25 +1,25 @@
-import { msgType } from "./dataType";
-import { dbHandler } from "./dbHandler";
+import { msgType } from "./DataType";
+import { DbHandler } from "./DbHandler";
 
-export class dataCtrl {
+export class DataCtrl {
     static writeToDatabase(msg: msgType): Promise<void> {
-        return dbHandler.writeToDatabase(msg)
+        return DbHandler.writeToDatabase(msg)
     }
     static deleteMsg(hash: string): Promise<void> {
-        return dbHandler.deleteFromDatabase(hash);
+        return DbHandler.deleteFromDatabase(hash);
     }
     static getAllMsgs(): Promise<msgType[]> {
-        return dbHandler.getAllMsgs();
+        return DbHandler.getAllMsgs();
     }
     static getAllFileOrTextHashes(): Promise<string[]> {
-        return dbHandler.getAllFileOrTextHashes();
+        return DbHandler.getAllFileOrTextHashes();
     }
     static getMsgTypeByHash(hash: string): Promise<msgType> {
-        return dbHandler.getMsgTypeByHash(hash);
+        return DbHandler.getMsgTypeByHash(hash);
     }
 
 
     static getFileName2HashNameMap(): Promise<Map<string, string>> {
-        return dbHandler.getFileName2HashNameMap();
+        return DbHandler.getFileName2HashNameMap();
     }
 }

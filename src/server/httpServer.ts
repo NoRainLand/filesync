@@ -6,13 +6,13 @@ import path from 'path';
 
 import crypto from 'crypto';
 import fs from 'fs';
-import { config } from './config';
-import { dataCtrl } from './dataCtrl';
-import { msgType, socketInfoType } from './dataType';
-import { eventSystem } from './eventSystem';
-import { getRelativePath } from './getRelativePath';
+import { Config } from './Config';
+import { DataCtrl } from './DataCtrl';
+import { msgType, socketInfoType } from './DataType';
+import { EventSystem } from './EventSystem';
+import { GetRelativePath } from './GetRelativePath';
 
-export class httpServer {
+export class HttpServer {
     private static fileHashes: string[];
 
     private static fileName2HashNameMap: Map<string, string>;
@@ -28,12 +28,12 @@ export class httpServer {
 
     static async startHttpServer(port: number) {
 
-        await dataCtrl.getAllFileOrTextHashes().then((hashes) => {
+        await DataCtrl.getAllFileOrTextHashes().then((hashes) => {
             this.fileHashes = hashes;
             this.fileHashes = this.fileHashes ? this.fileHashes : [];
         });
 
-        await dataCtrl.getFileName2HashNameMap().then((map) => {
+        await DataCtrl.getFileName2HashNameMap().then((map) => {
             this.fileName2HashNameMap = map;
             this.hashName2FileNameMap = new Map();
             if (this.fileName2HashNameMap) {
@@ -44,7 +44,7 @@ export class httpServer {
         });
 
         await new Promise((resolve, reject) => {
-            this.savePath = getRelativePath.tranPath(config.savePath);
+            this.savePath = GetRelativePath.tranPath(Config.savePath);
             this.checkUploadFileDir();
             this.app = express();
             this.server = http.createServer(this.app);
@@ -69,14 +69,14 @@ export class httpServer {
             server.listen(port)
                 .on('listening', () => {
                     console.log("http服务器已启动：");
-                    console.log(`http://${config.URL}:${config.HTTPPORT}`);
+                    console.log(`http://${Config.URL}:${Config.HTTPPORT}`);
                     resolve(null);
                 })
                 .on('error', (err: any) => {
                     if (err.code === 'EADDRINUSE') {
                         console.warn(`端口${port}已被占用，尝试使用端口${port + 10}`);
                         server.removeAllListeners('listening');
-                        config.HTTPPORT = port + 10;
+                        Config.HTTPPORT = port + 10;
                         resolve(self.startServer(server, port + 10));
                     } else {
                         reject(err);
@@ -94,7 +94,7 @@ export class httpServer {
 
     private static addEvent() {
         this.onServerApi();
-        eventSystem.on("deleteItem", this.deleteFileOrText.bind(this));
+        EventSystem.on("deleteItem", this.deleteFileOrText.bind(this));
     }
 
     private static deleteFileOrText(fileOrTextHash: string) {
@@ -149,7 +149,7 @@ export class httpServer {
                     return res.status(409).send('文件已存在' + req.file!.originalname);
                 }
                 res.send('文件上传成功');
-                let savePath = `${config.savePath}/${req.file!.filename}`;
+                let savePath = `${Config.savePath}/${req.file!.filename}`;
                 const msg: msgType = {
                     msgType: "file",
                     fileOrTextHash: fileHash,
@@ -159,8 +159,8 @@ export class httpServer {
                     size: (req.file!.size / 1024) > 0 ? (req.file!.size / 1024) : 0,
                     hashName: req.file!.filename
                 };
-                dataCtrl.writeToDatabase(msg).then(() => {
-                    eventSystem.emit('msgSaved', msg);
+                DataCtrl.writeToDatabase(msg).then(() => {
+                    EventSystem.emit('msgSaved', msg);
                     this.fileHashes.push(fileHash);
                     this.fileName2HashNameMap.set(req.file!.originalname, req.file!.filename);
                     this.hashName2FileNameMap.set(req.file!.filename, req.file!.originalname);
@@ -184,8 +184,8 @@ export class httpServer {
                 size: 0,
                 hashName: ""
             };
-            dataCtrl.writeToDatabase(msg).then(() => {
-                eventSystem.emit('msgSaved', msg);
+            DataCtrl.writeToDatabase(msg).then(() => {
+                EventSystem.emit('msgSaved', msg);
             }).catch((err) => {
                 res.status(500).send(err);
             });
@@ -195,9 +195,9 @@ export class httpServer {
     private static onGetSocketInfoApi() {
         this.app.get('/getSocketInfo', (req: Request, res: Response) => {
             const socketInfo: socketInfoType = {
-                socketURL: config.URL,
-                socketPORT: config.socketPort,
-                version: config.version,
+                socketURL: Config.URL,
+                socketPORT: Config.socketPort,
+                version: Config.version,
             };
             res.send(socketInfo);
         });
@@ -205,9 +205,9 @@ export class httpServer {
 
 
     private static onGetWebFileApi() {
-        for (let key in config.loadConfig) {
+        for (let key in Config.loadConfig) {
             this.app.get(key, (req: Request, res: Response) => {
-                res.sendFile(path.join(__dirname, '../client/' + config.loadConfig[key]));
+                res.sendFile(path.join(__dirname, '../client/' + Config.loadConfig[key]));
             });
         }
         this.app.use('/client', express.static(path.join(__dirname, '../client')));
