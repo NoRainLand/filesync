@@ -3,7 +3,7 @@ var nodeExternals = require('webpack-node-externals');
 
 module.exports = [
 	{
-		entry: "./dist/client_temp/index.js",
+		entry: "./dist/client_temp/client/index.js",
 		output: {
 			path: path.resolve(__dirname, "dist/client"),
 			filename: "index.js",
@@ -11,7 +11,7 @@ module.exports = [
 		mode: "production",
 	},
 	{
-		entry: "./dist/server_temp/index.js",
+		entry: "./dist/server_temp/server/index.js",
 		output: {
 			path: path.resolve(__dirname, "dist/server"),
 			filename: "index.js",

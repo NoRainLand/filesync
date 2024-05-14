@@ -1,5 +1,5 @@
 import * as net from 'net';
-import { Server as WebSocketServer } from 'ws';
+import { WebSocketServer } from 'ws';
 import { config } from './config';
 import { dataCtrl } from './dataCtrl';
 import { actionAddType, actionDelteType, actionFullMsgType, msgType, socketMsgType } from './dataType';

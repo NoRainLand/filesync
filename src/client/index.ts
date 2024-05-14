@@ -1,3 +1,4 @@
+import { TestClass } from '../common/TestClass';
 import { config } from "./config";
 import { actionAddType, actionDelteType, actionFullMsgType, colorType, msgType, socketInfoType, socketMsgType } from "./dataType";
 import { eventSystem } from "./eventSystem";
@@ -61,6 +62,7 @@ export class index {
     constructor() {
         this.init();
         (<any>window).NiarApp = this;
+        new TestClass();
     }
 
     init() {

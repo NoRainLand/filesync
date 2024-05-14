@@ -1,5 +1,6 @@
 import open from 'open';
 import * as os from 'os';
+import { TestClass } from '../common/TestClass';
 import { config } from './config';
 import { dbHandler } from './dbHandler';
 import { httpServer } from './httpServer';
@@ -11,6 +12,7 @@ export default class main {
 
     constructor() {
         this.init();
+        new TestClass();
     }
 
     async init() {

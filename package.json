@@ -5,9 +5,9 @@
 	"bin": "dist/server/index.js",
 	"main": "dist/server/index.js",
 	"scripts": {
-		"watch": "concurrently \"npx webpack -w\" \"tsc --project ./tsconfig.json -w\" \"tsc --project ./src/client/tsconfig.es6.json -w\" \"nodemon ./dist/server/index.js\"",
-		"copy": "concurrently \"@powershell -Command if (!(Test-Path .\\dist\\client_temp)) {New-Item .\\dist\\client_temp -Type Directory}; Copy-Item -Path .\\src\\html\\* -Destination .\\dist\\client_temp -Recurse -Force\" \"@powershell -Command if (!(Test-Path .\\dist\\client)) {New-Item .\\dist\\client -Type Directory}; Copy-Item -Path .\\src\\html\\* -Destination .\\dist\\client -Recurse -Force\"",
-		"build": "tsc --project ./tsconfig.json && tsc --project ./src/client/tsconfig.es6.json && npx webpack",
+		"watch": "concurrently \"npx webpack -w\" \"tsc --project ./tsconfig.json -w\" \"tsc --project ./tsconfig.es6.json -w\" \"nodemon ./dist/server/index.js\"",
+		"copy": "concurrently \"@powershell -Command if (!(Test-Path .\\dist\\client)) {New-Item .\\dist\\client -Type Directory}; Copy-Item -Path .\\src\\html\\* -Destination .\\dist\\client -Recurse -Force\"",
+		"build": "tsc --project ./tsconfig.json && tsc --project ./tsconfig.es6.json && npx webpack",
 		"debug": "node --trace-warnings ./dist/server/index.js",
 		"rcedit": "node ./rcedit.js",
 		"exec": "concurrently \"pkg -t win package.json\" "

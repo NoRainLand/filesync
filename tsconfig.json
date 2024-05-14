@@ -10,5 +10,6 @@
 		"outDir": "./dist/server_temp",
 		"strictPropertyInitialization": false
 	},
-	"exclude": ["node_modules", "src/client/*.ts"]
+	"exclude": ["node_modules", "src/client/*.ts"],
+	"include": ["src/server/*.ts","src/common/*.ts"]
 }

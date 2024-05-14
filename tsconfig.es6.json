@@ -7,10 +7,9 @@
 		"strict": true,
 		"skipLibCheck": true,
 		"sourceMap": false,
-		"outDir": "../../dist/client_temp",
-		"moduleResolution":"Node",
-		"strictPropertyInitialization":false
+		"outDir": "./dist/client_temp",
+		"strictPropertyInitialization": false
 	},
-	"include": ["./*.ts"],
-
+	"exclude": ["node_modules", "src/server/*.ts"],
+	"include": ["src/client/*.ts","src/common/*.ts"]
 }
