@@ -1,67 +1,58 @@
-import "../../client/css/style.scss";
+import "../../client/css/style.scss"; //引入样式 这个是copy到client文件之后的路径
 import { ProjectConfig } from "../ProjectConfig";
+import { ServerInfo } from "../common/CommonDefine";
 import { EventMgr } from "../common/EventMgr";
 import { NiarApp } from "../common/NiarApp";
-import { EventName } from "./ClientDefine";
-import { HtmlControl } from "./HtmlControl";
+import { Color, EventName } from "./ClientDefine";
+import { Config } from "./Config";
+import { HttpMgr } from "./HttpMgr";
+import { InputMgr } from "./InputMgr";
 import { Logger } from "./Logger";
+import { MsgItemMgr } from "./MsgItemMgr";
+import { QRCodeButton } from "./QRCodeButton";
+import { ThemeMgr } from "./ThemeMgr";
 import { Utils } from "./Utils";
 export class index {
 
+    statusText: HTMLParagraphElement;
 
-    private _isDark: number = -1;
-    get isDark(): boolean {
-        if (this._isDark == -1) {
-            let dark = localStorage.getItem("isDark");
-            if (dark == null || dark == void 0) {
-                this._isDark = 0;
-                localStorage.setItem("isDark", "false");
-            } else {
-                this._isDark = ((dark == "true") ? 1 : 0);
-            }
-        }
-        return !!this._isDark;
-    }
-    set isDark(value: boolean) {
-        this._isDark = value ? 1 : 0;
-        localStorage.setItem("isDark", value.toString());
-    }
-
-    themeButtonSvg: HTMLElement;
-
-
+    pageParent: HTMLElement;
     constructor() {
         this.init();
     }
     init() {
         (<any>window)["NiarApp"] = NiarApp;
+        Logger.tranLogger();
         ProjectConfig.openVC && Utils.openVConsole();
         this.initUI();
-        this.initTheme();
-        Logger.tranLogger();
+        ThemeMgr.init(this.pageParent);
+        MsgItemMgr.init(this.pageParent);
+        QRCodeButton.init(this.pageParent);
+        InputMgr.init();
         this.addEvent();
+        HttpMgr.getSocketInfo<ServerInfo>()
+            .then((socketInfo) => {
+                Config.serverURL = socketInfo.socketServerURL;
+                Config.socketPort = socketInfo.socketPort;
+                Config.version = socketInfo.version;
+                // SocketMgr.initSocket();
+                Logger.log("当前版本" + Config.version);
+            })
+            .catch((error) => {
+                console.warn(error);
+                this.showMsg("获取socket信息失败", Color.red);
+            });
     }
-
     initUI() {
-        this.themeButtonSvg = document.getElementById('themeButton') as HTMLElement;
+        this.pageParent = document.getElementById('pageParent') as HTMLElement;
+        this.statusText = document.getElementById('statusText') as HTMLParagraphElement;
     }
 
-    initTheme() {
-        if (this.isDark) {
-            this.themeButtonSvg.innerHTML = HtmlControl.sunSVG;
-            document.documentElement.setAttribute('data-theme', 'dark');
-        } else {
-            this.themeButtonSvg.innerHTML = HtmlControl.moonSVG;
-            document.documentElement.setAttribute('data-theme', 'light');
-        }
-    }
 
     addEvent() {
         document.addEventListener(EventName.visibilitychange, () => {
             EventMgr.emit(EventName.visibilitychange, document.hidden);
         });
-
-        this.themeButtonSvg.addEventListener('click', this.onChangeTheme.bind(this));
     }
 
     removeEvent() {
@@ -70,11 +61,19 @@ export class index {
         });
     }
 
-    onChangeTheme() {
-        this.isDark = !this.isDark;
-        this.initTheme();
+    /**显示固定的页面消息 */
+    showMsg(msg: string, color: Color) {
+        if (this.statusText) {
+            this.statusText.textContent = msg;
+            this.statusText.style.color = color;
+        }
     }
 
+    clear() {
+        MsgItemMgr.clear();
+        InputMgr.clear();
+        ThemeMgr.clear();
+    }
 
 }
 new index();

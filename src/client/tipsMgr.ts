@@ -1,6 +1,7 @@
 import { Pool } from "../common/Pool";
 import { dialogType } from "./DataType";
 import { HtmlControl } from "./HtmlControl";
+import { Utils } from "./Utils";
 
 export class TipsMgr {
     private static _body: HTMLElement;
@@ -83,15 +84,14 @@ export class TipsMgr {
     }
 }
 
-interface UIControl {
-    _html: string;
-    init(): void;
-    show(...args: any[]): void;
-    close(): void;
+class UIControl {
+    init(): void { };
+    show(...args: any[]): void { };
+    close(): void { };
 }
 
-class Dialog implements UIControl {
-    _html: string;
+class Dialog extends UIControl {
+
     private parent: HTMLElement;
     private dialog: HTMLDialogElement;
     private dialogTitle: HTMLHeadingElement;
@@ -103,13 +103,13 @@ class Dialog implements UIControl {
     private _sure: Function | null;
     private _cancel: Function | null;
     constructor(parent: HTMLElement) {
+        super();
         this.parent = parent;
-        this._html = HtmlControl.Dialog;
         this.init();
     }
     init() {
-        this.parent.insertAdjacentHTML("afterbegin", this._html);
-        this.dialog = document.getElementById('myDialog') as HTMLDialogElement;
+        this.dialog = Utils.createControl(this.parent, HtmlControl.Dialog, "myDialog") as HTMLDialogElement;
+
 
         this.dialogTitle = this.dialog.querySelector("article header h6")!;
         this.dialogContent = this.dialog.querySelector("article p")!;
@@ -165,8 +165,8 @@ class Dialog implements UIControl {
     }
 }
 
-class Alert implements UIControl {
-    _html: string;
+class Alert extends UIControl {
+
     private qrcode: any;
     private parent: HTMLElement;
     private qrcodeDiv: HTMLElement;
@@ -178,13 +178,12 @@ class Alert implements UIControl {
     private _caller: any;
     private _callback: Function | null;
     constructor(parent: HTMLElement) {
+        super();
         this.parent = parent;
-        this._html = HtmlControl.Alert;
         this.init();
     }
     init() {
-        this.parent.insertAdjacentHTML("afterbegin", this._html);
-        this.dialog = document.getElementById('myAlert') as HTMLDialogElement;
+        this.dialog = Utils.createControl(this.parent, HtmlControl.Alert, "myAlert") as HTMLDialogElement;
 
         this.qrcodeDiv = this.dialog.querySelector('#qrcodeDiv') as HTMLElement;
         this.qrcode = new ((window as any).QRCode)(this.qrcodeDiv);
@@ -233,12 +232,13 @@ class Alert implements UIControl {
     }
 }
 
-class Notice implements UIControl {
-    _html: string;
+class Notice extends UIControl {
+
     private parent: HTMLElement;
     private showIngTips: HTMLElement[];
     private tipsPool: Pool<HTMLElement>;
     constructor(parent: HTMLElement) {
+        super();
         this.parent = parent;
         this.showIngTips = [];
         this.tipsPool = new Pool<HTMLElement>(this.createTips);
@@ -297,21 +297,21 @@ class Notice implements UIControl {
     }
 }
 
-class Progress implements UIControl {
-    _html: string;
+class Progress extends UIControl {
+
     private parent: HTMLElement;
     private progress: HTMLDialogElement;
     private progressCard: HTMLElement;
     private progressValue: HTMLProgressElement;
     private myProgressText: HTMLSpanElement;
     constructor(parent: HTMLElement) {
+        super();
         this.parent = parent;
-        this._html = HtmlControl.Progress;
         this.init();
     }
     init() {
-        this.parent.insertAdjacentHTML("afterbegin", this._html);
-        this.progress = document.getElementById('myProgress') as HTMLDialogElement;
+        this.progress = Utils.createControl(this.parent, HtmlControl.Progress, "myProgress") as HTMLDialogElement;
+
         this.progressCard = this.progress.querySelector('#myProgressCard') as HTMLDListElement;
         this.progressValue = this.progress.querySelector('#myProgressValue') as HTMLProgressElement;
         this.myProgressText = this.progress.querySelector('#myProgressText') as HTMLSpanElement;

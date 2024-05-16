@@ -71,6 +71,24 @@ export class Utils {
         return QRCode.toDataURL(text);
     }
 
-    /** */
+    private static aHref: HTMLAnchorElement;
+    /**下载文件 */
+    static downloadFile(url: string, fileName: string) {
+        if (!this.aHref) {
+            this.aHref = document.createElement('a');
+        }
+        this.aHref.href = url;
+        this.aHref.download = fileName;
+        this.aHref.target = '_blank'; // 在当前页面中打开链接
+        document.body.appendChild(this.aHref);
+        this.aHref.click();
+        document.body.removeChild(this.aHref);
+    }
+
+    /**创建控件 */
+    static createControl(parent: HTMLElement, html: string, elementId: string, position: InsertPosition = "afterbegin") {
+        parent.insertAdjacentHTML(position, html);
+        return document.getElementById(elementId) as HTMLElement;
+    }
 
 }

@@ -23,8 +23,6 @@
 
 //     itemList: ListItem[];
 
-//     private aHref: HTMLAnchorElement;
-
 //     private _inputLock = false;
 //     get inputLock(): boolean {
 //         return this._inputLock;
@@ -238,17 +236,6 @@
 //         this.sendSocketMsg(JSON.stringify(data));
 //     }
 
-//     downloadFile(url: string, fileName: string) {
-//         if (!this.aHref) {
-//             this.aHref = document.createElement('a');
-//         }
-//         this.aHref.href = url;
-//         this.aHref.download = fileName;
-//         this.aHref.target = '_blank'; // 在当前页面中打开链接
-//         document.body.appendChild(this.aHref);
-//         this.aHref.click();
-//         document.body.removeChild(this.aHref);
-//     }
 
 //     //-------------提示-----------------
 

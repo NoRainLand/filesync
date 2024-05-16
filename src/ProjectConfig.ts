@@ -11,4 +11,8 @@ export class ProjectConfig {
     static readonly openVC: boolean = false;
     /**前端页面是否屏蔽输出 */
     static readonly closeLog: boolean = false;
+    /**前端最大显示消息条数 */
+    static readonly maxMsgLen: number = 64;
+    /**客户端发送消息间隔 ms */
+    static readonly sendTimeout: number = 100;
 }

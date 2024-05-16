@@ -1,7 +1,7 @@
 import { EventMgr } from "../common/EventMgr";
 import { msgType } from "./DataType";
 
-export class ListItem {
+export class MsgItem {
     private element: HTMLDivElement;
     private txtNameOrText: HTMLParagraphElement;
     private txtDate: HTMLParagraphElement;
@@ -140,7 +140,7 @@ export class ListItem {
     }
 
 
-    onRemoveItem(): void {
+    clear(): void {
         this.element.parentNode!.removeChild(this.element);
         this.removeEvent();
     }
