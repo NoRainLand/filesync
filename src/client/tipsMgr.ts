@@ -261,10 +261,10 @@ class Notice implements UIControl {
         tips.style.opacity = '0.75';
         let self = this;
 
-        tips["startTime"] = setTimeout(() => {
+        (<any>tips)["startTime"] = setTimeout(() => {
             tips.style.top = '30%';
             tips.style.opacity = '0';
-            tips["holdTime"] = setTimeout(() => {
+            (<any>tips)["holdTime"] = setTimeout(() => {
                 self.recoverTips(tips);
             }, 1000);
         }, 1000);
@@ -286,11 +286,11 @@ class Notice implements UIControl {
         if (this.parent.contains(tips)) {
             this.parent.removeChild(tips);
         }
-        if (tips["startTime"]) {
-            clearTimeout(tips["startTime"]);
-            clearTimeout(tips["holdTime"]);
-            tips["startTime"] = null;
-            tips["holdTime"] = null;
+        if ((<any>tips)["startTime"]) {
+            clearTimeout((<any>tips)["startTime"]);
+            clearTimeout((<any>tips)["holdTime"]);
+            (<any>tips)["startTime"] = null;
+            (<any>tips)["holdTime"] = null;
         }
         tips.textContent = "";
         this.showIngTips.push(tips);

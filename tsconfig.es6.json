@@ -8,6 +8,7 @@
 		"skipLibCheck": true,
 		"sourceMap": false,
 		"outDir": "./dist/client_temp",
+		"moduleResolution": "Node",
 		"strictPropertyInitialization": false
 	},
 	"exclude": ["node_modules", "src/server/*.ts"],

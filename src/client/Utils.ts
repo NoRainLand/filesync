@@ -1,3 +1,6 @@
+import QRCode from "qrcode";
+import VConsole from "vconsole";
+
 export class Utils {
     /**文件尺寸转换 */
     static formatSize(size: number): string {
@@ -23,4 +26,51 @@ export class Utils {
         const seconds = ('0' + date.getSeconds()).slice(-2);
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
+
+
+    /**复制文本到剪切板 */
+    static copyText(text: string) {
+        const input = document.createElement('input');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+    }
+
+    /**复制文本到剪切板 ES6 还没普及呢 */
+    static copyTextES6(text: string) {
+        navigator.clipboard.writeText(text).then(() => {
+            console.log('复制成功');
+        }).catch(() => {
+            console.log('复制失败');
+        });
+    }
+
+    /**从剪切板读取文本 */
+    static readText(): Promise<string> {
+        return navigator.clipboard.readText();
+    }
+
+    private static vs: VConsole;
+    /**打开vconsle */
+    static openVConsole() {
+        if (!this.vs) {
+            this.vs = new VConsole();
+        }
+        (<any>window)["closeVConsole"] = this.closeVConsole.bind(this);
+    }
+
+    /**关闭vconsole */
+    static closeVConsole() {
+        this.vs?.destroy();
+    }
+
+    /**新建二维码 */
+    static createQRCode(text: string, size: number = 256): Promise<string> {
+        return QRCode.toDataURL(text);
+    }
+
+    /** */
+
 }

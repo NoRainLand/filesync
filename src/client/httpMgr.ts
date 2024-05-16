@@ -1,9 +1,6 @@
 import { Config } from "./Config";
 
 export class HttpMgr {
-    constructor() {
-
-    }
     static getSocketInfo<T>(): Promise<T> {
         return fetch(Config.httpApiMap.getSocketInfo)
             .then(response => {
