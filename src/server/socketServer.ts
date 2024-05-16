@@ -1,87 +1,122 @@
 import * as net from 'net';
 import { WebSocketServer } from 'ws';
-import { Config } from './Config';
-import { DataCtrl } from './DataCtrl';
-import { actionAddType, actionDelteType, actionFullMsgType, msgType, socketMsgType } from './DataType';
-import { EventSystem } from './EventSystem';
-import { FileCtrl } from './FileCtrl';
+import { AddData, DeleteData, ErrorData, FullData, MsgData, ServerClientOperate, SocketMsg } from '../common/CommonDefine';
+import { EventMgr } from '../common/EventMgr';
+import { DatabaseOperation } from './DatabaseOperation';
+import { FileOperation } from './FileOperation';
+import { ServerConfig } from './ServerConfig';
+import { EventName } from './ServerDefine';
 
 export class SocketServer {
     private static wss: WebSocketServer;
 
-    private static _lastActionTimestamp: number = 0;
+    private static _lastMsgChangeTimestamp: number = 0;
 
-    private static server: net.Server;//辅助用
+    private static server: net.Server | null;//辅助用
 
-    static async startSocketServer(port: number) {
+    /**开启服务器 */
+    static async startServer(port: number) {
         await new Promise((resolve, reject) => {
             this.server = net.createServer();
             this.server.once('error', (err: any) => {
                 if (err.code === 'EADDRINUSE') {
                     console.log(`端口${port}已被占用，尝试使用端口${port + 10}`);
-                    resolve(SocketServer.startSocketServer(port + 10));
+                    resolve(SocketServer.startServer(port + 10));
                 } else {
                     console.error(err);
                 }
             });
-            this.server.once('listening', () => {
-                this.server.close();
-                this.wss = new WebSocketServer({ port: port });
-                Config.socketPort = port;
-                console.log("socket服务器已启动：");
-                console.log(`ws://${Config.URL}:${port}`);
-                this._lastActionTimestamp = Date.now();
-                this.wss.on('connection', SocketServer.onSocketConnection.bind(SocketServer));
-                EventSystem.on('msgSaved', this.sendSaveMsg.bind(this));
-                resolve(null);
-            });
+            this.server.once('listening', this.initSocketServer.bind(this, port, resolve));
             this.server.listen(port);
         });
     }
 
-    private static onSocketConnection(ws: any) {
-        ws.on('close', () => {
-            console.log('用户断开连接');
-        });
-
-        ws.on('message', (message: string) => {
-            let data = JSON.parse(message);
-            this.selectAction(data, ws);
-        });
-
-        ws.on('error', (err: any) => {
-            console.warn(err);
-        });
+    /**关闭socket服务器 */
+    static closeSocketServer() {
+        this.removeEvent();
+        if (this.wss) {
+            for (let i of this.wss.clients) {
+                i.off("close", this.onWsClose.bind(this));
+                i.off("message", this.onWsMsg.bind(this, i));
+                i.off("error", this.onWsError.bind(this));
+                i.close();
+            }
+        }
+        this.wss?.close();
     }
 
+    /**初始化socket服务器 */
+    private static initSocketServer(port: number,resolve:any) {
+        this.server?.close();
+        this.server = null;
+        if (!port || typeof port !== 'number') {
+            throw new Error('端口号必须是数字');
+        }
+        this.wss = new WebSocketServer({ port: port });
+        ServerConfig.socketPort = port;
+        this._lastMsgChangeTimestamp = Date.now();
+        this.addEvent();
+        resolve();
+        console.log("socket服务器已启动：");
+        console.log(`ws://${ServerConfig.serverURL}:${port}`);
+    }
 
-    private static sendSaveMsg(msg: msgType) {
-        let data: actionAddType = { msg: msg };
-        this._lastActionTimestamp = Date.now();
-        let socketMsg: socketMsgType = { action: 'add', timeStamp: this._lastActionTimestamp, data: data };
+    /**添加监听 */
+    private static addEvent() {
+        this.wss.on('connection', this.onSocketConnection.bind(this));
+        EventMgr.on(EventName.ONMESSAGESAVED, this.onMessageSaved, this);
+    }
+
+    /**移除监听 */
+    private static removeEvent() {
+        this.wss?.off('connection', this.onSocketConnection);
+        EventMgr.off(EventName.ONMESSAGESAVED, this.onMessageSaved, this);
+    }
+    /**消息保存 */
+    private static onMessageSaved(msg: MsgData) {
+        let data: AddData = { msg: msg };
+        this._lastMsgChangeTimestamp = Date.now();
+        let socketMsg: SocketMsg = { operate: ServerClientOperate.ADD, timeStamp: this._lastMsgChangeTimestamp, data: data };
         let str = JSON.stringify(socketMsg);
         this.wss.clients.forEach((client) => {
             client.send(str);
         });
     }
+    /**socket连接 */
+    private static onSocketConnection(ws: any) {
+        ws.on('close', this.onWsClose.bind(this));
+        ws.on('message', this.onWsMsg.bind(this, ws));
+        ws.on('error', this.onWsError.bind(this));
+    }
 
-    private static selectAction(socketMsgFromClient: socketMsgType, ws: any) {
-        switch (socketMsgFromClient.action) {
-            case 'heartBeat':
-                ws.send(JSON.stringify({ action: 'heartBeat', timeStamp: Date.now() }));
+    /**socket关闭 */
+    private static onWsClose() {
+        console.log('用户断开连接');
+    }
+    /**socket错误 */
+    private static onWsError(err: any) {
+        console.warn(err);
+    }
+    /**socket消息 */
+    private static onWsMsg(ws: any, msg: string) {
+        let socketMsgFromClient: SocketMsg = JSON.parse(msg);
+        switch (socketMsgFromClient.operate) {
+            case ServerClientOperate.HEARTBEAT:
+                let heartBeat: SocketMsg = { operate: ServerClientOperate.HEARTBEAT, timeStamp: this._lastMsgChangeTimestamp };
+                ws.send(JSON.stringify(heartBeat));
                 break;
-            case 'delete':
+            case ServerClientOperate.DELETE:
                 let fileOrTextHash: string = socketMsgFromClient.data!;
-                DataCtrl.getMsgTypeByHash(fileOrTextHash).then((msgType: msgType) => {
-                    if (msgType != null && msgType.msgType != null) {//防止重复删除
-                        if (msgType.msgType === 'file') {
-                            FileCtrl.deleteFile(msgType.url!);
+                DatabaseOperation.getMsgTypeByHash(fileOrTextHash).then((deleteMsg: MsgData) => {
+                    if (deleteMsg != null && deleteMsg.msgType != null) {//防止重复删除
+                        if (deleteMsg.msgType === 'file') {
+                            FileOperation.deleteFile(deleteMsg.url!);
                         }
-                        DataCtrl.deleteMsg(fileOrTextHash).then(() => {
-                            EventSystem.emit('deleteItem', fileOrTextHash);
-                            this._lastActionTimestamp = Date.now();
-                            let data: actionDelteType = { fileOrTextHash: fileOrTextHash };
-                            let socketMsg: socketMsgType = { action: 'delete', timeStamp: this._lastActionTimestamp, data: data };
+                        DatabaseOperation.deleteFromDatabase(fileOrTextHash).then(() => {
+                            EventMgr.emit(EventName.DELETEITEM, fileOrTextHash);
+                            this._lastMsgChangeTimestamp = Date.now();
+                            let data: DeleteData = { fileOrTextHash: fileOrTextHash };
+                            let socketMsg: SocketMsg = { operate: ServerClientOperate.DELETE, timeStamp: this._lastMsgChangeTimestamp, data: data };
                             let str = JSON.stringify(socketMsg);
                             this.wss.clients.forEach((client) => {
                                 client.send(str);
@@ -90,21 +125,21 @@ export class SocketServer {
                     }
                 });
                 break;
-            case 'full':
-                DataCtrl.getAllMsgs().then((msgs: msgType[]) => {
-                    let data: actionFullMsgType = { msgs: msgs };
-                    let socketMsg: socketMsgType = { action: 'full', timeStamp: this._lastActionTimestamp, data: data };
+            case ServerClientOperate.FULL:
+                DatabaseOperation.getAllMsgs().then((msgs: MsgData[]) => {
+                    let data: FullData = { msgs: msgs };
+                    let socketMsg: SocketMsg = { operate: ServerClientOperate.FULL, timeStamp: this._lastMsgChangeTimestamp, data: data };
                     ws.send(JSON.stringify(socketMsg));
                 });
                 break;
-            case "refresh":
-                let data: socketMsgType = { action: "refresh", timeStamp: this._lastActionTimestamp };
+            case ServerClientOperate.REFRESH:
+                let data: SocketMsg = { operate: ServerClientOperate.FULL, timeStamp: this._lastMsgChangeTimestamp };
                 ws.send(JSON.stringify(data));
                 break;
             default:
-                let msg = "未知的action:" + socketMsgFromClient.action;
-                console.warn(msg)
-                let err: socketMsgType = { action: "error", timeStamp: this._lastActionTimestamp, data: { error: msg } };
+                let msg = "未知的operate:" + socketMsgFromClient.operate;
+                let errData: ErrorData = { error: msg };
+                let err: SocketMsg = { operate: ServerClientOperate.ERROR, timeStamp: this._lastMsgChangeTimestamp, data: errData };
                 ws.send(JSON.stringify(err));
                 break;
         }

@@ -1,7 +1,7 @@
+import { EventMgr } from "../common/EventMgr";
 import { msgType } from "./DataType";
-import { EventSystem } from "./EventSystem";
 
-export class Item {
+export class ListItem {
     private element: HTMLDivElement;
     private txtNameOrText: HTMLParagraphElement;
     private txtDate: HTMLParagraphElement;
@@ -59,7 +59,7 @@ export class Item {
     }
 
     downloadFile(): void {
-        EventSystem.emit('downloadFile', this.data.url, this.data.fileName);
+        EventMgr.emit('downloadFile', this.data.url, this.data.fileName);
     }
 
     copyData() {
@@ -70,7 +70,7 @@ export class Item {
     }
 
     deleteData(): void {
-        EventSystem.emit('deleteItem', this.data.fileOrTextHash!);
+        EventMgr.emit('deleteItem', this.data.fileOrTextHash!);
     }
 
     setData(data: msgType): void {

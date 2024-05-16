@@ -1,10 +1,13 @@
+import { ServerInfo } from "../common/CommonDefine";
+import { EventMgr } from "../common/EventMgr";
+import { Pool } from "../common/Pool";
+import { ProjectConfig } from "../ProjectConfig";
+import { EventName } from "./ClientDefine";
 import { Config } from "./Config";
-import { actionAddType, actionDelteType, actionFullMsgType, colorType, msgType, socketInfoType, SocketMsgType } from "./DataType";
-import { EventSystem } from "./EventSystem";
+import { actionAddType, actionDelteType, actionFullMsgType, colorType, msgType, SocketMsgType } from "./DataType";
 import { HttpMgr } from "./HttpMgr";
-import { Item } from "./Item";
+import { ListItem } from "./ListItem";
 import { Logger } from "./Logger";
-import { ObjectPool } from "./ObjectPool";
 import { SocketMgr } from "./SocketMgr";
 import { TipsMgr } from "./TipsMgr";
 
@@ -15,10 +18,10 @@ export class index {
     uploadButton: HTMLButtonElement;
     fileList: HTMLElement;
     msgList: msgType[];
-    itemPool: ObjectPool<Item>;
+    itemPool: Pool<ListItem>;
     msgHashArr: Array<string>;
 
-    itemList: Item[];
+    itemList: ListItem[];
 
     private aHref: HTMLAnchorElement;
 
@@ -69,13 +72,13 @@ export class index {
         this.msgList = [];
         this.msgHashArr = [];
         this.itemList = [];
-        this.itemPool = new ObjectPool(() => new Item());
+        this.itemPool = new Pool(() => new ListItem());
         this.initTheme();
 
         this.getSocketInfo();
         this.addEvent();
         Logger.tranLogger();
-        if (Config.openVconsole) {
+        if (ProjectConfig.openVC) {
             this.vConsole = new (window as any).VConsole();
         }
 
@@ -110,8 +113,8 @@ export class index {
     }
 
     addEvent() {
-        EventSystem.on('deleteItem', this.deleteItem.bind(this));
-        EventSystem.on('downloadFile', this.downloadFile.bind(this));
+        EventMgr.on(EventName.deleteItem, this.deleteItem, this);
+        EventMgr.on(EventName.downloadFile, this.downloadFile, this);
         this.uploadButton.addEventListener('click', this.sendMsg.bind(this));
         this.textInput.addEventListener('keydown', this.onKeyDown.bind(this));
 
@@ -119,10 +122,10 @@ export class index {
 
         this.qrcodeButtonSvg.addEventListener('click', this.onShowLocalQrcode.bind(this));
 
-        EventSystem.on('socketEvent', this.onSocketEvent.bind(this));
+        EventMgr.on('socketEvent', this.onSocketEvent, this);
 
-        document.addEventListener('visibilitychange', () => {
-            EventSystem.emit("visibilitychange", document.hidden);
+        document.addEventListener(EventName.visibilitychange, () => {
+            EventMgr.emit(EventName.visibilitychange, document.hidden);
         });
     }
 
@@ -260,10 +263,10 @@ export class index {
     //-------------http-----------------
 
     getSocketInfo() {
-        HttpMgr.getSocketInfo<socketInfoType>()
+        HttpMgr.getSocketInfo<ServerInfo>()
             .then((socketInfo) => {
-                Config.URL = socketInfo.socketURL;
-                Config.SocketIOPORT = socketInfo.socketPORT;
+                Config.serverURL = socketInfo.socketServerURL;
+                Config.socketPort = socketInfo.socketPort;
                 Config.version = socketInfo.version;
                 SocketMgr.initSocket();
                 Logger.log("当前版本" + Config.version);

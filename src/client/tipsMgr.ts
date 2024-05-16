@@ -11,24 +11,24 @@ export class TipsMgr {
     }
 
 
-    private static _myAlert: myAlert;
+    private static _myAlert: Alert;
 
-    private static _myDialog: myDialog;
+    private static _myDialog: Dialog;
 
-    private static _myTips: myTips;
+    private static _myTips: Notice;
 
-    private static _myProgress: myProgress;
+    private static _myProgress: Progress;
 
     static showTips(msg: string) {
         if (!this._myTips) {
-            this._myTips = new myTips(this.body);
+            this._myTips = new Notice(this.body);
         }
         this._myTips.showTips(msg);
     }
 
     static showDialog(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示", onlySure: boolean = false) {
         if (!this._myDialog) {
-            this._myDialog = new myDialog(this.body);
+            this._myDialog = new Dialog(this.body);
         }
         this.hideAll();
         this._myDialog.show(content, caller, sure, cancel, title, onlySure);
@@ -42,7 +42,7 @@ export class TipsMgr {
 
     static showAlert(content: string, title: string = "提示", type: dialogType = "msg", caller: any = null, callback: Function | null = null) {
         if (!this._myAlert) {
-            this._myAlert = new myAlert(this.body);
+            this._myAlert = new Alert(this.body);
         }
         this._myAlert.show(content, title, type);
     }
@@ -55,7 +55,7 @@ export class TipsMgr {
 
     static showProgress(value: number, autoClose: boolean = false) {
         if (!this._myProgress) {
-            this._myProgress = new myProgress(this.body);
+            this._myProgress = new Progress(this.body);
         }
         this._myProgress.show(value, autoClose);
     }
@@ -72,7 +72,7 @@ export class TipsMgr {
     }
 }
 
-class myDialog {
+class Dialog {
     private _html: string;
     private parent: HTMLElement;
     private dialog: HTMLDialogElement;
@@ -86,7 +86,7 @@ class myDialog {
     private _cancel: Function | null;
     constructor(parent: HTMLElement) {
         this.parent = parent;
-        this._html = Config.myDialog;
+        this._html = Config.Dialog;
         this.init();
     }
     private init() {
@@ -147,7 +147,7 @@ class myDialog {
     }
 }
 
-class myAlert {
+class Alert {
     private _html: string;
     private qrcode: any;
     private parent: HTMLElement;
@@ -161,7 +161,7 @@ class myAlert {
     private _callback: Function | null;
     constructor(parent: HTMLElement) {
         this.parent = parent;
-        this._html = Config.myAlert;
+        this._html = Config.Alert;
         this.init();
     }
     private init() {
@@ -215,7 +215,7 @@ class myAlert {
     }
 }
 
-class myTips {
+class Notice {
     private parent: HTMLElement;
     private tipsPoor: HTMLElement[];
     constructor(parent: HTMLElement) {
@@ -265,7 +265,7 @@ class myTips {
     }
 }
 
-class myProgress {
+class Progress {
     private _html: string;
     private parent: HTMLElement;
     private progress: HTMLDialogElement;
@@ -274,7 +274,7 @@ class myProgress {
     private myProgressText: HTMLSpanElement;
     constructor(parent: HTMLElement) {
         this.parent = parent;
-        this._html = Config.myProgress;
+        this._html = Config.Progress;
         this.init();
     }
     private init() {

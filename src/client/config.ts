@@ -1,24 +1,28 @@
 export class Config {
-    static URL: string = '127.0.0.1'; // 服务器的 URL
-    static SocketIOPORT: number = 4200; // Socket.IO 服务器的端口号
-    static isDebug: boolean = true; // 是否开启调试模式
-    static version: string = "1.0.0"//版本号
+    /**服务器的 URL */
+    static serverURL: string = '127.0.0.1';
+    /**socket  */
+    static socketPort: number = 4200;
+    /**程序版本 */
+    static version: string = "1.0.0";
 
-    static showQrcodeDivClass: string = "showQrcodeDiv";
-    static hideQrcodeDivClass: string = "hideQrcodeDiv";
 
-    static openVconsole: boolean = false;//是否开启vconsole
 
-    static httpApi = {
+    /**展示二维码的class */
+    static readonly showQrcodeDivClass: string = "showQrcodeDiv";
+    /**隐藏二维码的class */
+    static readonly hideQrcodeDivClass: string = "hideQrcodeDiv";
+    /**http服务器的api接口 */
+    static readonly httpApiMap = {
         getSocketInfo: "/getSocketInfo",
         upload: "/upload",
     }
-
-    static showProgressMinSize: number = 1024 * 1024 * 64;//显示进度条的最小文件体积
-
-    static copyBtnClass = "btnCopy";//复制按钮的class
-
-    static myProgress =
+    /**显示进度条的最小文件体积 */
+    static readonly showProgressMinSize: number = 1024 * 1024 * 64;
+    /**复制按钮的class */
+    static readonly copyBtnClass = "btnCopy";
+    /**进度条的class */
+    static readonly Progress =
         `
         <dialog close id = "myProgress">
             <article id = "myProgressCard">
@@ -26,10 +30,9 @@ export class Config {
                 <p id="myProgressText">25%</p>
             </article>
         </dialog>
-    `
-
-
-    static myAlert =
+    `;
+    /**提示框的class */
+    static readonly Alert =
         `
         <dialog close id = "myAlert">
             <article>
@@ -41,9 +44,9 @@ export class Config {
                 <div id="qrcodeDiv"></div>
             </article>
         </dialog>
-        `
-
-    static myDialog =
+        `;
+    /**对话框的class */
+    static readonly Dialog =
         `
     <dialog close id = "myDialog">
         <article>
@@ -58,12 +61,13 @@ export class Config {
             </footer>
         </article>
     </dialog>
-    `
-
-    static moonSVG = `<svg data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    `;
+    /**月亮图案的svg */
+    static readonly moonSVG = `<svg data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"></path>
     </svg>`;
-    static sunSVG = `<svg data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    /**太阳图案的svg */
+    static readonly sunSVG = `<svg data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"></path>
     </svg>`;
 }

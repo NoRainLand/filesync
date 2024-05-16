@@ -1,10 +1,12 @@
 import fs from 'fs';
 import sqlite3 from 'sqlite3';
-import { Config } from './Config';
-import { msgType } from './DataType';
-import { GetRelativePath } from './GetRelativePath';
+import { MsgData } from '../common/CommonDefine';
+import { ServerConfig } from './ServerConfig';
+import { SQLCAMMAND } from './ServerDefine';
+import { Utils } from './Utils';
 
-export class DbHandler {
+/**数据库操作类 */
+export class DatabaseOperation {
     private static db: sqlite3.Database;
     private static tableName: string = "";
 
@@ -14,10 +16,10 @@ export class DbHandler {
 
     private static dbPath: string;
 
-
+    /**开启数据库 */
     static async openDatabase(dbPath: string, tableName: string) {
         if (this.dbIsOpen) return Promise.resolve();
-        this.dbPath = GetRelativePath.tranPath(dbPath);
+        this.dbPath = Utils.getRelativePath(dbPath);
         this.dbExists = fs.existsSync(this.dbPath);
         await new Promise((resolve, reject) => {
             this.tableName = tableName;
@@ -31,17 +33,18 @@ export class DbHandler {
         });
     }
 
+    /**创建数据库表 */
     private static async createTable() {
         let self = this;
         await new Promise((resolve, reject) => {
-            self.db.run(self.getSqlCommand("createTable"), (err) => {
+            self.db.run(self.getSqlCommand(SQLCAMMAND.CREATETABLE), (err) => {
                 if (err) {
                     self.db.close();
                     reject(err);
                 } else {
                     self.dbIsOpen = true;
                     if (!self.dbExists) {
-                        resolve(self.writeToDatabase((Config.wellcomeMsg as any)));
+                        resolve(self.writeToDatabase(ServerConfig.welcomeMsg));
                     } else {
                         console.log(`数据库 ${this.dbPath} 已开启`);
                         resolve(null);
@@ -51,12 +54,12 @@ export class DbHandler {
         });
     }
 
-
-    static writeToDatabase(msg: msgType): Promise<void> {
+    /**写入数据库 */
+    static writeToDatabase(msg: MsgData): Promise<void> {
         if (!this.dbIsOpen) return Promise.resolve();
         return new Promise((resolve, reject) => {
             const { fileName, fileOrTextHash, timestamp, text, msgType, url, size, hashName: originalname } = msg;
-            this.db.run(this.getSqlCommand("writeToDatabase"), [fileName, fileOrTextHash, timestamp, text, msgType, url, size, originalname], (err) => {
+            this.db.run(this.getSqlCommand(SQLCAMMAND.WRITETODATABASE), [fileName, fileOrTextHash, timestamp, text, msgType, url, size, originalname], (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -66,10 +69,11 @@ export class DbHandler {
         })
     }
 
+    /**从数据库删除 */
     static deleteFromDatabase(hash: string): Promise<void> {
         if (!this.dbIsOpen) return Promise.resolve();
         return new Promise((resolve, reject) => {
-            this.db.run(this.getSqlCommand("deleteFromDatabase"), hash, (err) => {
+            this.db.run(this.getSqlCommand(SQLCAMMAND.DELETEFROMDATABASE), hash, (err) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -79,23 +83,25 @@ export class DbHandler {
         })
     }
 
-    static getAllMsgs(): Promise<msgType[]> {
+    /**获取所有消息 */
+    static getAllMsgs(): Promise<MsgData[]> {
         if (!this.dbIsOpen) return Promise.resolve([]);
         return new Promise((resolve, reject) => {
-            this.db.all(this.getSqlCommand("getAllMsgs"), (err, rows) => {
+            this.db.all(this.getSqlCommand(SQLCAMMAND.GETALLMSGS), (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows as msgType[]);
+                    resolve(rows as MsgData[]);
                 }
             });
         });
     }
 
+    /**获取所有文件或文本的hash */
     static getAllFileOrTextHashes(): Promise<string[]> {
         if (!this.dbIsOpen) return Promise.resolve([]);
         return new Promise((resolve, reject) => {
-            this.db.all(this.getSqlCommand("getAllFileOrTextHashes"), [], (err, rows) => {
+            this.db.all(this.getSqlCommand(SQLCAMMAND.GETALLFILEORTEXTHASHES), [], (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -106,10 +112,11 @@ export class DbHandler {
         });
     }
 
-    static getMsgTypeByHash(hash: string): Promise<msgType> {//Function.prototype.name实际编译压缩后可能会变
-        if (!this.dbIsOpen) return Promise.resolve({} as msgType);
+    /**根据hash获取消息类型 */
+    static getMsgTypeByHash(hash: string): Promise<MsgData> {//Function.prototype.name实际编译压缩后可能会变
+        if (!this.dbIsOpen) return Promise.resolve({} as MsgData);
         return new Promise((resolve, reject) => {
-            this.db.get(this.getSqlCommand("getMsgTypeByHash"), hash, (err: any, row: msgType) => {
+            this.db.get(this.getSqlCommand(SQLCAMMAND.GETMSGTYPEBYHASH), hash, (err: any, row: MsgData) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -119,11 +126,11 @@ export class DbHandler {
         });
     }
 
-
+    /**获取文件名到hash名的映射 */
     static getFileName2HashNameMap(): Promise<Map<string, string>> {
         if (!this.dbIsOpen) return Promise.resolve(new Map<string, string>());
         return new Promise((resolve, reject) => {
-            this.db.all(this.getSqlCommand("getFileName2HashNameMap"), (err: any, rows: Array<{ fileName: string, originalname: string }>) => {
+            this.db.all(this.getSqlCommand(SQLCAMMAND.GETFILENAME2HASHNAMEMAP), (err: any, rows: Array<{ fileName: string, originalname: string }>) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -137,22 +144,23 @@ export class DbHandler {
         });
     }
 
-    private static getSqlCommand(cammand: string, tableName?: string): string {
+    /**获取sql语句 */
+    private static getSqlCommand(cammand: SQLCAMMAND, tableName?: string): string {
         tableName = tableName ? tableName : this.tableName;
         switch (cammand) {
-            case "createTable":
+            case SQLCAMMAND.CREATETABLE:
                 return `CREATE TABLE IF NOT EXISTS ${tableName} (fileName TEXT, fileOrTextHash TEXT, timestamp INTEGER, text TEXT, msgType TEXT,url TEXT,size INTEGER,originalname TEXT)`;
-            case "writeToDatabase":
+            case SQLCAMMAND.WRITETODATABASE:
                 return `INSERT INTO ${tableName} (fileName, fileOrTextHash, timestamp, text, msgType, url ,size,originalname) VALUES (?, ?, ?, ?, ? ,? ,?,?)`;
-            case "deleteFromDatabase":
+            case SQLCAMMAND.DELETEFROMDATABASE:
                 return `DELETE FROM ${tableName} WHERE fileOrTextHash = ?`;
-            case "getAllMsgs":
+            case SQLCAMMAND.GETALLMSGS:
                 return `SELECT * FROM ${tableName}`;
-            case "getAllFileOrTextHashes":
+            case SQLCAMMAND.GETALLFILEORTEXTHASHES:
                 return `SELECT fileOrTextHash FROM ${tableName}`;
-            case "getMsgTypeByHash":
+            case SQLCAMMAND.GETMSGTYPEBYHASH:
                 return `SELECT * FROM ${tableName} WHERE fileOrTextHash = ?`;
-            case "getFileName2HashNameMap":
+            case SQLCAMMAND.GETFILENAME2HASHNAMEMAP:
                 return `SELECT fileName, originalname FROM ${tableName} WHERE msgType = 'file'`;
             default:
                 return "";

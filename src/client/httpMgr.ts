@@ -5,7 +5,7 @@ export class HttpMgr {
 
     }
     static getSocketInfo<T>(): Promise<T> {
-        return fetch(Config.httpApi.getSocketInfo)
+        return fetch(Config.httpApiMap.getSocketInfo)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(response.statusText);
@@ -17,7 +17,7 @@ export class HttpMgr {
     static uploadMsg(formData: FormData, onprogress: (event: ProgressEvent) => {}): Promise<string> {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', Config.httpApi.upload, true);
+            xhr.open('POST', Config.httpApiMap.upload, true);
             xhr.upload.onprogress = onprogress;
             xhr.onload = function () {
                 if (xhr.status === 200) {

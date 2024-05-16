@@ -1,31 +1,30 @@
+import { Pool } from "./Pool";
+
 export class Handler {
 
     static createHandler(caller: any, callback: Function, isOnce: boolean = true): Handler {
         let hd = this.getHandler();
-        hd._caller = caller;
-        hd._callback = callback;
-        hd._isOnce = isOnce;
+        hd = this.setHandler(caller, callback, hd, isOnce);
         return hd;
     }
-    private static _poor: Handler[] = [];
-    private static getHandler(): Handler {
-        if (this._poor.length > 0) {
-            let hd = this._poor.pop()!;
-            hd._isRecover = false;
-            return hd;
-        } else {
-            let hd = new Handler();
-            hd._isRecover = false;
-            return hd;
-        }
+    private static pool: Pool<Handler> = new Pool<Handler>(() => new Handler());
+    static getHandler(): Handler {
+        let hd = this.pool.get();
+        hd._isRecover = false;
+        return hd;
     }
-    static recoverdHandler(handler: Handler) {
-        if (handler) {
+    static setHandler(caller: any, callback: Function, handler: Handler, isOnce: boolean = true) {
+        handler._caller = caller;
+        handler._callback = callback;
+        handler._isOnce = isOnce;
+        return handler;
+    }
+    static recoverHandler(handler: Handler) {
+        if (handler && handler instanceof Handler && handler.isRecover == false) {
             handler._reset();
-            this._poor.push(handler);
+            this.pool.recycle(handler);
         }
     }
-
 
 
     //------self------
@@ -50,7 +49,7 @@ export class Handler {
         if (!this._isRecover) {
             this._callback?.call(this._caller);
             if (this._isOnce) {
-                Handler.recoverdHandler(this);
+                Handler.recoverHandler(this);
             }
         }
     }
@@ -58,8 +57,16 @@ export class Handler {
         if (!this._isRecover) {
             this._callback?.call(this._caller, parms);
             if (this._isOnce) {
-                Handler.recoverdHandler(this);
+                Handler.recoverHandler(this);
             }
         }
+    }
+
+    isMe(caller: any, callback: Function) {
+        return this._caller == caller && this._callback == callback;
+    }
+
+    isCaller(caller: any) {
+        return this._caller == caller;
     }
 }

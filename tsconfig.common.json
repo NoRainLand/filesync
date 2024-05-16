@@ -11,5 +11,5 @@
 		"strictPropertyInitialization": false
 	},
 	"exclude": ["node_modules", "src/client/*.ts"],
-	"include": ["src/server/*.ts","src/common/*.ts"]
+	"include": ["src/server/*.ts", "src/common/*.ts", "src/ProjectConfig.ts"]
 }

@@ -1,6 +1,8 @@
+import { EventMgr } from "../common/EventMgr";
+import { EventName } from "./ClientDefine";
 import { Config } from "./Config";
 import { socketEventType, SocketMsgType } from "./DataType";
-import { EventSystem } from "./EventSystem";
+
 
 export class SocketMgr {
     constructor() {
@@ -28,7 +30,7 @@ export class SocketMgr {
         }
         this.isInit = true;
         this.resetConfig();
-        EventSystem.on("visibilitychange", this._onVisibilityChange.bind(this));
+        EventMgr.on(EventName.visibilitychange, this._onVisibilityChange, this);
     }
 
 
@@ -44,7 +46,7 @@ export class SocketMgr {
     static initSocket() {
         this.close();
         this.init();
-        this.socket = new WebSocket(`ws://${Config.URL}:${Config.SocketIOPORT}`);
+        this.socket = new WebSocket(`ws://${Config.serverURL}:${Config.socketPort}`);
         this.socket.onmessage = this._onSocketMessage.bind(this);
         this.socket.onopen = this._onSocketOpen.bind(this);
         this.socket.onclose = this._onSocketClose.bind(this);
@@ -83,7 +85,7 @@ export class SocketMgr {
         } else if (data.action == "refresh") {
             this.getRefresh(data);
         } else if (data.action == "error") {
-            EventSystem.emit("socketEvent", { event: "onerror", data: data.data });
+            EventMgr.emit(EventName.socketEvent, { event: "onerror", data: data.data });
         } else {
             this._lastActionTimestamp = data.timeStamp!;
             this._onSocketEvent({ event: "onmessage", data })
@@ -104,7 +106,7 @@ export class SocketMgr {
     }
 
     private static _onSocketEvent(msg: socketEventType) {
-        EventSystem.emit("socketEvent", msg);
+        EventMgr.emit(EventName.socketEvent, msg);
     }
     //--------------手机浏览器且后台回来刷新----------------
 
