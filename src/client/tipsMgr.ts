@@ -1,5 +1,6 @@
-import { Config } from "./Config";
+import { Pool } from "../common/Pool";
 import { dialogType } from "./DataType";
+import { HtmlControl } from "./HtmlControl";
 
 export class TipsMgr {
     private static _body: HTMLElement;
@@ -19,13 +20,16 @@ export class TipsMgr {
 
     private static _myProgress: Progress;
 
-    static showTips(msg: string) {
+
+    /**显示一个提示 */
+    static showNotice(msg: string) {
         if (!this._myTips) {
             this._myTips = new Notice(this.body);
         }
-        this._myTips.showTips(msg);
+        this._myTips.show(msg);
     }
 
+    /**显示一个对话框 */
     static showDialog(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示", onlySure: boolean = false) {
         if (!this._myDialog) {
             this._myDialog = new Dialog(this.body);
@@ -34,12 +38,14 @@ export class TipsMgr {
         this._myDialog.show(content, caller, sure, cancel, title, onlySure);
     }
 
+    /**隐藏对话框 */
     static hideDialog() {
         if (this._myDialog) {
             this._myDialog.close();
         }
     }
 
+    /**显示一个提示框 */
     static showAlert(content: string, title: string = "提示", type: dialogType = "msg", caller: any = null, callback: Function | null = null) {
         if (!this._myAlert) {
             this._myAlert = new Alert(this.body);
@@ -47,24 +53,29 @@ export class TipsMgr {
         this._myAlert.show(content, title, type);
     }
 
+    /**隐藏提示框 */
     static hideAlert() {
         if (this._myAlert) {
             this._myAlert.close();
         }
     }
 
+    /**显示进度条 */
     static showProgress(value: number, autoClose: boolean = false) {
         if (!this._myProgress) {
             this._myProgress = new Progress(this.body);
         }
         this._myProgress.show(value, autoClose);
     }
+
+    /**隐藏进度条 */
     static hideProgress() {
         if (this._myProgress) {
             this._myProgress.close();
         }
     }
 
+    /**隐藏所有提示 */
     static hideAll() {
         this.hideDialog();
         this.hideAlert();
@@ -72,8 +83,15 @@ export class TipsMgr {
     }
 }
 
-class Dialog {
-    private _html: string;
+interface UIControl {
+    _html: string;
+    init(): void;
+    show(...args: any[]): void;
+    close(): void;
+}
+
+class Dialog implements UIControl {
+    _html: string;
     private parent: HTMLElement;
     private dialog: HTMLDialogElement;
     private dialogTitle: HTMLHeadingElement;
@@ -86,10 +104,10 @@ class Dialog {
     private _cancel: Function | null;
     constructor(parent: HTMLElement) {
         this.parent = parent;
-        this._html = Config.Dialog;
+        this._html = HtmlControl.Dialog;
         this.init();
     }
-    private init() {
+    init() {
         this.parent.insertAdjacentHTML("afterbegin", this._html);
         this.dialog = document.getElementById('myDialog') as HTMLDialogElement;
 
@@ -147,8 +165,8 @@ class Dialog {
     }
 }
 
-class Alert {
-    private _html: string;
+class Alert implements UIControl {
+    _html: string;
     private qrcode: any;
     private parent: HTMLElement;
     private qrcodeDiv: HTMLElement;
@@ -161,10 +179,10 @@ class Alert {
     private _callback: Function | null;
     constructor(parent: HTMLElement) {
         this.parent = parent;
-        this._html = Config.Alert;
+        this._html = HtmlControl.Alert;
         this.init();
     }
-    private init() {
+    init() {
         this.parent.insertAdjacentHTML("afterbegin", this._html);
         this.dialog = document.getElementById('myAlert') as HTMLDialogElement;
 
@@ -192,14 +210,14 @@ class Alert {
         if (type == "msg") {
             this.dialogContent.textContent = content;
             this.qrcode.clear();
-            this.qrcodeDiv.className = Config.hideQrcodeDivClass;
+            this.qrcodeDiv.className = HtmlControl.hideQrcodeDivClass;
             if (this.imgQrCode) {
                 this.imgQrCode.style.display = "none";
             }
         } else if (type == "qrcode") {
             this.dialogContent.textContent = "";
             this.qrcode.makeCode(content);
-            this.qrcodeDiv.className = Config.showQrcodeDivClass;
+            this.qrcodeDiv.className = HtmlControl.showQrcodeDivClass;
             if (this.imgQrCode) {
                 this.imgQrCode.style.display = "block";
             }
@@ -215,16 +233,21 @@ class Alert {
     }
 }
 
-class Notice {
+class Notice implements UIControl {
+    _html: string;
     private parent: HTMLElement;
-    private tipsPoor: HTMLElement[];
+    private showIngTips: HTMLElement[];
+    private tipsPool: Pool<HTMLElement>;
     constructor(parent: HTMLElement) {
         this.parent = parent;
-        this.tipsPoor = [];
+        this.showIngTips = [];
+        this.tipsPool = new Pool<HTMLElement>(this.createTips);
     }
+    init() { };
 
-    showTips(msg: string) {
-        let tips = this.createTips();
+    show(msg: string) {
+        let tips = this.tipsPool.get();
+        this.showIngTips.push(tips);
         this.parent.appendChild(tips);
         tips.textContent = msg;
 
@@ -237,36 +260,45 @@ class Notice {
 
         tips.style.opacity = '0.75';
         let self = this;
-        setTimeout(() => {
+
+        tips["startTime"] = setTimeout(() => {
             tips.style.top = '30%';
             tips.style.opacity = '0';
-            setTimeout(() => {
+            tips["holdTime"] = setTimeout(() => {
                 self.recoverTips(tips);
             }, 1000);
         }, 1000);
+    }
 
+    close(): void {
+        this.showIngTips.forEach((tips) => {
+            this.recoverTips(tips);
+        });
     }
 
     private createTips(): HTMLElement {
-        let tips = this.tipsPoor.pop();
-        if (!tips) {
-            tips = document.createElement("article");
-            tips.className = "tips";
-            tips.style.borderRadius = "10px";
-        }
+        let tips = document.createElement("article");
+        tips.className = "tips";
+        tips.style.borderRadius = "10px";
         return tips;
     }
     private recoverTips(tips: HTMLElement) {
         if (this.parent.contains(tips)) {
             this.parent.removeChild(tips);
         }
+        if (tips["startTime"]) {
+            clearTimeout(tips["startTime"]);
+            clearTimeout(tips["holdTime"]);
+            tips["startTime"] = null;
+            tips["holdTime"] = null;
+        }
         tips.textContent = "";
-        this.tipsPoor.push(tips);
+        this.showIngTips.push(tips);
     }
 }
 
-class Progress {
-    private _html: string;
+class Progress implements UIControl {
+    _html: string;
     private parent: HTMLElement;
     private progress: HTMLDialogElement;
     private progressCard: HTMLElement;
@@ -274,10 +306,10 @@ class Progress {
     private myProgressText: HTMLSpanElement;
     constructor(parent: HTMLElement) {
         this.parent = parent;
-        this._html = Config.Progress;
+        this._html = HtmlControl.Progress;
         this.init();
     }
-    private init() {
+    init() {
         this.parent.insertAdjacentHTML("afterbegin", this._html);
         this.progress = document.getElementById('myProgress') as HTMLDialogElement;
         this.progressCard = this.progress.querySelector('#myProgressCard') as HTMLDListElement;

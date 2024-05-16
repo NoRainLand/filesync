@@ -15,7 +15,6 @@ export default class index {
         ServerConfigMgr.readConfig(ServerConfig.serverConfigPath);
         await DatabaseOperation.openDatabase(ServerConfig.sqlDbPath, ServerConfig.tableName);
         await SocketServer.startServer(ServerConfig.socketPort);
-        console.log("http服务器启动中")
         await HttpServer.startServer(ServerConfig.httpPort);
         await ServerConfigMgr.writeConfig(ServerConfig.serverConfigPath);
         Utils.openBrowser(`http://${ServerConfig.serverURL}:${ServerConfig.httpPort}`);

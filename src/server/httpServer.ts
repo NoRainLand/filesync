@@ -63,7 +63,6 @@ export class HttpServer {
             }
         });
         this.uploadMulter = multer({ storage: this.storageEngine });
-        console.log("http服务器初始化完成")
     }
 
     /**开启http服务器 */

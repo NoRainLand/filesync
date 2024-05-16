@@ -1,3 +1,4 @@
+import { exec } from 'child_process';
 import fs from 'fs';
 import * as os from 'os';
 import path from 'path';
@@ -35,7 +36,6 @@ export class Utils {
 
     /**打开浏览器 */
     static openBrowser(url: string) {
-        let exec = require('child_process').exec;
         switch (process.platform) {
             case "win32":
                 exec(`start ${url}`);
