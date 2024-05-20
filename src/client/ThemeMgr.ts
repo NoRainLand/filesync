@@ -1,4 +1,5 @@
 import { HtmlControl } from "./HtmlControl";
+import { Utils } from "./Utils";
 
 export class ThemeMgr {
     private static _isDark: number = -1;
@@ -21,15 +22,14 @@ export class ThemeMgr {
 
     private static themeButtonSvg: HTMLElement;
     private static parent: HTMLElement;
-    static init(parent) {
+    static init(parent:HTMLElement) {
         this.parent = parent;
         this.setUI();
         this.initTheme();
         this.addEvent();
     }
     private static setUI() {
-        this.parent.insertAdjacentHTML("afterbegin", HtmlControl.themeButton);
-        this.themeButtonSvg = document.getElementById('themeButton') as HTMLElement;
+        this.themeButtonSvg = Utils.createControl(this.parent, HtmlControl.themeButton, "themeButton", "afterbegin");
     }
 
     /**初始化主题 */

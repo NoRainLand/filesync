@@ -34,4 +34,4 @@ export type eventType = "deleteItem" | "downloadFile" | "socketEvent" | "visibil
 
 export type colorType = "red" | "blue" | "gray" | "green";
 
-export type dialogType = "msg" | "qrcode";
+

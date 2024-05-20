@@ -53,11 +53,15 @@ export class HtmlControl {
         <dialog close id = "myAlert">
             <article>
                 <header>
-                    <a href="#close" aria-label="Close" class="close"></a>
-                    <h6>提示</h6>
+                    <button aria-label="Close" rel="prev"></button>
+                    <p>
+                        <strong>提示</strong>
+                    </p>
                 </header>
                 <p>hello world!</p>
-                <div id="qrcodeDiv"></div>
+                <Div id="qrcodeDiv">
+                    <Img id="qrcodeImg"></Img>
+                </Div>
             </article>
         </dialog>
         `;

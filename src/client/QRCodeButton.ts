@@ -1,3 +1,4 @@
+import { AlertType } from "./ClientDefine";
 import { HtmlControl } from "./HtmlControl";
 import { TipsMgr } from "./TipsMgr";
 import { Utils } from "./Utils";
@@ -20,7 +21,7 @@ export class QRCodeButton {
         this.qrcodeButtonSvg.removeEventListener('click', this.onShowQRCode);
     }
     private static onShowQRCode() {
-        TipsMgr.showAlert(window.location.href, "当前网址", "qrcode");
+        TipsMgr.showAlert(window.location.href, "当前网址", AlertType.qrcode);
     }
     static clear() {
         this.pageParent?.removeChild(this.qrcodeButtonSvg);

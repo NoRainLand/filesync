@@ -1,5 +1,5 @@
 import { Pool } from "../common/Pool";
-import { dialogType } from "./DataType";
+import { AlertType } from "./ClientDefine";
 import { HtmlControl } from "./HtmlControl";
 import { Utils } from "./Utils";
 
@@ -47,7 +47,7 @@ export class TipsMgr {
     }
 
     /**显示一个提示框 */
-    static showAlert(content: string, title: string = "提示", type: dialogType = "msg", caller: any = null, callback: Function | null = null) {
+    static showAlert(content: string, title: string = "提示", type: AlertType = AlertType.text, caller: any = null, callback: Function | null = null) {
         if (!this._myAlert) {
             this._myAlert = new Alert(this.body);
         }
@@ -167,9 +167,9 @@ class Dialog extends UIControl {
 
 class Alert extends UIControl {
 
-    private qrcode: any;
+
     private parent: HTMLElement;
-    private qrcodeDiv: HTMLElement;
+    private qrcodeDiv: HTMLImageElement;
     private imgQrCode: HTMLImageElement;
     private dialog: HTMLDialogElement;
     private dialogTitle: HTMLHeadingElement;
@@ -185,13 +185,11 @@ class Alert extends UIControl {
     init() {
         this.dialog = Utils.createControl(this.parent, HtmlControl.Alert, "myAlert") as HTMLDialogElement;
 
-        this.qrcodeDiv = this.dialog.querySelector('#qrcodeDiv') as HTMLElement;
-        this.qrcode = new ((window as any).QRCode)(this.qrcodeDiv);
-        this.imgQrCode = this.dialog.querySelector("#qrcodeDiv img") as HTMLImageElement;
-        this.dialogTitle = this.dialog.querySelector("article header h6")!;
-        this.dialogContent = this.dialog.querySelector("article p")!;
-        this.dialogCloseButton = this.dialog.querySelector("article header a")!;
-
+        this.qrcodeDiv = this.dialog.querySelector('#qrcodeDiv') as HTMLImageElement;
+        this.imgQrCode = this.dialog.querySelector("#qrcodeImg") as HTMLImageElement;
+        this.dialogTitle = this.dialog.querySelector("article header p strong")!;
+        this.dialogContent = this.dialog.querySelectorAll("article p")[1]! as HTMLParagraphElement;
+        this.dialogCloseButton = this.dialog.querySelector("article header button")!;
         this.dialogCloseButton.addEventListener('click', (event) => {
             event.preventDefault();
             this.dialog.close();
@@ -202,23 +200,32 @@ class Alert extends UIControl {
     }
 
 
-    show(content: string, title: string = "提示", type: dialogType = "msg", caller: any = null, callback: Function | null = null) {
+    show(content: string, title: string = "提示", type: AlertType = AlertType.text, caller: any = null, callback: Function | null = null) {
+        console.log(this.dialogTitle);
+        console.log(this.dialogContent);
         this._caller = caller;
         this._callback = callback;
-        this.dialogTitle.textContent = title;
-        if (type == "msg") {
-            this.dialogContent.textContent = content;
-            this.qrcode.clear();
+        this.dialogTitle.innerText = title;
+        if (type == AlertType.text) {
+            this.dialogContent.innerText = content;
             this.qrcodeDiv.className = HtmlControl.hideQrcodeDivClass;
             if (this.imgQrCode) {
                 this.imgQrCode.style.display = "none";
             }
-        } else if (type == "qrcode") {
-            this.dialogContent.textContent = "";
-            this.qrcode.makeCode(content);
+        } else if (type == AlertType.qrcode) {
+            this.dialogContent.innerText = "";
             this.qrcodeDiv.className = HtmlControl.showQrcodeDivClass;
+
             if (this.imgQrCode) {
-                this.imgQrCode.style.display = "block";
+                Utils.createQRCode(content)
+                    .then((url) => {
+                        this.imgQrCode.src = url;
+                        this.imgQrCode.style.display = "block";
+                    })
+                    .catch((err) => {
+                        this.show(content, title, AlertType.text, caller, callback);
+                        console.error(err);
+                    });
             }
         }
         if (this.dialog.open) {

@@ -2,13 +2,13 @@
 	$theme-color: "cyan"
 );
 
-
 body {
 	display: flex;
 	justify-content: center;
 	min-width: 600px;
 	padding: 20px; /* 添加 padding 以防止内容贴近屏幕边缘 */
 }
+
 .qrcodeButton {
 	position: fixed;
 	bottom: 60px;
@@ -32,6 +32,12 @@ body {
 	height: 160px;
 	margin-top: 15px;
 }
+
+#qrcode {
+	width: 100%;
+	height: 100%;
+}
+
 #hideQrcodeDiv {
 	display: none;
 	width: 0px;

@@ -6,7 +6,7 @@ export class Logger {
     private static wLog: Function;
     private static eLog: Function;
     static tranLogger() {
-        if (!ProjectConfig.closeLog) {
+        if (ProjectConfig.closeLog) {
             this.sLog = console.log;
             this.iLog = console.info;
             this.wLog = console.warn;
@@ -18,7 +18,7 @@ export class Logger {
         }
     }
     static log(...args: any[]) {
-        if (!ProjectConfig.closeLog) {
+        if (ProjectConfig.closeLog) {
             this.sLog(...args);
         } else {
             console.log(...args);
@@ -26,7 +26,7 @@ export class Logger {
     }
 
     static info(...args: any[]) {
-        if (!ProjectConfig.closeLog) {
+        if (ProjectConfig.closeLog) {
             this.iLog(...args);
         } else {
             console.info(...args);
@@ -34,7 +34,7 @@ export class Logger {
     }
 
     static warn(...args: any[]) {
-        if (!ProjectConfig.closeLog) {
+        if (ProjectConfig.closeLog) {
             this.wLog(...args);
         } else {
             console.warn(...args);
@@ -42,7 +42,7 @@ export class Logger {
     }
 
     static error(...args: any[]) {
-        if (!ProjectConfig.closeLog) {
+        if (ProjectConfig.closeLog) {
             this.eLog(...args);
         } else {
             console.error(...args);

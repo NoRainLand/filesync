@@ -10,3 +10,8 @@ export enum Color {
     green = "#00ff00",
     blue = "#0000ff",
 }
+
+export enum AlertType {
+    text = "text",
+    qrcode = "qrcode",
+}

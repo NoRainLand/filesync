@@ -66,9 +66,26 @@ export class Utils {
         this.vs?.destroy();
     }
 
+
+    private static canvasElement: HTMLCanvasElement;
     /**新建二维码 */
-    static createQRCode(text: string, size: number = 256): Promise<string> {
-        return QRCode.toDataURL(text);
+    static createQRCode(text: string, darkColor: string = "#000000", lightColor: string = "#ffffff"): Promise<string> {
+        let opts = {
+            // errorCorrectionLevel: 'H',
+            // type: 'image/jpeg',
+            quality: 0.3,
+            margin: 1,
+            color: {
+                dark: darkColor,
+                light: lightColor
+            },
+            width: 256, // 设置宽度
+        }
+        //创建离屏画布
+        if (!this.canvasElement) {
+            this.canvasElement = document.createElement('canvas');
+        }
+        return QRCode.toDataURL(this.canvasElement, text, opts)
     }
 
     private static aHref: HTMLAnchorElement;
