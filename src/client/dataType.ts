@@ -6,24 +6,24 @@ export type SocketMsgType = {
     data?: any,
 }
 
-export type msgType = {
-    msgType: 'file' | 'text',
-    fileOrTextHash: string,
-    timestamp: number,
-    size: number,
-    fileName?: string,
-    hashName?: string,
-    text?: string,
-    url?: string,
-}
+// export type msgType = {
+//     msgType: 'file' | 'text',
+//     fileOrTextHash: string,
+//     timestamp: number,
+//     size: number,
+//     fileName?: string,
+//     hashName?: string,
+//     text?: string,
+//     url?: string,
+// }
 
-export type actionFullMsgType = { msgs: msgType[] };
+// export type actionFullMsgType = { msgs: msgType[] };
 
-export type actionDelteType = { fileOrTextHash: string }
+// export type actionDelteType = { fileOrTextHash: string }
 
-export type actionAddType = { msg: msgType }
+// export type actionAddType = { msg: msgType }
 
-export type socketInfoType = { "socketURL": string, "socketPORT": number, "version": string };
+// export type socketInfoType = { "socketURL": string, "socketPORT": number, "version": string };
 
 
 //---------------本地-------------

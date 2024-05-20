@@ -1,5 +1,5 @@
+import { MsgData } from "../common/CommonDefine";
 import { EventMgr } from "../common/EventMgr";
-import { msgType } from "./DataType";
 
 export class MsgItem {
     private element: HTMLDivElement;
@@ -8,7 +8,7 @@ export class MsgItem {
     private btnDownload: HTMLButtonElement;
     private btnCopy: HTMLButtonElement;
     private btnDel: HTMLButtonElement;
-    private data: msgType = null!;
+    private data: MsgData | null;
     private onceInit: boolean = false;
     private maxTextLength = 30;
     constructor() {
@@ -59,7 +59,7 @@ export class MsgItem {
     }
 
     downloadFile(): void {
-        EventMgr.emit('downloadFile', this.data.url, this.data.fileName);
+        EventMgr.emit('downloadFile', this.data!.url, this.data!.fileName);
     }
 
     copyData() {
@@ -70,10 +70,10 @@ export class MsgItem {
     }
 
     deleteData(): void {
-        EventMgr.emit('deleteItem', this.data.fileOrTextHash!);
+        EventMgr.emit('deleteItem', this.data!.fileOrTextHash!);
     }
 
-    setData(data: msgType): void {
+    setData(data: MsgData): void {
         this.data = data;
         this.initItem();
 
@@ -141,6 +141,7 @@ export class MsgItem {
 
 
     clear(): void {
+        this.data = null;
         this.element.parentNode!.removeChild(this.element);
         this.removeEvent();
     }

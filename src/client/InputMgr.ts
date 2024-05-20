@@ -1,12 +1,15 @@
 import { ProjectConfig } from "../ProjectConfig";
 import { Config } from "./Config";
+import { HtmlControl } from "./HtmlControl";
 import { HttpMgr } from "./HttpMgr";
 import { TipsMgr } from "./TipsMgr";
+import { Utils } from "./Utils";
 
 export class InputMgr {
     private static fileInput: HTMLInputElement;
     private static textInput: HTMLInputElement;
     private static uploadButton: HTMLButtonElement;
+    private static pageParent: HTMLElement;
 
 
     private static _inputLock = false;
@@ -22,14 +25,16 @@ export class InputMgr {
 
 
 
-    static init() {
-        this.getUI();
+    static init(pageParent: HTMLElement) {
+        this.pageParent = pageParent;
+        this.setUI();
         this.addEvent();
     }
-    private static getUI() {
-        this.fileInput = document.getElementById('fileInput') as HTMLInputElement;
-        this.textInput = document.getElementById('textInput') as HTMLInputElement;
-        this.uploadButton = document.getElementById('uploadButton') as HTMLButtonElement;
+    private static setUI() {
+        let uploadForm: HTMLFormElement = Utils.createControl(this.pageParent, HtmlControl.uploadComponent, "uploadForm") as HTMLFormElement;
+        this.fileInput = uploadForm.querySelector('#fileInput') as HTMLInputElement;
+        this.textInput = uploadForm.querySelector('#textInput') as HTMLInputElement;
+        this.uploadButton = uploadForm.querySelector('#uploadButton') as HTMLButtonElement;
     }
     private static addEvent() {
         this.uploadButton.addEventListener('click', this.sendMsg.bind(this));

@@ -5,7 +5,7 @@
 body {
 	display: flex;
 	justify-content: center;
-	min-width: 600px;
+	min-width: 800px;
 	padding: 20px; /* 添加 padding 以防止内容贴近屏幕边缘 */
 }
 
@@ -77,7 +77,7 @@ body {
 }
 
 /* 媒体查询，当设备宽度大于 600px 时，使用以下样式 */
-@media (min-width: 600px) {
+@media (min-width: 800px) {
 	#uploadForm {
 		flex-direction: row; /* 在非移动端，将元素排成一行 */
 		align-items: center; /* 对齐到中间 */
