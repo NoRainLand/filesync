@@ -1,49 +1,32 @@
-import { MsgData } from "../common/CommonDefine";
-import { EventMgr } from "../common/EventMgr";
+import { MsgData } from "../../common/CommonDefine";
+import { EventMgr } from "../../common/EventMgr";
+import { BtnEvent } from "../config/ClientDefine";
+import { HtmlControl } from "../config/HtmlControl";
+import { Utils } from "../utils/Utils";
 
 export class MsgItem {
-    private element: HTMLDivElement;
+    private form: HTMLFormElement;
     private txtNameOrText: HTMLParagraphElement;
     private txtDate: HTMLParagraphElement;
     private btnDownload: HTMLButtonElement;
     private btnCopy: HTMLButtonElement;
     private btnDel: HTMLButtonElement;
     private data: MsgData | null;
-    private onceInit: boolean = false;
     private maxTextLength = 30;
     constructor() {
 
     }
 
-    initItem() {
-        if (!this.onceInit) {
-            this.element = document.createElement('div');
-            this.element.className = 'item';
-
-            this.txtNameOrText = document.createElement('p');
-            this.txtDate = document.createElement('p');
-            this.btnDownload = document.createElement('button');
-            this.btnCopy = document.createElement('button');
-            this.btnCopy.className = "btnCopy";
-
-            this.btnDel = document.createElement('button');
-
-
-            this.element.appendChild(this.txtNameOrText);
-            const buttonContainer = document.createElement('div');
-
-            buttonContainer.appendChild(this.txtDate);
-            buttonContainer.appendChild(this.btnDownload);
-            buttonContainer.appendChild(this.btnCopy);
-            buttonContainer.appendChild(this.btnDel);
-
-            this.element.appendChild(buttonContainer);
-
-            this.btnDownload.textContent = '下载';
-            this.btnCopy.textContent = '复制';
-            this.btnDel.textContent = '删除';
-            this.onceInit = true;
+    initItem(parent: HTMLElement) {
+        if (!this.form) {
+            this.form = Utils.createControlByHtml(HtmlControl.fileItem) as HTMLFormElement;
+            this.txtNameOrText = this.form.querySelector('p') as HTMLParagraphElement;
+            this.txtDate = this.form.querySelector('div small') as HTMLParagraphElement;
+            this.btnDownload = this.form.querySelector('div .downloadFile') as HTMLButtonElement;
+            this.btnCopy = this.form.querySelector('div .copyMsg') as HTMLButtonElement;
+            this.btnDel = this.form.querySelector('div .deleteMsg') as HTMLButtonElement;
         }
+        this.setMyParnet(parent);
 
         this.addEvent();
     }
@@ -59,7 +42,7 @@ export class MsgItem {
     }
 
     downloadFile(): void {
-        EventMgr.emit('downloadFile', this.data!.url, this.data!.fileName);
+        EventMgr.emit(BtnEvent.downloadFile, this.data!.url, this.data!.fileName);
     }
 
     copyData() {
@@ -70,12 +53,12 @@ export class MsgItem {
     }
 
     deleteData(): void {
-        EventMgr.emit('deleteItem', this.data!.fileOrTextHash!);
+        EventMgr.emit(BtnEvent.deleteItem, this.data!.fileOrTextHash!);
     }
 
-    setData(data: MsgData): void {
+    setData(data: MsgData, parent: HTMLElement): void {
         this.data = data;
-        this.initItem();
+        this.initItem(parent);
 
         // 显示 text 或 filename
         if (data.fileName) {
@@ -107,46 +90,26 @@ export class MsgItem {
         }
 
         if (data.size != void 0 && data.size > 0) {
-            this.txtNameOrText.setAttribute("data-tooltip", "文件大小：" + this.reSize(data.size));
+            this.txtNameOrText.setAttribute("data-tooltip", "文件大小：" + Utils.formatSize(data.size));
             this.txtNameOrText.style.borderBottom = 'none';
         } else {
             this.txtNameOrText.removeAttribute("data-tooltip");
         }
 
         // 显示时间戳
-        this.txtDate.textContent = this.tranDate(data.timestamp);
-    }
-
-    tranDate(timestamp: number): string {
-        const date = new Date(timestamp);
-        const year = date.getFullYear();
-        const month = ('0' + (date.getMonth() + 1)).slice(-2);
-        const day = ('0' + date.getDate()).slice(-2);
-        const hours = ('0' + date.getHours()).slice(-2);
-        const minutes = ('0' + date.getMinutes()).slice(-2);
-        const seconds = ('0' + date.getSeconds()).slice(-2);
-        const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        return formattedDate;
-    }
-
-    reSize(size: number): string {
-        if (size >= 1024 * 1024) {
-            return (size / 1024 / 1024).toFixed(2) + "GB";
-        } else if (size >= 1024) {
-            return (size / 1024).toFixed(2) + "MB";
-        } else {
-            return Math.ceil(size) + "KB";
-        }
+        this.txtDate.textContent = Utils.formatTime(data.timestamp);
     }
 
 
     clear(): void {
         this.data = null;
-        this.element.parentNode!.removeChild(this.element);
+        this.form?.parentNode?.removeChild(this.form);
         this.removeEvent();
     }
 
     setMyParnet(parent: HTMLElement) {
-        parent.insertBefore(this.element, parent.firstChild);
+        if (parent && this.form) {
+            parent.insertBefore(this.form, parent.firstChild);
+        }
     }
 }

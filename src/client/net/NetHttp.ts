@@ -1,7 +1,7 @@
-import { Config } from "./Config";
+import { Config } from "../config/Config";
 
-export class HttpMgr {
-    static getSocketInfo<T>(): Promise<T> {
+export class NetHttp {
+    getSocketInfo<T>(): Promise<T> {
         return fetch(Config.httpApiMap.getSocketInfo)
             .then(response => {
                 if (!response.ok) {
@@ -11,7 +11,7 @@ export class HttpMgr {
             });
     }
 
-    static uploadMsg(formData: FormData, onprogress: (event: ProgressEvent) => {}): Promise<string> {
+    uploadMsg(formData: FormData, onprogress: (event: ProgressEvent) => {}): Promise<string> {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', Config.httpApiMap.upload, true);

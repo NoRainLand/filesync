@@ -1,5 +1,5 @@
-import { HtmlControl } from "./HtmlControl";
-import { Utils } from "./Utils";
+import { HtmlControl } from "../config/HtmlControl";
+import { Utils } from "../utils/Utils";
 
 export class ThemeMgr {
     private static _isDark: number = -1;
@@ -29,7 +29,7 @@ export class ThemeMgr {
         this.addEvent();
     }
     private static setUI() {
-        this.themeButtonSvg = Utils.createControl(this.parent, HtmlControl.themeButton, "themeButton", "afterbegin");
+        this.themeButtonSvg = Utils.createConnonControl(this.parent, HtmlControl.themeButton, "themeButton", "afterbegin");
     }
 
     /**初始化主题 */

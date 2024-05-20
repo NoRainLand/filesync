@@ -1,40 +1,73 @@
-import { ProjectConfig } from "../ProjectConfig";
-import { Config } from "./Config";
-import { HtmlControl } from "./HtmlControl";
-import { HttpMgr } from "./HttpMgr";
+import { ProjectConfig } from "../../ProjectConfig";
+import { Color, InputStatus } from "../config/ClientDefine";
+import { Config } from "../config/Config";
+import { HtmlControl } from "../config/HtmlControl";
+import { NetMgr } from "../net/NetMgr";
+import { Utils } from "../utils/Utils";
 import { TipsMgr } from "./TipsMgr";
-import { Utils } from "./Utils";
 
 export class InputMgr {
     private static fileInput: HTMLInputElement;
     private static textInput: HTMLInputElement;
-    private static uploadButton: HTMLButtonElement;
+    private static uploadButton: HTMLInputElement;
     private static pageParent: HTMLElement;
 
 
-    private static _inputLock = false;
-    static get inputLock(): boolean {
-        return this._inputLock;
-    }
-    static set inputLock(value: boolean) {
-        this._inputLock = value;
-        this.uploadButton.value = value ? "发送中" : "发送";
-        this.uploadButton.setAttribute('aria-busy', value.toString());
-        this.textInput.placeholder = value ? "发送中…" : "等待输入…";
+    private static inputStatus: InputStatus = InputStatus.null;
+
+
+    static get static() {
+        return this.inputStatus;
     }
 
+    static changeStatus(status: InputStatus) {
+        if (this.inputStatus === status) return;
+        this.inputStatus = status;
+        switch (status) {
+            case InputStatus.loading:
+                this.inputLock = true;
+                this.uploadButton.value = "加载中";
+                this.textInput.placeholder = "正在加载中";
+                this.uploadButton.style.backgroundColor = Color.blue;
+                this.uploadButton.style.borderColor = Color.blue;
+                break;
+            case InputStatus.sending:
+                this.inputLock = true;
+                this.uploadButton.value = "发送中";
+                this.textInput.placeholder = "正在发送中";
+                this.uploadButton.style.backgroundColor = Color.yellow;
+                this.uploadButton.style.borderColor = Color.yellow;
+                break;
+            case InputStatus.error:
+                this.inputLock = true;
+                this.uploadButton.value = "错误";
+                this.textInput.placeholder = "网络发生错误";
+                this.uploadButton.style.backgroundColor = Color.red;
+                this.uploadButton.style.borderColor = Color.red;
+                break;
+            case InputStatus.waiting:
+                this.inputLock = false;
+                this.uploadButton.value = "发送";
+                this.textInput.placeholder = "等待输入中";
+                this.uploadButton.style.backgroundColor = Color.green;
+                this.uploadButton.style.borderColor = Color.green;
+                break;
+        }
+    }
+    private static inputLock = false;
 
 
     static init(pageParent: HTMLElement) {
         this.pageParent = pageParent;
+        this.inputStatus = InputStatus.null;
         this.setUI();
         this.addEvent();
     }
     private static setUI() {
-        let uploadForm: HTMLFormElement = Utils.createControl(this.pageParent, HtmlControl.uploadComponent, "uploadForm") as HTMLFormElement;
+        let uploadForm: HTMLFormElement = Utils.createConnonControl(this.pageParent, HtmlControl.uploadComponent, "uploadForm") as HTMLFormElement;
         this.fileInput = uploadForm.querySelector('#fileInput') as HTMLInputElement;
         this.textInput = uploadForm.querySelector('#textInput') as HTMLInputElement;
-        this.uploadButton = uploadForm.querySelector('#uploadButton') as HTMLButtonElement;
+        this.uploadButton = uploadForm.querySelector('#uploadButton') as HTMLInputElement;
     }
     private static addEvent() {
         this.uploadButton.addEventListener('click', this.sendMsg.bind(this));
@@ -44,7 +77,7 @@ export class InputMgr {
         this.uploadButton.removeEventListener('click', this.sendMsg);
     }
 
-
+    /**发送文件或者文字 */
     private static sendMsg() {
         let text = this.textInput.value;
         if (!text && !this.fileInput.files) {
@@ -63,7 +96,7 @@ export class InputMgr {
 
 
     private static sendHttpMsg(formData: FormData) {
-        HttpMgr.uploadMsg(formData, (event: ProgressEvent) => {
+        NetMgr.uploadMsg(formData, (event: ProgressEvent) => {
             if (event.lengthComputable) {
                 if (event.total > Config.showProgressMinSize) {
                     TipsMgr.showProgress(event.loaded / event.total);

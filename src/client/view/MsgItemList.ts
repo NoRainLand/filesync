@@ -1,11 +1,11 @@
-import { MsgData } from "../common/CommonDefine";
-import { Pool } from "../common/Pool";
-import { HtmlControl } from "./HtmlControl";
+import { MsgData } from "../../common/CommonDefine";
+import { Pool } from "../../common/Pool";
+import { HtmlControl } from "../config/HtmlControl";
+import { Utils } from "../utils/Utils";
 import { MsgItem } from "./MsgItem";
-import { Utils } from "./Utils";
 
 /**文件列表管理类 */
-export class MsgItemMgr {
+export class MsgItemList {
     private static itemPool: Pool<MsgItem>;
     private static fileListDiv: HTMLElement;
     private static msgList: MsgData[];
@@ -20,7 +20,7 @@ export class MsgItemMgr {
         this.fileOrTextHashList = [];
     }
     private static setUI() {
-        this.fileListDiv = Utils.createControl(this.pageParent, HtmlControl.fileList, "fileList", "beforeend");
+        this.fileListDiv = Utils.createConnonControl(this.pageParent, HtmlControl.fileList, "fileList", "beforeend");
     }
 
     static onFullItems(msgList: MsgData[]) {
@@ -37,8 +37,10 @@ export class MsgItemMgr {
             this.fileOrTextHashList.splice(index, 1);
             let item = this.itemList[index];
             this.itemList.splice(index, 1);
-            item.clear();
-            this.itemPool.recycle(item);
+            if (item) {
+                item.clear();
+                this.itemPool.recycle(item);
+            }
         }
     }
 
@@ -48,8 +50,7 @@ export class MsgItemMgr {
             let hash = this.fileOrTextHashList[0];//移除最前面的一条
             this.onDeleteItem(hash);
             let item = this.itemPool.get();
-            item.setData(msgData);
-            item.setMyParnet(this.fileListDiv);
+            item.setData(msgData, this.fileListDiv);
         }
     }
 

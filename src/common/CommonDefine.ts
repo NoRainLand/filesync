@@ -18,17 +18,17 @@ export type MsgData = {
 
 /**socket服务器客户端交互 */
 export enum ServerClientOperate {
-    /**添加消息 */
+    /**添加消息 服务器主动下发*/
     ADD = "ADD",
-    /**删除消息 */
+    /**删除消息 服务器主动下发*/
     DELETE = "DELETE",
-    /**全量消息 */
+    /**全量消息 客户端主动请求全部消息*/
     FULL = "FULL",
-    /**心跳 */
+    /**心跳 客户端主动请求，服务器原样返回*/
     HEARTBEAT = "HEARTBEAT",
-    /**刷新 */
+    /**刷新 客户端主动请求，服务器返回最后操作时间戳*/
     REFRESH = "REFRESH",
-    /**错误 */
+    /**错误 服务器主动下发 */
     ERROR = "ERROR",
 }
 

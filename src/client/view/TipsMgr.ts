@@ -1,7 +1,7 @@
-import { Pool } from "../common/Pool";
-import { AlertType } from "./ClientDefine";
-import { HtmlControl } from "./HtmlControl";
-import { Utils } from "./Utils";
+import { Pool } from "../../common/Pool";
+import { AlertType } from "../config/ClientDefine";
+import { HtmlControl } from "../config/HtmlControl";
+import { Utils } from "../utils/Utils";
 
 export class TipsMgr {
     private static _body: HTMLElement;
@@ -108,7 +108,7 @@ class Dialog extends UIControl {
         this.init();
     }
     init() {
-        this.dialog = Utils.createControl(this.parent, HtmlControl.Dialog, "myDialog") as HTMLDialogElement;
+        this.dialog = Utils.createConnonControl(this.parent, HtmlControl.Dialog, "myDialog") as HTMLDialogElement;
 
 
         this.dialogTitle = this.dialog.querySelector("article header h6")!;
@@ -183,7 +183,7 @@ class Alert extends UIControl {
         this.init();
     }
     init() {
-        this.dialog = Utils.createControl(this.parent, HtmlControl.Alert, "myAlert") as HTMLDialogElement;
+        this.dialog = Utils.createConnonControl(this.parent, HtmlControl.Alert, "myAlert") as HTMLDialogElement;
 
         this.qrcodeDiv = this.dialog.querySelector('#qrcodeDiv') as HTMLImageElement;
         this.imgQrCode = this.dialog.querySelector("#qrcodeImg") as HTMLImageElement;
@@ -201,8 +201,6 @@ class Alert extends UIControl {
 
 
     show(content: string, title: string = "提示", type: AlertType = AlertType.text, caller: any = null, callback: Function | null = null) {
-        console.log(this.dialogTitle);
-        console.log(this.dialogContent);
         this._caller = caller;
         this._callback = callback;
         this.dialogTitle.innerText = title;
@@ -317,7 +315,7 @@ class Progress extends UIControl {
         this.init();
     }
     init() {
-        this.progress = Utils.createControl(this.parent, HtmlControl.Progress, "myProgress") as HTMLDialogElement;
+        this.progress = Utils.createConnonControl(this.parent, HtmlControl.Progress, "myProgress") as HTMLDialogElement;
 
         this.progressCard = this.progress.querySelector('#myProgressCard') as HTMLDListElement;
         this.progressValue = this.progress.querySelector('#myProgressValue') as HTMLProgressElement;

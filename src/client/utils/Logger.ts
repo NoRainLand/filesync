@@ -1,4 +1,4 @@
-import { ProjectConfig } from "../ProjectConfig";
+import { ProjectConfig } from "../../ProjectConfig";
 
 export class Logger {
     private static sLog: Function;

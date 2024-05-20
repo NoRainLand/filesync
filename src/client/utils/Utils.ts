@@ -5,13 +5,11 @@ export class Utils {
     /**文件尺寸转换 */
     static formatSize(size: number): string {
         if (size < 1024) {
-            return size + 'B';
+            return Math.floor(size) + 'KB';
         } else if (size < 1024 * 1024) {
-            return (size / 1024).toFixed(2) + 'KB';
-        } else if (size < 1024 * 1024 * 1024) {
-            return (size / 1024 / 1024).toFixed(2) + 'MB';
+            return (size / 1024).toFixed(2) + 'MB';
         } else {
-            return (size / 1024 / 1024 / 1024).toFixed(2) + 'GB';
+            return (size / 1024 / 1024).toFixed(2) + 'GB';
         }
     }
 
@@ -103,9 +101,22 @@ export class Utils {
     }
 
     /**创建控件 */
-    static createControl(parent: HTMLElement, html: string, elementId: string, position: InsertPosition = "afterbegin") {
-        parent.insertAdjacentHTML(position, html);
+    static createConnonControl(parent: HTMLElement, html: string, elementId: string, position: InsertPosition = "afterbegin") {
+        let obj = parent.insertAdjacentHTML(position, html);
         return document.getElementById(elementId) as HTMLElement;
+    }
+
+
+    private static div: HTMLDivElement;
+    /**直接创建 */
+    static createControlByHtml(html: string) {
+        if (!this.div) {
+            this.div = document.createElement('div');
+        }
+        this.div.innerHTML = html;
+        let ch = this.div.firstElementChild;
+        this.div.removeChild(ch!);
+        return ch;
     }
 
 }

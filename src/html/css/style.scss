@@ -52,11 +52,6 @@ body {
 	gap: 10px;
 }
 
-#statusText {
-	margin-left: auto;
-	min-width: 100px;
-}
-
 #fileList {
 	margin-top: 20px;
 }
@@ -67,13 +62,16 @@ body {
 	justify-content: space-between;
 	align-items: start; /* 对齐到左边 */
 	gap: 10px; /* 添加 gap 以增加元素之间的间距 */
-}
-
-.item > div {
-	display: flex;
-	justify-content: flex-start;
-	gap: 10px;
-	align-items: center;
+	min-width: 800px;
+	div {
+		display: flex;
+		gap: 10px;
+		justify-content: flex-end;
+		.msgDate {
+			margin-top: 10px;
+			width: 100px;
+		}
+	}
 }
 
 /* 媒体查询，当设备宽度大于 600px 时，使用以下样式 */

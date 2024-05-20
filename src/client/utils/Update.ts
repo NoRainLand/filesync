@@ -1,4 +1,4 @@
-import { Handler } from "../common/Handler";
+import { Handler } from "../../common/Handler";
 
 export class Update {
     private static _handlers: Handler[] = [];

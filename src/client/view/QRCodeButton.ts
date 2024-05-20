@@ -1,7 +1,7 @@
-import { AlertType } from "./ClientDefine";
-import { HtmlControl } from "./HtmlControl";
+import { AlertType } from "../config/ClientDefine";
+import { HtmlControl } from "../config/HtmlControl";
+import { Utils } from "../utils/Utils";
 import { TipsMgr } from "./TipsMgr";
-import { Utils } from "./Utils";
 
 export class QRCodeButton {
     private static pageParent: HTMLElement | null;
@@ -12,7 +12,7 @@ export class QRCodeButton {
         this.addEvent();
     }
     private static setUI() {
-        this.qrcodeButtonSvg = Utils.createControl(this.pageParent!, HtmlControl.qrcodeButton, "qrcodeButton", "beforeend");
+        this.qrcodeButtonSvg = Utils.createConnonControl(this.pageParent!, HtmlControl.qrcodeButton, "qrcodeButton", "beforeend");
     }
     private static addEvent() {
         this.qrcodeButtonSvg.addEventListener('click', this.onShowQRCode.bind(this));

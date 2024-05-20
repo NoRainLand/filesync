@@ -21,10 +21,7 @@ export class ServerConfig {
     static readonly httpFileMap: { [key: string]: string } = {
         "/": "index.html",
         "/favicon.ico": "favicon.ico",
-        "/css/pico.min.css": "css/pico.min.css",
-        "/libs/qrcode.min.js": "libs/qrcode.min.js",
-        "/libs/vconsole.min.js": "libs/vconsole.min.js",
-        "/libs/clipboard.min.js": "libs/clipboard.min.js"
+        "/index.js":"index.js"
     }
 
     /**服务器配置文件路径 */
