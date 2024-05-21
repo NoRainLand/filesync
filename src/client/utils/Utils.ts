@@ -1,6 +1,5 @@
 import Clipboard from "clipboard";
 import QRCode from "qrcode";
-import VConsole from "vconsole";
 
 export class Utils {
     /**文件尺寸转换 */
@@ -59,19 +58,19 @@ export class Utils {
         return navigator.clipboard.readText();
     }
 
-    private static vs: VConsole;
-    /**打开vconsle */
-    static openVConsole() {
-        if (!this.vs) {
-            this.vs = new VConsole();
-        }
-        (<any>window)["closeVConsole"] = this.closeVConsole.bind(this);
-    }
+    // private static vs: VConsole;
+    // /**打开vconsle */
+    // static openVConsole() {
+    //     if (!this.vs) {
+    //         this.vs = new VConsole();
+    //     }
+    //     (<any>window)["closeVConsole"] = this.closeVConsole.bind(this);
+    // }
 
-    /**关闭vconsole */
-    static closeVConsole() {
-        this.vs?.destroy();
-    }
+    // /**关闭vconsole */
+    // static closeVConsole() {
+    //     this.vs?.destroy();
+    // }
 
 
     private static canvasElement: HTMLCanvasElement;
