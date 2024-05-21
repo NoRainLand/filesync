@@ -167,7 +167,7 @@ export class HttpServer {
                     hashName: req.file!.filename
                 };
                 DatabaseOperation.writeToDatabase(msg).then(() => {
-                    EventMgr.emit(EventName.MSGSAVED, msg);
+                    EventMgr.emit(EventName.ONMESSAGESAVED, msg);
                     this.fileHashes.push(fileHash);
                     this.fileName2HashNameMap.set(req.file!.originalname, req.file!.filename);
                     this.hashName2FileNameMap.set(req.file!.filename, req.file!.originalname);
@@ -193,7 +193,7 @@ export class HttpServer {
                 hashName: ""
             };
             DatabaseOperation.writeToDatabase(msg).then(() => {
-                EventMgr.emit(EventName.MSGSAVED, msg);
+                EventMgr.emit(EventName.ONMESSAGESAVED, msg);
             }).catch((err) => {
                 res.status(500).send(err);
             });

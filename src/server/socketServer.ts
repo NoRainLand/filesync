@@ -99,14 +99,15 @@ export class SocketServer {
     }
     /**socket消息 */
     private static onWsMsg(ws: any, msg: string) {
-        let socketMsgFromClient: SocketMsg = JSON.parse(msg);
-        switch (socketMsgFromClient.operate) {
+        let socketMsg: SocketMsg = JSON.parse(msg);
+        console.log(socketMsg);
+        switch (socketMsg.operate) {
             case ServerClientOperate.HEARTBEAT:
                 let heartBeat: SocketMsg = { operate: ServerClientOperate.HEARTBEAT, timeStamp: this._lastMsgChangeTimestamp };
                 ws.send(JSON.stringify(heartBeat));
                 break;
             case ServerClientOperate.DELETE:
-                let fileOrTextHash: string = socketMsgFromClient.data!;
+                let fileOrTextHash: string = socketMsg.data.fileOrTextHash;
                 DatabaseOperation.getMsgTypeByHash(fileOrTextHash).then((deleteMsg: MsgData) => {
                     if (deleteMsg != null && deleteMsg.msgType != null) {//防止重复删除
                         if (deleteMsg.msgType === 'file') {
@@ -133,11 +134,11 @@ export class SocketServer {
                 });
                 break;
             case ServerClientOperate.REFRESH:
-                let data: SocketMsg = { operate: ServerClientOperate.FULL, timeStamp: this._lastMsgChangeTimestamp };
+                let data: SocketMsg = { operate: ServerClientOperate.REFRESH, timeStamp: this._lastMsgChangeTimestamp };
                 ws.send(JSON.stringify(data));
                 break;
             default:
-                let msg = "未知的operate:" + socketMsgFromClient.operate;
+                let msg = "未知的operate:" + socketMsg.operate;
                 let errData: ErrorData = { error: msg };
                 let err: SocketMsg = { operate: ServerClientOperate.ERROR, timeStamp: this._lastMsgChangeTimestamp, data: errData };
                 ws.send(JSON.stringify(err));

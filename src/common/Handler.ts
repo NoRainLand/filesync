@@ -55,7 +55,7 @@ export class Handler {
     }
     runWith(parms: any) {
         if (!this._isRecover) {
-            this._callback?.call(this._caller, parms);
+            this._callback?.apply(this._caller, parms);
             if (this._isOnce) {
                 Handler.recoverHandler(this);
             }

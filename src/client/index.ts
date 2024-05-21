@@ -25,10 +25,10 @@ export class index {
         Logger.tranLogger();
         ProjectConfig.openVC && Utils.openVConsole();
         this.initUI();
-        ThemeMgr.init(this.pageParent);
-        MsgItemList.init(this.pageParent);
-        QRCodeButton.init(this.pageParent);
         InputMgr.init(this.pageParent);
+        MsgItemList.init(this.pageParent);
+        ThemeMgr.init(this.pageParent);
+        QRCodeButton.init(this.pageParent);
         NetMgr.init();
         this.addEvent();
 
@@ -90,28 +90,27 @@ export class index {
         NetMgr.getFullMsg();
     }
 
-    private onSocketMsg(msg: SocketMsg[]) {
+    private onSocketMsg(msg: SocketMsg) {
         console.log(msg);
-        let data = msg[0];
-        switch (data.operate) {
+        switch (msg.operate) {
             case ServerClientOperate.ADD:
-                MsgItemList.onAddItem(data.data);
+                MsgItemList.onAddItem(msg.data.msg);
                 break;
             case ServerClientOperate.DELETE:
-                MsgItemList.onDeleteItem(data.data.fileOrTextHash);
+                MsgItemList.onDeleteItem(msg.data.fileOrTextHash);
                 break;
             case ServerClientOperate.FULL:
-                MsgItemList.onFullItems(data.data.msgs);
+                MsgItemList.onFullItems(msg.data.msgs);
                 break;
         }
     }
 
     private onSocketError() {
-        InputMgr.changeStatus(InputStatus.error)
+        InputMgr.changeStatus(InputStatus.error);
     }
 
     private onSocketOpening() {
-        InputMgr.changeStatus(InputStatus.loading)
+        InputMgr.changeStatus(InputStatus.loading);
     }
 
 

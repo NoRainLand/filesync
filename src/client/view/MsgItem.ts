@@ -47,8 +47,11 @@ export class MsgItem {
 
     copyData() {
         if (this.data) {
-            const text = (this.data.text || this.data.url)!.toString();
-            this.btnCopy.setAttribute('data-clipboard-text', text);
+            if (this.data.fileName) {
+                Utils.copyText(this.data.fileName);
+            } else {
+                Utils.copyText(this.data.text!);
+            }
         }
     }
 

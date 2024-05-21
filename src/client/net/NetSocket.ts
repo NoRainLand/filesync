@@ -103,9 +103,10 @@ export class NetSocket {
         } else if (data.operate == ServerClientOperate.REFRESH) {
             this.getRefresh(data);
         } else if (data.operate == ServerClientOperate.ERROR) {
+            console.warn(data.data);
             EventMgr.emit(SocketEvent.onerror, data.data);
         } else {
-            this._lastActionTimestamp = data.timeStamp!;
+            this._lastActionTimestamp = data.timeStamp;
             EventMgr.emit(SocketEvent.onmessage, data);
         }
     }
@@ -153,7 +154,7 @@ export class NetSocket {
     }
 
     private sendHeartBeat() {
-        this.send(JSON.stringify({ action: "heartBeat" }));
+        this.send(JSON.stringify({ operate: ServerClientOperate.HEARTBEAT, timeStamp: Date.now() }));
     }
     private getHeartBeat(data: SocketMsg) {
         this.lostConnectTimer && clearTimeout(this.lostConnectTimer);

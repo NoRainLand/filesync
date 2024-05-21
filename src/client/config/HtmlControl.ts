@@ -25,9 +25,9 @@ export class HtmlControl {
         <p class="NameOrText">这是名字这是名字这是名字这是名字</p>
         <div>
             <small class="msgDate">2024-05-17 12:12:44</small>
-            <button class="downloadFile">下载</button>
-            <button class="copyMsg">复制</button>
-            <button class="deleteMsg">删除</button>
+            <button type="button" class="downloadFile">下载</button>
+            <button type="button" class="copyMsg">复制</button>
+            <button type="button" class="deleteMsg">删除</button>
         </div>
     </form>
     `

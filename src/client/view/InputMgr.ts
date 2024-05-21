@@ -13,8 +13,11 @@ export class InputMgr {
     private static pageParent: HTMLElement;
 
 
-    private static inputStatus: InputStatus = InputStatus.null;
+    private static _inputStatus: InputStatus = InputStatus.null;
 
+    static get inputStatus() {
+        return this._inputStatus;
+    }
 
     static get static() {
         return this.inputStatus;
@@ -22,7 +25,7 @@ export class InputMgr {
 
     static changeStatus(status: InputStatus) {
         if (this.inputStatus === status) return;
-        this.inputStatus = status;
+        this._inputStatus = status;
         switch (status) {
             case InputStatus.loading:
                 this.inputLock = true;
@@ -59,7 +62,7 @@ export class InputMgr {
 
     static init(pageParent: HTMLElement) {
         this.pageParent = pageParent;
-        this.inputStatus = InputStatus.null;
+        this._inputStatus = InputStatus.null;
         this.setUI();
         this.addEvent();
     }
@@ -79,12 +82,14 @@ export class InputMgr {
 
     /**发送文件或者文字 */
     private static sendMsg() {
+        if (this.inputLock) return;
         let text = this.textInput.value;
         if (!text && !this.fileInput.files) {
             TipsMgr.showNotice('请选择文件或输入文本');
             return;
         }
         this.inputLock = true;
+        this.changeStatus(InputStatus.sending);
         const file = this.fileInput.files?.[0];
         const formData = new FormData();
         file && formData.append('file', file);
@@ -117,7 +122,9 @@ export class InputMgr {
             })
             .finally(() => {
                 setTimeout(() => {
-                    this.inputLock = false;
+                    if (this.inputStatus === InputStatus.sending) {
+                        this.changeStatus(InputStatus.waiting);
+                    }
                     TipsMgr.hideProgress();
                 }, ProjectConfig.sendTimeout);
                 this.fileInput.value = '';

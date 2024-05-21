@@ -21,5 +21,4 @@ export enum SQLCAMMAND {
 export enum EventName {
     ONMESSAGESAVED = "ONMESSAGESAVED",
     DELETEITEM = "DELETEITEM",
-    MSGSAVED = "MSGSAVED",
 }
