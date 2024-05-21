@@ -9,7 +9,7 @@ module.exports = [
 			path: path.resolve(__dirname, "dist/client"),
 			filename: "index.js",
 		},
-		mode: "development",
+		mode: "production",
 		module: {
 			rules: [
 				{

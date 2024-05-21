@@ -44,7 +44,6 @@ async function copyFilesC(sourcePath, targetPath, blackList) {
 	for (const file of files) {
 		const from = path.resolve(sourcePath, file);
 		const to = path.resolve(targetPath, file);
-		console.log(from);
 		// 检查文件或目录是否在黑名单中，或者它们的父目录是否在黑名单中
 		let isInBlackList = false;
 		for (let i = 0; i < blackList.length; i++) {
