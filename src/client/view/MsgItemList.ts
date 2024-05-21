@@ -1,8 +1,10 @@
+import { ProjectConfig } from "../../ProjectConfig";
 import { MsgData } from "../../common/CommonDefine";
 import { Pool } from "../../common/Pool";
 import { HtmlControl } from "../config/HtmlControl";
 import { Utils } from "../utils/Utils";
 import { MsgItem } from "./MsgItem";
+import { TipsMgr } from "./TipsMgr";
 
 /**文件列表管理类 */
 export class MsgItemList {
@@ -18,9 +20,10 @@ export class MsgItemList {
         this.itemPool = new Pool<MsgItem>(() => new MsgItem());
         this.itemList = [];
         this.fileOrTextHashList = [];
+        Utils.copyTextByClipboard(HtmlControl.copyNodeButton, this.copySuccess.bind(this));
     }
     private static setUI() {
-        this.fileListDiv = Utils.createConnonControl(this.pageParent, HtmlControl.fileList, "fileList", "beforeend");
+        this.fileListDiv = Utils.createConnonControl(this.pageParent, HtmlControl.fileList, "fileList");
     }
 
     static onFullItems(msgList: MsgData[]) {
@@ -44,13 +47,28 @@ export class MsgItemList {
         }
     }
 
+    private static copySuccess() {
+        TipsMgr.showNotice("复制成功");
+    }
+
     static onAddItem(msgData: MsgData) {
         if (this.fileOrTextHashList.indexOf(msgData.fileOrTextHash) == -1) {
             this.fileOrTextHashList.push(msgData.fileOrTextHash);
-            let hash = this.fileOrTextHashList[0];//移除最前面的一条
-            this.onDeleteItem(hash);
+            this.removeItems()
             let item = this.itemPool.get();
             item.setData(msgData, this.fileListDiv);
+            this.itemList.push(item);
+        }
+    }
+
+    private static removeItems() {
+        if (this.fileOrTextHashList.length > ProjectConfig.maxMsgLen) {
+            for (let i = 0; i < ProjectConfig.removeMsgLen; i++) {
+                let hash = this.fileOrTextHashList[0];
+                if (hash) {
+                    this.onDeleteItem(hash);
+                }
+            }
         }
     }
 

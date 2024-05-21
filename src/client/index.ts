@@ -3,7 +3,7 @@ import { ProjectConfig } from "../ProjectConfig";
 import { ServerClientOperate, ServerInfo, SocketMsg } from "../common/CommonDefine";
 import { EventMgr } from "../common/EventMgr";
 import { NiarApp } from "../common/NiarApp";
-import { BtnEvent, EventName, InputStatus, SocketEvent } from "./config/ClientDefine";
+import { BtnEvent, Color, EventName, InputStatus, SocketEvent } from "./config/ClientDefine";
 import { Config } from "./config/Config";
 import { HtmlControl } from "./config/HtmlControl";
 import { NetMgr } from "./net/NetMgr";
@@ -13,6 +13,7 @@ import { InputMgr } from "./view/InputMgr";
 import { MsgItemList } from "./view/MsgItemList";
 import { QRCodeButton } from "./view/QRCodeButton";
 import { ThemeMgr } from "./view/ThemeMgr";
+import { TipsMgr } from "./view/TipsMgr";
 export class index {
 
     pageParent: HTMLElement;
@@ -25,10 +26,10 @@ export class index {
         Logger.tranLogger();
         ProjectConfig.openVC && Utils.openVConsole();
         this.initUI();
-        InputMgr.init(this.pageParent);
-        MsgItemList.init(this.pageParent);
-        ThemeMgr.init(this.pageParent);
         QRCodeButton.init(this.pageParent);
+        ThemeMgr.init(this.pageParent);
+        MsgItemList.init(this.pageParent);
+        InputMgr.init(this.pageParent);
         NetMgr.init();
         this.addEvent();
 
@@ -37,8 +38,11 @@ export class index {
                 Config.serverURL = socketInfo.socketServerURL;
                 Config.socketPort = socketInfo.socketPort;
                 Config.version = socketInfo.version;
+                Config.author = socketInfo.author;
+                Config.description = socketInfo.description;
+                Config.projectName = socketInfo.projectName;
                 NetMgr.initSocket();
-                Logger.log("当前版本" + Config.version);
+                this.printMsg();
             }).catch((e) => {
                 Logger.error(e);
             });
@@ -47,6 +51,12 @@ export class index {
         this.pageParent = Utils.createConnonControl(document.body, HtmlControl.container, "container") as HTMLElement;
     }
 
+
+    printMsg() {
+        Logger.log("%c" + Config.projectName + "：" + "%c" + Config.description, `color: ${Color.red};font-size: large;`, `color: ${Color.blue}; `);
+        Logger.log("%c作者：" + "%c" + Config.author, `color: ${Color.green}; `, `color: ${Color.blue};`);
+        Logger.log("%c当前版本：" + "%c" + Config.version, `color: ${Color.green}; `, `color: ${Color.blue}; `);
+    }
 
     addEvent() {
         document.addEventListener(EventName.visibilitychange, () => {
@@ -83,6 +93,11 @@ export class index {
 
     private onSocketClose(isClient: boolean = false) {
         InputMgr.changeStatus(InputStatus.error);
+        if (isClient) {
+            TipsMgr.showDialog("服务器已关闭，点击确定刷新页面尝试重连", this, () => {
+                location.reload();
+            }, null, "提示", true);
+        }
     }
 
     private onSocketOpen() {
@@ -90,8 +105,10 @@ export class index {
         NetMgr.getFullMsg();
     }
 
+    private onSocketError() {
+        InputMgr.changeStatus(InputStatus.error);
+    }
     private onSocketMsg(msg: SocketMsg) {
-        console.log(msg);
         switch (msg.operate) {
             case ServerClientOperate.ADD:
                 MsgItemList.onAddItem(msg.data.msg);
@@ -105,9 +122,6 @@ export class index {
         }
     }
 
-    private onSocketError() {
-        InputMgr.changeStatus(InputStatus.error);
-    }
 
     private onSocketOpening() {
         InputMgr.changeStatus(InputStatus.loading);

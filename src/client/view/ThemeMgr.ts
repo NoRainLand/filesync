@@ -29,7 +29,7 @@ export class ThemeMgr {
         this.addEvent();
     }
     private static setUI() {
-        this.themeButtonSvg = Utils.createConnonControl(this.parent, HtmlControl.themeButton, "themeButton", "afterbegin");
+        this.themeButtonSvg = Utils.createConnonControl(this.parent, HtmlControl.themeButton, "themeButton");
     }
 
     /**初始化主题 */

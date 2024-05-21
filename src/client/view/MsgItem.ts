@@ -46,12 +46,16 @@ export class MsgItem {
     }
 
     copyData() {
+        // if (this.data) {
+        //     if (this.data.fileName) {
+        //         Utils.copyText(this.data.fileName);
+        //     } else {
+        //         Utils.copyText(this.data.text!);
+        //     }
+        // }
         if (this.data) {
-            if (this.data.fileName) {
-                Utils.copyText(this.data.fileName);
-            } else {
-                Utils.copyText(this.data.text!);
-            }
+            const text = (this.data.text || this.data.url)!.toString();
+            this.btnCopy.setAttribute('data-clipboard-text', text);
         }
     }
 
@@ -108,6 +112,8 @@ export class MsgItem {
         this.data = null;
         this.form?.parentNode?.removeChild(this.form);
         this.removeEvent();
+        this.btnCopy.removeAttribute('data-clipboard-text');
+        this.txtNameOrText.removeAttribute("data-tooltip");
     }
 
     setMyParnet(parent: HTMLElement) {

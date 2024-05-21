@@ -100,7 +100,6 @@ export class SocketServer {
     /**socket消息 */
     private static onWsMsg(ws: any, msg: string) {
         let socketMsg: SocketMsg = JSON.parse(msg);
-        console.log(socketMsg);
         switch (socketMsg.operate) {
             case ServerClientOperate.HEARTBEAT:
                 let heartBeat: SocketMsg = { operate: ServerClientOperate.HEARTBEAT, timeStamp: this._lastMsgChangeTimestamp };

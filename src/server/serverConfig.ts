@@ -19,9 +19,7 @@ export class ServerConfig {
 
     /**服务器文件映射 */
     static readonly httpFileMap: { [key: string]: string } = {
-        "/": "index.html",
-        "/favicon.ico": "favicon.ico",
-        "/index.js":"index.js"
+        "/": "index.html"
     }
 
     /**服务器配置文件路径 */

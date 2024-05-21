@@ -2,7 +2,10 @@
 export type ServerInfo = {
     "socketServerURL": string,
     "socketPort": number,
-    "version": string
+    "projectName": string,
+    "version": string,
+    "author": string,
+    "description": string,
 }
 
 export type MsgData = {

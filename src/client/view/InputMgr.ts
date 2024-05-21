@@ -84,10 +84,11 @@ export class InputMgr {
     private static sendMsg() {
         if (this.inputLock) return;
         let text = this.textInput.value;
-        if (!text && !this.fileInput.files) {
+        if (!text && (!this.fileInput.files || !this.fileInput.files.length)) {
             TipsMgr.showNotice('请选择文件或输入文本');
             return;
         }
+
         this.inputLock = true;
         this.changeStatus(InputStatus.sending);
         const file = this.fileInput.files?.[0];

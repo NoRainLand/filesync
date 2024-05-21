@@ -12,7 +12,7 @@ export class QRCodeButton {
         this.addEvent();
     }
     private static setUI() {
-        this.qrcodeButtonSvg = Utils.createConnonControl(this.pageParent!, HtmlControl.qrcodeButton, "qrcodeButton", "beforeend");
+        this.qrcodeButtonSvg = Utils.createConnonControl(this.pageParent!, HtmlControl.qrcodeButton, "qrcodeButton");
     }
     private static addEvent() {
         this.qrcodeButtonSvg.addEventListener('click', this.onShowQRCode.bind(this));

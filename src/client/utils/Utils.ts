@@ -1,3 +1,4 @@
+import Clipboard from "clipboard";
 import QRCode from "qrcode";
 import VConsole from "vconsole";
 
@@ -25,6 +26,14 @@ export class Utils {
         return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
     }
 
+    /**复制文本到剪切板 */
+    static copyTextByClipboard(node: string, callback: Function) {
+        let cp = new Clipboard(node);
+        cp.on('success', function (e) {
+            e.clearSelection();
+            callback?.();
+        });
+    }
 
     /**复制文本到剪切板 */
     static copyText(text: string) {
@@ -117,6 +126,19 @@ export class Utils {
         let ch = this.div.firstElementChild;
         this.div.removeChild(ch!);
         return ch;
+    }
+
+    private static moueseUpEvent: MouseEvent;
+    static get mouseUpEvent() {
+        if (!this.moueseUpEvent) {
+            this.moueseUpEvent = new MouseEvent('mouseup', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            Object.freeze(this.moueseUpEvent);
+        }
+        return this.moueseUpEvent;
     }
 
 }

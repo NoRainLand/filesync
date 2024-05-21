@@ -1,3 +1,4 @@
+import compression from 'compression';
 import crypto from 'crypto';
 import express, { NextFunction, Request, Response } from 'express';
 import fs from 'fs';
@@ -48,10 +49,11 @@ export class HttpServer {
         });
     }
 
-    /**初始化服务器中间件 */
+    /**初始化服务器框架 */
     private static initServer() {
         Utils.checkDirExist(this.savePath);
         this.appExpress = express();
+        this.appExpress.use(compression());//开启gzip压缩
         this.server = http.createServer(this.appExpress);
         this.storageEngine = multer.diskStorage({
             destination: (req, file, cb) => {
@@ -206,6 +208,9 @@ export class HttpServer {
             const socketInfo: ServerInfo = {
                 socketServerURL: ServerConfig.serverURL,
                 socketPort: ServerConfig.socketPort,
+                projectName: ProjectConfig.projectName,
+                author: ProjectConfig.author,
+                description: ProjectConfig.description,
                 version: ProjectConfig.versionStr,
             };
             res.send(socketInfo);
@@ -219,9 +224,9 @@ export class HttpServer {
                 res.sendFile(path.join(__dirname, '../client/' + ServerConfig.httpFileMap[key]));
             });
         }
-        this.appExpress.use('/client', express.static(path.join(__dirname, '../client')));
-        this.appExpress.get('/client/:file', (req: Request, res: Response) => {
-            res.sendFile(path.join(__dirname, '../client', req.params.file + '.js'));
+
+        this.appExpress.get('/:file', (req: Request, res: Response) => {
+            res.sendFile(path.join(__dirname, '../client/', req.params.file));
         });
     }
 

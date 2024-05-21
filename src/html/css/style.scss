@@ -2,11 +2,32 @@
 	$theme-color: "cyan"
 );
 
+$minWidth: 800px;
+$itemMinWidth: 690px;
+$maxWidth: 1400px;
+
 body {
 	display: flex;
 	justify-content: center;
-	min-width: 800px;
-	padding: 20px; /* 添加 padding 以防止内容贴近屏幕边缘 */
+	min-width: $minWidth;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	padding-left: 55px;
+	padding-right: 55px;
+	.container {
+		max-width: 1250px;
+	}
+	font-family: "JetBrains Mono NL Medium", "Source Han Serif CN Medium";
+}
+
+@font-face {
+	font-family: "JetBrains Mono NL Medium";
+	src: url("../font/JetBrainsMonoNL-Medium.ttf") format("truetype");
+}
+
+@font-face {
+	font-family: "Source Han Serif CN Medium";
+	src: url("../font/SourceHanSerifCN-Medium.otf") format("opentype");
 }
 
 .qrcodeButton {
@@ -47,9 +68,48 @@ body {
 
 #uploadForm {
 	display: flex;
-	flex-direction: column; /* 在移动端，将元素堆叠成一列 */
-	align-items: start; /* 对齐到左边 */
+	flex-direction: column;
+	align-items: start;
 	gap: 10px;
+	max-width: $maxWidth;
+	position: sticky;
+	top: 0;
+	z-index: 99;
+}
+
+.tips {
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	transition: all 1s ease-in-out;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	opacity: 0.75;
+}
+
+/* Dark color scheme (Forced) */
+/* Enabled if forced with data-theme="dark" */
+[data-theme="dark"] {
+	#uploadForm {
+		background-color: #13171f;
+	}
+	.qrcodeButton {
+		background-color: #13171f;
+	}
+	.themeButton {
+		background-color: #13171f;
+	}
+}
+[data-theme="light"] {
+	#uploadForm {
+		background-color: #fff;
+	}
+	.qrcodeButton {
+		background-color: #fff;
+	}
+	.themeButton {
+		background-color: #fff;
+	}
 }
 
 #fileList {
@@ -58,11 +118,12 @@ body {
 
 .item {
 	display: flex;
-	flex-direction: column; /* 在移动端，将元素堆叠成一列 */
+	flex-direction: row;
 	justify-content: space-between;
-	align-items: start; /* 对齐到左边 */
-	gap: 10px; /* 添加 gap 以增加元素之间的间距 */
-	min-width: 800px;
+	align-items: center;
+	gap: 10px;
+	min-width: $itemMinWidth;
+	max-width: $maxWidth;
 	div {
 		display: flex;
 		gap: 10px;
@@ -71,21 +132,28 @@ body {
 			margin-top: 10px;
 			width: 100px;
 		}
+		min-width: 340px;
+	}
+	.NameOrText {
+		display: inline-block;
+		width: auto;
+		white-space: nowrap;
+		flex: 0 1 auto;
 	}
 }
 
-/* 媒体查询，当设备宽度大于 600px 时，使用以下样式 */
-@media (min-width: 800px) {
-	#uploadForm {
-		flex-direction: row; /* 在非移动端，将元素排成一行 */
-		align-items: center; /* 对齐到中间 */
-	}
+// /* 媒体查询，当设备宽度大于 600px 时，使用以下样式 */
+// @media (min-width: 800px) {
+// 	#uploadForm {
+// 		flex-direction: row; /* 在非移动端，将元素排成一行 */
+// 		align-items: center; /* 对齐到中间 */
+// 	}
 
-	.item {
-		flex-direction: row; /* 在非移动端，将元素排成一行 */
-		align-items: center; /* 对齐到中间 */
-	}
-}
+// 	.item {
+// 		flex-direction: row; /* 在非移动端，将元素排成一行 */
+// 		align-items: center; /* 对齐到中间 */
+// 	}
+// }
 
 #copyRight {
 	position: fixed;

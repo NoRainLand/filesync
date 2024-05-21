@@ -110,12 +110,11 @@ class Dialog extends UIControl {
     init() {
         this.dialog = Utils.createConnonControl(this.parent, HtmlControl.Dialog, "myDialog") as HTMLDialogElement;
 
-
-        this.dialogTitle = this.dialog.querySelector("article header h6")!;
-        this.dialogContent = this.dialog.querySelector("article p")!;
-        this.dialogCancelButton = this.dialog.querySelector("article footer a:first-child")!;
-        this.dialogSureButton = this.dialog.querySelector("article footer a:last-child")!;
-        this.dialogCloseButton = this.dialog.querySelector("article header a")!;
+        this.dialogTitle = this.dialog.querySelector("article header p strong")!;
+        this.dialogContent = this.dialog.querySelectorAll("article p")[1]! as HTMLParagraphElement;
+        this.dialogCancelButton = this.dialog.querySelector("article footer button:first-child")!;
+        this.dialogSureButton = this.dialog.querySelector("article footer button:last-child")!;
+        this.dialogCloseButton = this.dialog.querySelector("article header button")!;
 
         this.dialogSureButton.addEventListener('click', (event) => {
             event.preventDefault();
@@ -145,8 +144,8 @@ class Dialog extends UIControl {
         this._caller = caller;
         this._sure = sure;
         this._cancel = cancel;
-        this.dialogTitle.textContent = title;
-        this.dialogContent.textContent = content;
+        this.dialogTitle.innerText = title;
+        this.dialogContent.innerText = content;
         if (onlySure) {
             this.dialogCancelButton.style.display = "none";
             this.dialogCloseButton.style.display = "none";
@@ -248,24 +247,12 @@ class Notice extends UIControl {
         this.showIngTips = [];
         this.tipsPool = new Pool<HTMLElement>(this.createTips);
     }
-    init() { };
-
     show(msg: string) {
         let tips = this.tipsPool.get();
         this.showIngTips.push(tips);
         this.parent.appendChild(tips);
-        tips.textContent = msg;
-
-
-        tips.style.position = 'fixed';
-        tips.style.left = '50%';
-        tips.style.top = '50%';
-        tips.style.transform = 'translate(-50%, -50%)';
-        tips.style.transition = 'all 1.0s ease-in-out';//平滑过渡
-
-        tips.style.opacity = '0.75';
+        tips.innerText = msg;
         let self = this;
-
         (<any>tips)["startTime"] = setTimeout(() => {
             tips.style.top = '30%';
             tips.style.opacity = '0';
@@ -282,9 +269,7 @@ class Notice extends UIControl {
     }
 
     private createTips(): HTMLElement {
-        let tips = document.createElement("article");
-        tips.className = "tips";
-        tips.style.borderRadius = "10px";
+        let tips = Utils.createControlByHtml(HtmlControl.tipsComponent) as HTMLElement;
         return tips;
     }
     private recoverTips(tips: HTMLElement) {
@@ -297,7 +282,7 @@ class Notice extends UIControl {
             (<any>tips)["startTime"] = null;
             (<any>tips)["holdTime"] = null;
         }
-        tips.textContent = "";
+        tips.innerText = "";
         this.showIngTips.push(tips);
     }
 }
