@@ -24,7 +24,6 @@ export class index {
         (<any>window)["NiarApp"] = NiarApp;
         document.title = ProjectConfig.projectName;
         Logger.tranLogger();
-        // ProjectConfig.openVC && Utils.openVConsole();
         this.initUI();
         QRCodeButton.init(this.pageParent);
         ThemeMgr.init(this.pageParent);

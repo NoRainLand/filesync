@@ -58,27 +58,11 @@ export class Utils {
         return navigator.clipboard.readText();
     }
 
-    // private static vs: VConsole;
-    // /**打开vconsle */
-    // static openVConsole() {
-    //     if (!this.vs) {
-    //         this.vs = new VConsole();
-    //     }
-    //     (<any>window)["closeVConsole"] = this.closeVConsole.bind(this);
-    // }
-
-    // /**关闭vconsole */
-    // static closeVConsole() {
-    //     this.vs?.destroy();
-    // }
-
 
     private static canvasElement: HTMLCanvasElement;
     /**新建二维码 */
     static createQRCode(text: string, darkColor: string = "#000000", lightColor: string = "#ffffff"): Promise<string> {
         let opts = {
-            // errorCorrectionLevel: 'H',
-            // type: 'image/jpeg',
             quality: 0.3,
             margin: 1,
             color: {
