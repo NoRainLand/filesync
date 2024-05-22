@@ -26,8 +26,8 @@
 打包：
 
 - 修改目录下的rcedit.js中的options配置
-- 执行```npm run rcedit```修补.pkg-cache/v3.4/built-v14.20.0-win-x64的文件
-- 复制粘贴built-v14.20.0-win-x64到C:\Users\你的用户名\.pkg-cache\v3.4目录下，如果没有，可以先执行一遍```npm run exec```
+- 执行```npm run rcedit```修补.pkg-cache/v3.4/built-v16.16.0-win-x64的文件
+- 复制粘贴built-v16.16.0-win-x64到C:\Users\你的用户名\.pkg-cache\v3.4目录下，如果没有，可以先执行一遍```npm run exec```
 - 执行```npm run exec```打包成.exe可执行文件到exce目录下
 
 运行：
