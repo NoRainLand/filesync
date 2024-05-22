@@ -11,7 +11,7 @@
 		"build": "tsc --project ./tsconfig.common.json && tsc --project ./tsconfig.es6.json && npx webpack",
 		"debug": "node --trace-warnings ./dist/server/index.js",
 		"rcedit": "node ./rcedit.js",
-		"exec": "concurrently \"pkg -t win package.json\" "
+		"exec": "concurrently \"pkg -t win package.json --compress=GZip\" "
 	},
 	"keywords": [
 		"fileSnyc",
