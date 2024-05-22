@@ -2,8 +2,8 @@
 	$theme-color: "cyan"
 );
 
-$minWidth: 800px;
-$itemMinWidth: 690px;
+$minWidth: 840px;
+$itemMinWidth: 728px;
 $maxWidth: 1400px;
 
 body {
@@ -28,6 +28,13 @@ body {
 @font-face {
 	font-family: "Source Han Serif CN Medium";
 	src: url("../font/SourceHanSerifCN-Medium.otf") format("opentype");
+}
+
+dialog article {
+	width: auto;
+	.dialogContent {
+		min-height: 90px;
+	}
 }
 
 .qrcodeButton {

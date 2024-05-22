@@ -68,7 +68,7 @@ export class HtmlControl {
                         <strong>提示</strong>
                     </p>
                 </header>
-                <p>hello world!</p>
+                <p class="dialogContent">hello world!</p>
                 <Div id="qrcodeDiv">
                     <Img id="qrcodeImg"></Img>
                 </Div>
@@ -86,7 +86,7 @@ export class HtmlControl {
                         <strong>提示</strong>
                     </p>
                 </header>
-                <p>hello world!</p>
+                <p class="dialogContent">hello world!</p>
                 <footer>
                     <button className="secondary">
                     取消
