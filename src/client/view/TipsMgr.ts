@@ -204,6 +204,7 @@ class Alert extends UIControl {
         this._callback = callback;
         this.dialogTitle.innerText = title;
         if (type == AlertType.text) {
+            this.dialogContent.style.display = "block";
             this.dialogContent.innerText = content;
             this.qrcodeDiv.className = HtmlControl.hideQrcodeDivClass;
             if (this.imgQrCode) {
@@ -212,7 +213,9 @@ class Alert extends UIControl {
         } else if (type == AlertType.qrcode) {
             this.dialogContent.innerText = "";
             this.qrcodeDiv.className = HtmlControl.showQrcodeDivClass;
-
+            if (this.dialogContent) {
+                this.dialogContent.style.display = "none";
+            }
             if (this.imgQrCode) {
                 Utils.createQRCode(content)
                     .then((url) => {
