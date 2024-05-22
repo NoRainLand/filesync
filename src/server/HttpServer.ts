@@ -14,10 +14,11 @@ import { EventName } from './ServerDefine';
 import { Utils } from './Utils';
 
 export class HttpServer {
-    private static fileHashes: string[];
 
     private static fileName2HashNameMap: Map<string, string>;
     private static hashName2FileNameMap: Map<string, string>;
+
+    private static hash2FileNameMap: Map<string, string>;
 
 
     private static appExpress: express.Express;
@@ -29,10 +30,6 @@ export class HttpServer {
 
     /**开启服务器 */
     static async startServer(port: number) {
-        await DatabaseOperation.getAllFileOrTextHashes().then((hashes) => {
-            this.fileHashes = hashes || [];
-        });
-
         await DatabaseOperation.getFileName2HashNameMap().then((map) => {
             this.fileName2HashNameMap = map;
             this.hashName2FileNameMap = new Map();
@@ -42,6 +39,11 @@ export class HttpServer {
                 });
             }
         });
+
+        await DatabaseOperation.getFileHashAndFileNameMap().then((map) => {
+            this.hash2FileNameMap = map;
+        });
+
         await new Promise((resolve, reject) => {
             this.savePath = Utils.getRelativePath(ServerConfig.uploadFileSavePath);
             this.initServer();
@@ -105,13 +107,8 @@ export class HttpServer {
 
     /**删除文件或文本 */
     private static deleteFileOrText(fileOrTextHash: string) {
-        if (this.fileHashes) {
-            for (let i = 0; i < this.fileHashes.length; i++) {
-                if (this.fileHashes[i] === fileOrTextHash) {
-                    this.fileHashes.splice(i, 1);
-                    break;
-                }
-            }
+        if (this.hash2FileNameMap) {
+            this.hash2FileNameMap.delete(fileOrTextHash);
         }
 
         if (this.fileName2HashNameMap) {
@@ -154,8 +151,9 @@ export class HttpServer {
             stream.on('end', () => {
                 const fileHash = hash.digest('hex');
                 req.file!.originalname = Buffer.from(req.file!.originalname, "latin1").toString('utf8');
-                if (this.fileHashes.indexOf(fileHash) !== -1) {
-                    return res.status(409).send('文件已存在' + req.file!.originalname);
+                if (this.hash2FileNameMap.get(fileHash)) {
+                    let name = self.hash2FileNameMap.get(fileHash);
+                    return res.status(409).send('文件已存在：' + name);
                 }
                 res.send('文件上传成功');
                 let savePath = `${ServerConfig.uploadFileSavePath}/${req.file!.filename}`;
@@ -170,11 +168,12 @@ export class HttpServer {
                 };
                 DatabaseOperation.writeToDatabase(msg).then(() => {
                     EventMgr.emit(EventName.ONMESSAGESAVED, msg);
-                    this.fileHashes.push(fileHash);
+                    this.hash2FileNameMap.set(fileHash, req.file!.originalname);
                     this.fileName2HashNameMap.set(req.file!.originalname, req.file!.filename);
                     this.hashName2FileNameMap.set(req.file!.filename, req.file!.originalname);
                 }).catch((err) => {
-                    res.status(500).send(err);
+                    console.error(err);
+                    res.status(500).send("数据库写入失败");
                 });
             });
         }
@@ -197,7 +196,8 @@ export class HttpServer {
             DatabaseOperation.writeToDatabase(msg).then(() => {
                 EventMgr.emit(EventName.ONMESSAGESAVED, msg);
             }).catch((err) => {
-                res.status(500).send(err);
+                console.error(err);
+                res.status(500).send("数据库写入失败");
             });
         }
     }

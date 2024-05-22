@@ -25,7 +25,7 @@ export enum SocketEvent {
 }
 
 export enum InputStatus {
-    null = "null",
+    nul = "nul",
     loading = "loading",
     sending = "sending",
     error = "error",
@@ -35,4 +35,8 @@ export enum InputStatus {
 export enum BtnEvent {
     deleteItem = "deleteItem",
     downloadFile = "downloadFile",
+}
+
+export enum HttpstatusText {
+    Conflict = "Conflict",
 }

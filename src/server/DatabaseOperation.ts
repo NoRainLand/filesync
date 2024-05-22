@@ -46,7 +46,8 @@ export class DatabaseOperation {
                     if (!self.dbExists) {
                         resolve(self.writeToDatabase(ServerConfig.welcomeMsg));
                     } else {
-                        console.log(`数据库 ${this.dbPath} 已开启`);
+                        console.log("数据库已开启：");
+                        console.log(this.dbPath);
                         resolve(null);
                     }
                 }
@@ -112,8 +113,26 @@ export class DatabaseOperation {
         });
     }
 
-    /**根据hash获取消息类型 */
-    static getMsgTypeByHash(hash: string): Promise<MsgData> {//Function.prototype.name实际编译压缩后可能会变
+    /**获取所有文件的的hash和文件源码的map */
+    static getFileHashAndFileNameMap(): Promise<Map<string, string>> {
+        if (!this.dbIsOpen) return Promise.resolve(new Map<string, string>());
+        return new Promise((resolve, reject) => {
+            this.db.all(this.getSqlCommand(SQLCAMMAND.GETALLFILEHASHES), [], (err, rows: any[]) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const map = new Map<string, string>();
+                    for (const row of rows) {
+                        map.set(row.fileOrTextHash, row.fileName);
+                    }
+                    resolve(map);
+                }
+            });
+        });
+    }
+
+    /**根据hash获取消息 */
+    static getMsgDataByHash(hash: string): Promise<MsgData> {//Function.prototype.name实际编译压缩后可能会变
         if (!this.dbIsOpen) return Promise.resolve({} as MsgData);
         return new Promise((resolve, reject) => {
             this.db.get(this.getSqlCommand(SQLCAMMAND.GETMSGTYPEBYHASH), hash, (err: any, row: MsgData) => {
@@ -162,6 +181,8 @@ export class DatabaseOperation {
                 return `SELECT * FROM ${tableName} WHERE fileOrTextHash = ?`;
             case SQLCAMMAND.GETFILENAME2HASHNAMEMAP:
                 return `SELECT fileName, originalname FROM ${tableName} WHERE msgType = 'file'`;
+            case SQLCAMMAND.GETALLFILEHASHES:
+                return `SELECT * FROM ${tableName} WHERE msgType = 'file'`;
             default:
                 return "";
         }

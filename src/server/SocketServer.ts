@@ -108,7 +108,7 @@ export class SocketServer {
                 break;
             case ServerClientOperate.DELETE:
                 let fileOrTextHash: string = socketMsg.data.fileOrTextHash;
-                DatabaseOperation.getMsgTypeByHash(fileOrTextHash).then((deleteMsg: MsgData) => {
+                DatabaseOperation.getMsgDataByHash(fileOrTextHash).then((deleteMsg: MsgData) => {
                     if (deleteMsg != null && deleteMsg.msgType != null) {//防止重复删除
                         if (deleteMsg.msgType === 'file') {
                             FileOperation.deleteFile(deleteMsg.url!);

@@ -13,7 +13,7 @@ export class InputMgr {
     private static pageParent: HTMLElement;
 
 
-    private static _inputStatus: InputStatus = InputStatus.null;
+    private static _inputStatus: InputStatus = InputStatus.nul;
 
     static get inputStatus() {
         return this._inputStatus;
@@ -62,7 +62,7 @@ export class InputMgr {
 
     static init(pageParent: HTMLElement) {
         this.pageParent = pageParent;
-        this._inputStatus = InputStatus.null;
+        this._inputStatus = InputStatus.nul;
         this.setUI();
         this.addEvent();
     }
@@ -108,18 +108,12 @@ export class InputMgr {
                     TipsMgr.showProgress(event.loaded / event.total);
                 }
             }
-            return {};
         })
             .then((data) => {
                 console.log(data);
             })
             .catch((error) => {
-                console.warn(error);
-                if (error.response) {
-                    TipsMgr.showAlert(error.response.data, "发送失败");
-                } else {
-                    TipsMgr.showAlert(error.message, "发送失败");
-                }
+                TipsMgr.showAlert(error, "上传失败");
             })
             .finally(() => {
                 setTimeout(() => {

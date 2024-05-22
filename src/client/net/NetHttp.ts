@@ -11,20 +11,20 @@ export class NetHttp {
             });
     }
 
-    uploadMsg(formData: FormData, onprogress: (event: ProgressEvent) => {}): Promise<string> {
+    uploadMsg(formData: FormData, onprogress: (event: ProgressEvent) => void): Promise<string> {
         return new Promise((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.open('POST', Config.httpApiMap.upload, true);
             xhr.upload.onprogress = onprogress;
-            xhr.onload = function () {
+            xhr.onload = () => {
                 if (xhr.status === 200) {
                     resolve(xhr.response);
                 } else {
-                    reject(new Error(xhr.statusText));
+                    reject(xhr.response);
                 }
             };
-            xhr.onerror = function () {
-                reject(new Error('An error occurred while uploading the file.'));
+            xhr.onerror = () => {
+                reject("上传失败，请检查网络连接");
             };
             xhr.send(formData);
         });
