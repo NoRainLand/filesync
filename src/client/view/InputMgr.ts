@@ -74,11 +74,22 @@ export class InputMgr {
     }
     private static addEvent() {
         this.uploadButton.addEventListener('click', this.sendMsg);
+        //监听回车，并且不允许跳转
+        this.textInput.addEventListener('keydown', this.getEnterDown);
     }
 
     private static removeEvent() {
         this.uploadButton.removeEventListener('click', this.sendMsg);
+        this.textInput.removeEventListener('keydown', this.getEnterDown);
     }
+
+
+    static getEnterDown = (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            this.sendMsg();
+        }
+    };
 
     /**发送文件或者文字 */
     private static sendMsg = () => {
