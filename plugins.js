@@ -74,6 +74,10 @@ function copyCache() {
 }
 function copyFile() {
 	copyFilesB(sourcePath, targetPath, blackList);
+
+    let sourcePath2 = "./tool";
+    let targetPath2 = "./dist/tool";
+	copyFilesB(sourcePath2, targetPath2, blackList);
 }
 
 module.exports = {

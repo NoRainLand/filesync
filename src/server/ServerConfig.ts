@@ -12,6 +12,8 @@ export class ServerConfig {
 
     /**上传文件保存路径 */
     static readonly uploadFileSavePath: string = '../uploadFile';
+    /**工具路径 */
+    static readonly toolPath: string = '../tool';
     /**服务器数据保存路径 */
     static readonly sqlDbPath: string = '../fsDatabase.sqlite';
     /**默认数据表名字 */

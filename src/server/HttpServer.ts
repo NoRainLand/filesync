@@ -27,6 +27,7 @@ export class HttpServer {
     private static uploadMulter: multer.Multer;
 
     private static savePath: string = "";
+    private static toolPath: string = "";
 
     /**开启服务器 */
     static async startServer(port: number) {
@@ -46,6 +47,7 @@ export class HttpServer {
 
         await new Promise((resolve, reject) => {
             this.savePath = Utils.getRelativePath(ServerConfig.uploadFileSavePath);
+            this.toolPath = Utils.getRelativePath(ServerConfig.toolPath);
             this.initServer();
             resolve(this.startHttpServer(this.server, port));
         });
@@ -126,6 +128,7 @@ export class HttpServer {
         this.initGetSocketInfoApi();
         this.initGetWebFileApi();
         this.initGetUploadFileApi();
+        this.initGetToolApi();
     }
 
     /**初始化上传api */
@@ -233,10 +236,19 @@ export class HttpServer {
     /**获取上传文件 */
     private static initGetUploadFileApi() {
         let self = this;
-        this.appExpress.get('/uploadFile/:filename', function (req, res) {
+        this.appExpress.get('/uploadFile/:filename', (req, res) => {
             const file = `${self.savePath}/${req.params.filename}`;
             const fileName = self.hashName2FileNameMap.get(req.params.filename);
             res.download(file, fileName!);
+        });
+    }
+
+    /**获取桌面快捷工具 */
+    private static initGetToolApi() {
+        let self = this;
+        this.appExpress.get('/tool/:filename', (req, res) => {
+
+            res.download(path.join(__dirname, '../tool/' + req.params.filename), req.params.filename!);
         });
     }
 }

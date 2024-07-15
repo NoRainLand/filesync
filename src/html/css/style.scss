@@ -2,6 +2,18 @@
 	$theme-color: "cyan"
 );
 
+$miku_color1: #525658;
+
+$miku_color2: #bec8d1;
+
+$miku_color3: #86cecb;
+
+$miku_color4: #137a7f;
+
+$now_color: #047878;
+
+$miku_color5: #e12885;
+
 $minWidth: 840px;
 $itemMinWidth: 728px;
 $maxWidth: 1400px;
@@ -54,6 +66,16 @@ dialog article {
 	width: 40px;
 	height: 40px;
 }
+
+.runButton {
+	position: fixed;
+	bottom: 110px;
+	left: 10px;
+	z-index: 1000;
+	width: 40px;
+	height: 40px;
+}
+
 #showQrcodeDiv {
 	display: block;
 	width: 160px;

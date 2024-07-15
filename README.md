@@ -91,6 +91,7 @@ node模组不在其内
 |3.0.0|完善打包流程，兼容浏览器不支持download属性|
 |4.0.0|把npm包管理改为pnpm，请使用16.14版本及以上的node，添加webpack打包|
 |5.0.0|大修，前端代码分离更细|
+|5.1.0|细调，添加右键文件“发送到服务器功能”,基于[另一个.net项目](https://github.com/NoRainLand/QuickSendTool)|
 
 ### 运行截图
 

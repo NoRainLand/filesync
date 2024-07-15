@@ -12,6 +12,7 @@ import { Utils } from "./utils/Utils";
 import { InputMgr } from "./view/InputMgr";
 import { MsgItemList } from "./view/MsgItemList";
 import { QRCodeButton } from "./view/QRCodeButton";
+import { RunButton } from "./view/RunButton";
 import { ThemeMgr } from "./view/ThemeMgr";
 import { TipsMgr } from "./view/TipsMgr";
 export class index {
@@ -27,6 +28,7 @@ export class index {
         this.initUI();
         QRCodeButton.init(this.pageParent);
         ThemeMgr.init(this.pageParent);
+        RunButton.init(this.pageParent);
         MsgItemList.init(this.pageParent);
         InputMgr.init(this.pageParent);
         NetMgr.init();
