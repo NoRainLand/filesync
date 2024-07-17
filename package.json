@@ -1,16 +1,16 @@
 {
 	"name": "file-sync",
-	"version": "5.1.1",
+	"version": "5.2.0",
 	"description": "一个简单的文件/文字同步服务器",
 	"author": "NoRain",
 	"bin": "dist/server/index.js",
 	"main": "dist/server/index.js",
 	"scripts": {
 		"watch": "concurrently \"npx webpack -w\" \"tsc --project ./tsconfig.common.json -w\" \"tsc --project ./tsconfig.es6.json -w\" \"nodemon ./dist/server/index.js\"",
-		"copy": "node ./copy.js",
+		"copy": "node ./plugins/copyFile.js",
 		"build": "tsc --project ./tsconfig.common.json && tsc --project ./tsconfig.es6.json && npx webpack",
 		"debug": "node --trace-warnings ./dist/server/index.js",
-		"rcedit": "node ./rcedit.js",
+		"rcedit": "node ./plugins/rcedit.js",
 		"exec": "concurrently \"pkg -t win package.json --compress=GZip\" "
 	},
 	"keywords": [

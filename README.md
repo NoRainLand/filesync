@@ -26,8 +26,9 @@
 打包：
 
 - 修改目录下的rcedit.js中的options配置
-- 执行```npm run rcedit```修补.pkg-cache/v3.4/built-v16.16.0-win-x64的文件
-- 复制粘贴built-v16.16.0-win-x64到C:\Users\你的用户名\.pkg-cache\v3.4目录下，如果没有，可以先执行一遍```npm run exec```
+- 执行```npm run rcedit```修补.pkg-cache/v3.4/fetched-v16.16.0-win-x64的文件
+- 这里稍微说明一下，有三个问题，node-xxx是github下载的源文件，复制一份，改名为fetched-xxx,然后修补，然后复制修补后的文件，改名为built-xxx
+- 复制粘贴上一步的built-xxxfetched-xxx和到C:\Users\你的用户名\.pkg-cache\v3.4（不一定是v3.4，需要对应你github的版本）目录下，如果没有，可以先执行一遍```npm run exec```
 - 执行```npm run exec```打包成.exe可执行文件到exce目录下
 
 运行：
@@ -93,6 +94,7 @@ node模组不在其内
 |5.0.0|大修，前端代码分离更细|
 |5.1.0|细调，添加右键文件“发送到服务器功能”,基于[另一个.net项目](https://github.com/NoRainLand/QuickSendTool)|
 |5.1.1|更新[QuickSendTool](https://github.com/NoRainLand/QuickSendTool)版本|
+|5.2.0|微调|
 
 ### 运行截图
 

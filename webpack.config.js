@@ -1,6 +1,6 @@
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
-const { copyCache, deleteCache } = require("./plugins");
+const { copyCache, deleteCache } = require("./plugins/copyFile");
 
 module.exports = [
 	{
