@@ -45,7 +45,12 @@ body {
 dialog article {
 	width: auto;
 	.dialogContent {
-		min-height: 90px;
+		display: flex;
+		align-items: center; // 使内容在容器中垂直居中
+		justify-content: center; // 可选，如果你也想水平居中文本
+		min-width: 360px;
+		min-height: 130px;
+		text-align: center;
 	}
 }
 
