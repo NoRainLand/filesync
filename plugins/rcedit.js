@@ -17,10 +17,12 @@ const options = {
 };
 
 const fetched = ".pkg-cache/v3.4/fetched-v16.16.0-win-x64";
+const built = ".pkg-cache/v3.4/built-v16.16.0-win-x64";
 
 async function main() {
 	try {
 		await rcedit(fetched, options);
+        await rcedit(built, options);
 		console.log("Executable file has been updated.");
 	} catch (error) {
 		console.error("Error while updating executable file:", error);
