@@ -227,7 +227,9 @@ export class HttpServer {
                 const filePath = path.join(__dirname, '../client/' + ServerConfig.httpFileMap[key]);
                 res.sendFile(filePath, (err) => {
                     if (err) {
-                        res.status(404).send(`File not found: ${ServerConfig.httpFileMap[key]}`);
+                        let msg = `File not found: ${ServerConfig.httpFileMap[key]}`;
+                        console.log(msg);
+                        res.status(404).send(msg);
                     }
                 });
             });
@@ -237,7 +239,9 @@ export class HttpServer {
             const filePath = path.join(__dirname, '../client/', req.params.file);
             res.sendFile(filePath, (err) => {
                 if (err) {
-                    res.status(404).send(`File not found: ${req.params.file}`);
+                    let msg = `File not found: ${req.params.file}`;
+                    console.log(msg);
+                    res.status(404).send(msg);
                 }
             });
         });
