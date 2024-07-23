@@ -224,12 +224,22 @@ export class HttpServer {
     private static initGetWebFileApi() {
         for (let key in ServerConfig.httpFileMap) {
             this.appExpress.get(key, (req: Request, res: Response) => {
-                res.sendFile(path.join(__dirname, '../client/' + ServerConfig.httpFileMap[key]));
+                const filePath = path.join(__dirname, '../client/' + ServerConfig.httpFileMap[key]);
+                res.sendFile(filePath, (err) => {
+                    if (err) {
+                        res.status(404).send(`File not found: ${ServerConfig.httpFileMap[key]}`);
+                    }
+                });
             });
         }
 
         this.appExpress.get('/:file', (req: Request, res: Response) => {
-            res.sendFile(path.join(__dirname, '../client/', req.params.file));
+            const filePath = path.join(__dirname, '../client/', req.params.file);
+            res.sendFile(filePath, (err) => {
+                if (err) {
+                    res.status(404).send(`File not found: ${req.params.file}`);
+                }
+            });
         });
     }
 
