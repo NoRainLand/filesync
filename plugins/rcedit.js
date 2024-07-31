@@ -3,7 +3,7 @@ const rcedit = require("rcedit");
 const options = {
 	"version-string": {
 		ProductName: "filesync",
-		FileDescription: "一个简单的文件/文字同步工具",
+		FileDescription: "基于node开发的一个多端文件/文字同步工具",
 		FileVersion: "5.3.0",
 		ProductVersion: "5.3.0",
 		OriginalFilename: "filesync.exe",
