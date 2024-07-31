@@ -47,4 +47,33 @@ export class Utils {
                 exec(`xdg-open ${url}`);
         }
     }
+
+
+    /**处理base64的编码格式 */
+    static decodeMimeEncodedString(encodedString: string): string {
+        const mimePattern = /=\?([^?]+)\?([BQ])\?([^?]+)\?=/i;
+        const matches = mimePattern.exec(encodedString);
+
+        if (!matches) {
+            return encodedString;
+        }
+
+        const charset: any = matches[1];
+        const encoding = matches[2].toUpperCase();
+        const encodedText = matches[3];
+
+        let decodedText: string;
+
+        if (encoding === 'B') {
+            decodedText = Buffer.from(encodedText, 'base64').toString(charset);
+        } else if (encoding === 'Q') {
+            decodedText = encodedText.replace(/_/g, ' ').replace(/=([A-Fa-f0-9]{2})/g, (match, hex) => {
+                return String.fromCharCode(parseInt(hex, 16));
+            });
+        } else {
+            decodedText = encodedString;
+        }
+
+        return decodedText;
+    }
 }

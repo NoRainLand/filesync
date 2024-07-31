@@ -95,6 +95,7 @@ node模组不在其内
 |5.1.0|细调，添加右键文件“发送到服务器功能”,基于[另一个.net项目](https://github.com/NoRainLand/QuickSendTool)|
 |5.1.1|更新[QuickSendTool](https://github.com/NoRainLand/QuickSendTool)版本|
 |5.2.0|微调|
+|5.3.0|修正QuickSendTool工具发送过来的文件带中文名编码错误问题|
 
 ### 运行截图
 

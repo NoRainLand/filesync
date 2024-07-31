@@ -164,7 +164,7 @@ export class HttpServer {
                     msgType: "file",
                     fileOrTextHash: fileHash,
                     timestamp: Date.now(),
-                    fileName: req.file!.originalname,
+                    fileName: Utils.decodeMimeEncodedString(req.file!.originalname),
                     url: savePath,
                     size: (req.file!.size / 1024) > 0 ? (req.file!.size / 1024) : 0,
                     hashName: req.file!.filename
@@ -181,6 +181,7 @@ export class HttpServer {
             });
         }
     }
+
 
     /**文本上传 */
     private static onTextUpload(req: Request, res: Response, next: NextFunction) {

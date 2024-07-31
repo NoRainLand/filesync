@@ -31,6 +31,9 @@ async function copyFilesB(sourcePath, targetPath, blackList) {
 async function deleteFiles(targetPath, cacheFilePath) {
 	for (const cacheFile of cacheFilePath) {
 		const filePath = path.resolve(targetPath, cacheFile);
+        if(!fs.existsSync(filePath)) {
+            continue;
+        }
 		try {
 			await fs.rm(filePath, { recursive: true, force: true });
 		} catch (err) {
