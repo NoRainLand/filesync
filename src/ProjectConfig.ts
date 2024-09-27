@@ -4,7 +4,7 @@ export class ProjectConfig {
     /**项目作者 */
     static readonly author: string = 'NoRain';
     /**版本号 */
-    static readonly versionStr: string = '5.3.0';
+    static readonly versionStr: string = '5.3.1';
     /**描述 */
     static readonly description: string = '一个简单的文件/文字同步服务器';
     /**前端页面是否屏蔽输出 */
@@ -15,4 +15,6 @@ export class ProjectConfig {
     static readonly removeMsgLen: number = 20;
     /**客户端发送消息间隔 ms */
     static readonly sendTimeout: number = 100;
+    /**jokeAPI */
+    static readonly jokeAPI: string = 'https://v2.jokeapi.dev/joke/Any';
 }

@@ -1,6 +1,6 @@
 {
 	"name": "file-sync",
-	"version": "5.3.0",
+	"version": "5.3.1",
 	"description": "基于node开发的一个多端文件/文字同步工具",
 	"author": "NoRain",
 	"bin": "dist/server/index.js",
@@ -11,7 +11,9 @@
 		"build": "tsc --project ./tsconfig.common.json && tsc --project ./tsconfig.es6.json && npx webpack",
 		"debug": "node --trace-warnings ./dist/server/index.js",
 		"rcedit": "node ./plugins/rcedit.js",
-		"exec": "concurrently \"pkg -t win package.json --compress=GZip\" "
+		"exec": "concurrently \"pkg -t win package.json --compress=GZip\" ",
+		"up": "node ./plugins/changeVersion.js",
+		"clean": "node ./plugins/cleanCache.js"
 	},
 	"keywords": [
 		"fileSnyc",
@@ -43,7 +45,6 @@
 		"typescript": "^5.0.4",
 		"webpack": "^5.90.3",
 		"webpack-cli": "^5.1.4",
-		"fs-extra": "^11.2.0",
 		"rcedit": "^4.0.1",
 		"common-js": "^0.3.8",
 		"@types/qrcode": "^1.5.5",
@@ -65,7 +66,7 @@
 			"dist/client/**/*",
 			"dist/server/**/*",
 			"node_modules/sqlite3/build/Release/node_sqlite3.node",
-            "dist/tool/QuickSendTool.exe"
+			"dist/tool/QuickSendTool.exe"
 		],
 		"outputPath": "exec"
 	}

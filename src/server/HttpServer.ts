@@ -176,7 +176,9 @@ export class HttpServer {
                     this.hashName2FileNameMap.set(req.file!.filename, req.file!.originalname);
                 }).catch((err) => {
                     console.error(err);
-                    res.status(500).send("数据库写入失败");
+                    if (!res.headersSent) {
+                        res.status(500).send("数据库写入失败");
+                    }
                 });
             });
         }
@@ -201,7 +203,9 @@ export class HttpServer {
                 EventMgr.emit(EventName.ONMESSAGESAVED, msg);
             }).catch((err) => {
                 console.error(err);
-                res.status(500).send("数据库写入失败");
+                if (!res.headersSent) {
+                    res.status(500).send("数据库写入失败");
+                }
             });
         }
     }
@@ -228,9 +232,11 @@ export class HttpServer {
                 const filePath = path.join(__dirname, '../client/' + ServerConfig.httpFileMap[key]);
                 res.sendFile(filePath, (err) => {
                     if (err) {
-                        let msg = `File not found: ${ServerConfig.httpFileMap[key]}`;
+                        let msg = `File not found1: ${ServerConfig.httpFileMap[key]}`;
                         console.log(msg);
-                        res.status(404).send(msg);
+                        if (!res.headersSent) {
+                            res.status(404).send(msg);
+                        }
                     }
                 });
             });
@@ -242,7 +248,9 @@ export class HttpServer {
                 if (err) {
                     let msg = `File not found: ${req.params.file}`;
                     console.log(msg);
-                    res.status(404).send(msg);
+                    if (!res.headersSent) {
+                        res.status(404).send(msg);
+                    }
                 }
             });
         });

@@ -19,9 +19,9 @@ module.exports = [
 			],
 		},
 		plugins: [
-			{
+            {
 				apply: (compiler) => {
-					compiler.hooks.beforeRun.tapPromise("CopyFilesPlugin", async () => {
+                    compiler.hooks.beforeRun.tapPromise("CopyFilesPlugin", async () => {
 						await copyCache();
 					});
 					compiler.hooks.done.tapPromise("DeleteFilesPlugin", async () => {

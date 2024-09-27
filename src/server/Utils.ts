@@ -6,7 +6,14 @@ export class Utils {
     /**获取本机IP */
     static getLocalIP() {
         const interfaces = os.networkInterfaces();
+        const virtualInterfaceKeywords = ['Virtual', 'VMware', 'vEthernet'];
+
         for (let devName in interfaces) {
+            // 过滤掉虚拟网卡
+            if (virtualInterfaceKeywords.some(keyword => devName.includes(keyword))) {
+                continue;
+            }
+
             let iface = interfaces[devName];
             for (let i = 0; i < iface!.length; i++) {
                 let alias = iface![i];
@@ -15,7 +22,7 @@ export class Utils {
                 }
             }
         }
-        console.warn("无法获取本机IP地址");
+        console.warn("无法获取本机IP地址，将使用默认地址");
         return '127.0.0.1';
     }
     /**检查目录是否存在,不存在就创建 */

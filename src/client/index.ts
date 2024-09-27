@@ -23,6 +23,7 @@ export class index {
     }
     init() {
         (<any>window)["NiarApp"] = NiarApp;
+        NiarApp.init(this);
         document.title = ProjectConfig.projectName;
         Logger.tranLogger();
         this.initUI();

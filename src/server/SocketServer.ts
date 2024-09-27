@@ -92,7 +92,7 @@ export class SocketServer {
 
     /**socket关闭 */
     private static onWsClose() {
-        console.log('用户断开连接');
+        // console.log('用户断开连接');
     }
     /**socket错误 */
     private static onWsError(err: any) {
