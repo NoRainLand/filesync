@@ -45,7 +45,7 @@ export class NiarApp {
                 learning: learning,
                 email: email
             }
-            console.log(obj);
+            return obj;
         }
         return void 0;
     }
