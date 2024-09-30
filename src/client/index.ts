@@ -23,6 +23,7 @@ export class index {
     }
     init() {
         (<any>window)["NiarApp"] = NiarApp;
+        Utils.fixMinWidth();
         NiarApp.init(this);
         document.title = ProjectConfig.projectName;
         Logger.tranLogger();

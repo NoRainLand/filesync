@@ -124,4 +124,13 @@ export class Utils {
         return this.moueseUpEvent;
     }
 
+    /**手动兼容一下火狐 */
+    static fixMinWidth() {
+        let u = window.navigator.userAgent;
+        if (u.indexOf('Firefox') > -1) {
+            document.body.style.minWidth = "1200px";
+        } else {
+            document.body.style.minWidth = "980px";
+        }
+    }
 }
