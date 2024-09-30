@@ -1,6 +1,8 @@
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
 const { copyCache, deleteCache } = require("./plugins/copyFile");
+const TerserPlugin = require("terser-webpack-plugin");
+const WebpackObfuscator = require("webpack-obfuscator");
 
 module.exports = [
 	{
@@ -18,10 +20,28 @@ module.exports = [
 				},
 			],
 		},
+		optimization: {
+			minimize: true,
+			minimizer: [
+				new TerserPlugin({
+					terserOptions: {
+						compress: {
+							drop_console: true,
+						},
+					},
+				}),
+			],
+		},
 		plugins: [
-            {
+			new WebpackObfuscator(
+				{
+					rotateStringArray: true,
+				},
+				[]
+			),
+			{
 				apply: (compiler) => {
-                    compiler.hooks.beforeRun.tapPromise("CopyFilesPlugin", async () => {
+					compiler.hooks.beforeRun.tapPromise("CopyFilesPlugin", async () => {
 						await copyCache();
 					});
 					compiler.hooks.done.tapPromise("DeleteFilesPlugin", async () => {
