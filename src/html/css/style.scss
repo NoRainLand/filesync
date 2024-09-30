@@ -35,11 +35,13 @@ body {
 @font-face {
 	font-family: "JetBrains Mono NL Medium";
 	src: url("../font/JetBrainsMonoNL-Medium.ttf") format("truetype");
+    font-display: swap;
 }
 
 @font-face {
 	font-family: "Source Han Serif CN Medium";
 	src: url("../font/SourceHanSerifCN-Medium.otf") format("opentype");
+    font-display: swap;
 }
 
 dialog article {
