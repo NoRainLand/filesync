@@ -39,6 +39,7 @@
 		"concurrently": "^8.2.2",
 		"css-loader": "^7.1.1",
 		"nodemon": "^2.0.22",
+		"pkg": "^5.8.1",
 		"rcedit": "^4.0.1",
 		"sass": "^1.77.1",
 		"sass-loader": "^14.2.1",
