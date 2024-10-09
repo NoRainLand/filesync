@@ -11,7 +11,7 @@ module.exports = [
 			path: path.resolve(__dirname, "dist/client"),
 			filename: "index.js",
 		},
-		mode: "production",
+		mode: "production",// "development" | "production" | "none"
 		module: {
 			rules: [
 				{

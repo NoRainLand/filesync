@@ -11,13 +11,13 @@ export default class index {
     }
 
     async init() {
-        ServerConfig.serverURL = Utils.getLocalIP();
+        ServerConfig.serverIp = Utils.getLocalIP();
         ServerConfigMgr.readConfig(ServerConfig.serverConfigPath);
         await DatabaseOperation.openDatabase(ServerConfig.sqlDbPath, ServerConfig.tableName);
         await SocketServer.startServer(ServerConfig.socketPort);
         await HttpServer.startServer(ServerConfig.httpPort);
         await ServerConfigMgr.writeConfig(ServerConfig.serverConfigPath);
-        Utils.openBrowser(`http://${ServerConfig.serverURL}:${ServerConfig.httpPort}`);
+        Utils.openBrowser(`http://${ServerConfig.serverIp}:${ServerConfig.httpPort}`);
     }
 
 }

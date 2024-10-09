@@ -3,8 +3,10 @@ export type ServerConfigType = {
     ps1: string,
     ps2: string,
     ps3: string,
+    ps4: string
     httpPort: number,
-    socketPort: number
+    socketPort: number,
+    serverIp: string
 }
 
 

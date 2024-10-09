@@ -10,6 +10,7 @@ export class ServerConfigMgr {
                 let serverConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
                 ServerConfig.httpPort = serverConfig.httpPort;
                 ServerConfig.socketPort = serverConfig.socketPort;
+                ServerConfig.serverIp = serverConfig.serverIp;
                 console.log("配置文件读取成功");
             } catch (e) {
                 console.warn(e);

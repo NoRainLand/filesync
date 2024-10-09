@@ -3,7 +3,7 @@ import { ServerConfigType } from "./ServerDefine";
 
 export class ServerConfig {
     /**服务器的URL 默认socket和http同一个 */
-    static serverURL: string = '127.0.0.1';
+    static serverIp: string = '127.0.0.1';
     /**http 服务器的端口号 注意，如果端口被占用，会自动加10直到找到空闲端口 */
     static httpPort: number = 4100;
     /**socket 服务器的端口号 注意，如果端口被占用，会自动加10直到找到空闲端口 */
@@ -30,11 +30,13 @@ export class ServerConfig {
     /**服务器配置 */
     static get serverConfig(): ServerConfigType {
         return {
-            "ps1": "这里主要是端口号，默认http服务器4100，socket服务器4200",
+            "ps1": "此处为端口以及IP配置，默认http服务器4100，socket服务器4200",
             "ps2": "如果你要修改，请修改下面的端口号之后重启服务器",
             "ps3": "如果端口冲突，默认+10直到找到空闲端口",
+            "ps4": "如果IP获取不对，请修改下面的IP地址",
             "httpPort": this.httpPort,
-            "socketPort": this.socketPort
+            "socketPort": this.socketPort,
+            "serverIp": this.serverIp
         };
     }
 

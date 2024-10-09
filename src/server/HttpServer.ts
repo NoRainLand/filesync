@@ -79,7 +79,7 @@ export class HttpServer {
                     this.addEvent();
                     this.initHttpServerApi();
                     console.log("http服务器已启动：");
-                    console.log(`http://${ServerConfig.serverURL}:${ServerConfig.httpPort}`);
+                    console.log(`http://${ServerConfig.serverIp}:${ServerConfig.httpPort}`);
                     resolve(null);
                 })
                 .on('error', (err: any) => {
@@ -156,9 +156,10 @@ export class HttpServer {
                 req.file!.originalname = Buffer.from(req.file!.originalname, "latin1").toString('utf8');
                 if (this.hash2FileNameMap.get(fileHash)) {
                     let name = self.hash2FileNameMap.get(fileHash);
-                    return res.status(409).send('文件已存在：' + name);
+                    if (!res.headersSent) {
+                        return res.status(409).send('文件已存在：' + name);
+                    }
                 }
-                res.send('文件上传成功');
                 let savePath = `${ServerConfig.uploadFileSavePath}/${req.file!.filename}`;
                 const msg: MsgData = {
                     msgType: "file",
@@ -170,6 +171,9 @@ export class HttpServer {
                     hashName: req.file!.filename
                 };
                 DatabaseOperation.writeToDatabase(msg).then(() => {
+                    if (!res.headersSent) {
+                        res.send('文件上传成功');
+                    }
                     EventMgr.emit(EventName.ONMESSAGESAVED, msg);
                     this.hash2FileNameMap.set(fileHash, req.file!.originalname);
                     this.fileName2HashNameMap.set(req.file!.originalname, req.file!.filename);
@@ -190,7 +194,6 @@ export class HttpServer {
         if (req.body.text) {
             const text = req.body.text;
             const textHash = crypto.createHash('md5').update(text + Date.now() + '-' + Math.round(Math.random() * 1E9)).digest('hex');
-            res.send('已发送');
             let msg: MsgData = {
                 msgType: "text",
                 fileOrTextHash: textHash,
@@ -201,6 +204,9 @@ export class HttpServer {
             };
             DatabaseOperation.writeToDatabase(msg).then(() => {
                 EventMgr.emit(EventName.ONMESSAGESAVED, msg);
+                if (!res.headersSent) {
+                    res.send('已发送');
+                }
             }).catch((err) => {
                 console.error(err);
                 if (!res.headersSent) {
@@ -214,7 +220,7 @@ export class HttpServer {
     private static initGetSocketInfoApi() {
         this.appExpress.get('/getSocketInfo', (req: Request, res: Response) => {
             const socketInfo: ServerInfo = {
-                socketServerURL: ServerConfig.serverURL,
+                socketServerURL: ServerConfig.serverIp,
                 socketPort: ServerConfig.socketPort,
                 projectName: ProjectConfig.projectName,
                 author: ProjectConfig.author,
@@ -262,7 +268,14 @@ export class HttpServer {
         this.appExpress.get('/uploadFile/:filename', (req, res) => {
             const file = `${self.savePath}/${req.params.filename}`;
             const fileName = self.hashName2FileNameMap.get(req.params.filename);
-            res.download(file, fileName!);
+            res.download(file, fileName!, (err) => {
+                if (err) {
+                    console.error(err);
+                    if (!res.headersSent) {
+                        res.status(500).send("文件下载失败");
+                    }
+                }
+            });
         });
     }
 
@@ -270,8 +283,14 @@ export class HttpServer {
     private static initGetToolApi() {
         let self = this;
         this.appExpress.get('/tool/:filename', (req, res) => {
-
-            res.download(path.join(__dirname, '../tool/' + req.params.filename), req.params.filename!);
+            res.download(path.join(__dirname, '../tool/' + req.params.filename), req.params.filename!, (err) => {
+                if (err) {
+                    console.error(err);
+                    if (!res.headersSent) {
+                        res.status(500).send("工具下载失败");
+                    }
+                }
+            });
         });
     }
 }

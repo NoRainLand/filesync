@@ -58,7 +58,7 @@ export class SocketServer {
         this.addEvent();
         resolve();
         console.log("socket服务器已启动：");
-        console.log(`ws://${ServerConfig.serverURL}:${port}`);
+        console.log(`ws://${ServerConfig.serverIp}:${port}`);
     }
 
     /**添加监听 */
