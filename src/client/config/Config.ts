@@ -21,4 +21,7 @@ export class Config {
     /**显示进度条的最小文件体积 */
     static readonly showProgressMinSize: number = 1024 * 1024 * 64;
 
+
+    /**默认显示图片 */
+    static readonly defaultImg:string = "./apple-touch-icon.png"
 }

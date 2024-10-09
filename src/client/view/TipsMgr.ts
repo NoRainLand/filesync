@@ -1,30 +1,24 @@
 import { Pool } from "../../common/Pool";
 import { AlertType } from "../config/ClientDefine";
+import { Config } from "../config/Config";
 import { HtmlControl } from "../config/HtmlControl";
 import { Utils } from "../utils/Utils";
 
 export class TipsMgr {
     private static _body: HTMLElement;
     private static get body() {
-        if (!this._body) {
-            this._body = document.body;
+        if (!TipsMgr._body) {
+            TipsMgr._body = document.body;
         }
-        return this._body;
+        return TipsMgr._body;
     }
 
-
     private static myAlert: Alert;
-
     private static myDialog: Dialog;
-
     private static myTips: Notice;
-
     private static myProgress: Progress;
-
     private static imgPreview: ImgPreview;
-
     private static videoPreview: VideoPreview;
-
     private static audioPreview: AudioPreview;
 
     /**预览音频 */
@@ -50,7 +44,6 @@ export class TipsMgr {
         }
         this.videoPreview.show(videoUrl);
     }
-
 
     /**显示一个提示 */
     static showNotice(msg: string) {
@@ -81,7 +74,7 @@ export class TipsMgr {
         if (!this.myAlert) {
             this.myAlert = new Alert(this.body);
         }
-        this.myAlert.show(content, title, type);
+        this.myAlert.show(content, title, type, caller, callback);
     }
 
     /**隐藏提示框 */
@@ -121,7 +114,6 @@ class UIControl {
 }
 
 class Dialog extends UIControl {
-
     private parent: HTMLElement;
     private dialog: HTMLDialogElement;
     private dialogTitle: HTMLHeadingElement;
@@ -132,14 +124,15 @@ class Dialog extends UIControl {
     private _caller: any;
     private _sure: Function | null;
     private _cancel: Function | null;
+
     constructor(parent: HTMLElement) {
         super();
         this.parent = parent;
         this.init();
     }
+
     init() {
         this.dialog = Utils.createConnonControl(this.parent, HtmlControl.myDialog, "myDialog") as HTMLDialogElement;
-
         this.dialogTitle = this.dialog.querySelector("article header p strong")!;
         this.dialogContent = this.dialog.querySelectorAll("article p")[1]! as HTMLParagraphElement;
         this.dialogCancelButton = this.dialog.querySelector("article footer button:first-child")!;
@@ -170,6 +163,7 @@ class Dialog extends UIControl {
             this._caller = null;
         });
     }
+
     show(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示", onlySure: boolean = false) {
         this._caller = caller;
         this._sure = sure;
@@ -191,12 +185,13 @@ class Dialog extends UIControl {
 
     close() {
         this.dialog.close();
+        this._caller = null;
+        this._sure = null;
+        this._cancel = null;
     }
 }
 
 class Alert extends UIControl {
-
-
     private parent: HTMLElement;
     private qrcodeDiv: HTMLImageElement;
     private imgQrCode: HTMLImageElement;
@@ -206,14 +201,15 @@ class Alert extends UIControl {
     private dialogCloseButton: HTMLButtonElement;
     private _caller: any;
     private _callback: Function | null;
+
     constructor(parent: HTMLElement) {
         super();
         this.parent = parent;
         this.init();
     }
+
     init() {
         this.dialog = Utils.createConnonControl(this.parent, HtmlControl.myAlert, "myAlert") as HTMLDialogElement;
-
         this.qrcodeDiv = this.dialog.querySelector('#qrcodeDiv') as HTMLImageElement;
         this.imgQrCode = this.dialog.querySelector("#qrcodeImg") as HTMLImageElement;
         this.dialogTitle = this.dialog.querySelector("article header p strong")!;
@@ -227,7 +223,6 @@ class Alert extends UIControl {
             this._caller = null;
         });
     }
-
 
     show(content: string, title: string = "提示", type: AlertType = AlertType.text, caller: any = null, callback: Function | null = null) {
         this._caller = caller;
@@ -266,20 +261,23 @@ class Alert extends UIControl {
 
     close() {
         this.dialog.close();
+        this._caller = null;
+        this._callback = null;
     }
 }
 
 class Notice extends UIControl {
-
     private parent: HTMLElement;
     private showIngTips: HTMLElement[];
     private tipsPool: Pool<HTMLElement>;
+
     constructor(parent: HTMLElement) {
         super();
         this.parent = parent;
         this.showIngTips = [];
         this.tipsPool = new Pool<HTMLElement>(this.createTips);
     }
+
     show(msg: string) {
         let tips = this.tipsPool.get();
         this.showIngTips.push(tips);
@@ -305,6 +303,7 @@ class Notice extends UIControl {
         let tips = Utils.createControlByHtml(HtmlControl.tipsComponent) as HTMLElement;
         return tips;
     }
+
     private recoverTips(tips: HTMLElement) {
         if (this.parent.contains(tips)) {
             this.parent.removeChild(tips);
@@ -316,25 +315,25 @@ class Notice extends UIControl {
             (<any>tips)["holdTime"] = null;
         }
         tips.innerText = "";
-        this.showIngTips.push(tips);
+        this.tipsPool.recycle(tips);
     }
 }
 
 class Progress extends UIControl {
-
     private parent: HTMLElement;
     private progress: HTMLDialogElement;
     private progressCard: HTMLElement;
     private progressValue: HTMLProgressElement;
     private myProgressText: HTMLSpanElement;
+
     constructor(parent: HTMLElement) {
         super();
         this.parent = parent;
         this.init();
     }
+
     init() {
         this.progress = Utils.createConnonControl(this.parent, HtmlControl.myProgress, "myProgress") as HTMLDialogElement;
-
         this.progressCard = this.progress.querySelector('#myProgressCard') as HTMLDListElement;
         this.progressValue = this.progress.querySelector('#myProgressValue') as HTMLProgressElement;
         this.myProgressText = this.progress.querySelector('#myProgressText') as HTMLSpanElement;
@@ -361,6 +360,7 @@ class Progress extends UIControl {
             }
         }
     }
+
     close() {
         this.myProgressText.textContent = "0%";
         this.progressValue.value = 0;
@@ -368,14 +368,10 @@ class Progress extends UIControl {
     }
 }
 
-
 class ImgPreview extends UIControl {
-
     private parent: HTMLElement;
     private dialog: HTMLDialogElement;
-
     private img: HTMLImageElement;
-
     private dialogCloseButton: HTMLButtonElement;
 
     constructor(parent: HTMLElement) {
@@ -383,29 +379,19 @@ class ImgPreview extends UIControl {
         this.parent = parent;
         this.init();
     }
+
     init() {
         this.dialog = Utils.createConnonControl(this.parent, HtmlControl.alertImgPreview, "alertImgPreview") as HTMLDialogElement;
-
         this.img = this.dialog.querySelector('#imgPreview') as HTMLImageElement;
-
-
-
         this.dialogCloseButton = this.dialog.querySelector("article header button")!;
 
         this.dialogCloseButton.addEventListener('click', (event) => {
             event.preventDefault();
-            this.dialog.close();
+            this.close()
         });
-
-        this.img.onload = () => {
-            this.img.style.maxWidth = window.innerWidth * 0.8 + "px";
-            this.img.style.maxHeight = window.innerHeight * 0.8 + "px";
-        }
     }
+
     show(imgUrl: string) {
-
-
-
         this.img.src = imgUrl;
         if (this.dialog.open) {
             this.dialog.close();
@@ -415,17 +401,15 @@ class ImgPreview extends UIControl {
 
     close() {
         this.dialog.close();
+
+        this.img.src = Config.defaultImg;
     }
 }
 
-
 class VideoPreview extends UIControl {
-
     private parent: HTMLElement;
     private dialog: HTMLDialogElement;
-
     private video: HTMLVideoElement;
-
     private dialogCloseButton: HTMLButtonElement;
 
     constructor(parent: HTMLElement) {
@@ -433,32 +417,21 @@ class VideoPreview extends UIControl {
         this.parent = parent;
         this.init();
     }
+
     init() {
         this.dialog = Utils.createConnonControl(this.parent, HtmlControl.alertVideoPreview, "alertVideoPreview") as HTMLDialogElement;
-
         this.video = this.dialog.querySelector('#videoPreview') as HTMLVideoElement;
-
         this.dialogCloseButton = this.dialog.querySelector("article header button")!;
 
         this.dialogCloseButton.addEventListener('click', (event) => {
             event.preventDefault();
-            this.dialog.close();
+            this.close();
         });
-
-
-        this.video.onloadedmetadata = () => {
-            // 设置视频的最大宽度和高度为窗口的80%
-            this.video.style.maxWidth = window.innerWidth * 0.8 + "px";
-            this.video.style.maxHeight = window.innerHeight * 0.8 + "px";
-        };
-
     }
+
     show(videoUrl: string) {
         this.video.src = videoUrl;
         this.video.play();
-
-
-
         if (this.dialog.open) {
             this.dialog.close();
         }
@@ -466,20 +439,18 @@ class VideoPreview extends UIControl {
     }
 
     close() {
+        this.dialog.close();
         this.video.currentTime = 0;
         this.video.pause();
-        this.dialog.close();
+        this.video.src = "";
+        this.video.poster = Config.defaultImg;
     }
 }
 
-
 class AudioPreview extends UIControl {
-
     private parent: HTMLElement;
     private dialog: HTMLDialogElement;
-
     private audio: HTMLAudioElement;
-
     private dialogCloseButton: HTMLButtonElement;
 
     constructor(parent: HTMLElement) {
@@ -487,11 +458,10 @@ class AudioPreview extends UIControl {
         this.parent = parent;
         this.init();
     }
+
     init() {
         this.dialog = Utils.createConnonControl(this.parent, HtmlControl.alertAudioPreview, "alertAudioPreview") as HTMLDialogElement;
-
         this.audio = this.dialog.querySelector('#audioPreview') as HTMLAudioElement;
-
         this.dialogCloseButton = this.dialog.querySelector("article header button")!;
 
         this.dialogCloseButton.addEventListener('click', (event) => {
@@ -499,6 +469,7 @@ class AudioPreview extends UIControl {
             this.dialog.close();
         });
     }
+
     show(audioUrl: string) {
         this.audio.src = audioUrl;
         if (this.dialog.open) {

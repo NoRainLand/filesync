@@ -177,8 +177,14 @@ dialog article {
 	height: auto;
 	max-width: 100%;
 	object-fit: contain; /* 确保内容按比例缩放 */
+	min-width: 10%;
 }
 
+#videoPreview,
+#imgPreview {
+	max-width: 80vw;
+	max-height: 80vh;
+}
 
 // /* 媒体查询，当设备宽度大于 600px 时，使用以下样式 */
 // @media (min-width: 800px) {
