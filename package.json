@@ -11,7 +11,7 @@
 		"build": "tsc --project ./tsconfig.common.json && tsc --project ./tsconfig.es6.json && npx webpack",
 		"debug": "node --trace-warnings ./dist/server/index.js",
 		"rcedit": "node ./plugins/rcedit.js",
-		"exec": "concurrently \"pkg -t win package.json --compress=GZip\" ",
+		"exec": "node ./plugins/pkg.js",
 		"up": "node ./plugins/changeVersion.js",
 		"clean": "node ./plugins/cleanCache.js"
 	},
@@ -62,14 +62,5 @@
 		"qrcode": "^1.5.3",
 		"sqlite3": "^5.1.7",
 		"ws": "^8.15.1"
-	},
-	"pkg": {
-		"assets": [
-			"dist/client/**/*",
-			"dist/server/**/*",
-			"node_modules/sqlite3/build/Release/node_sqlite3.node",
-			"dist/tool/QuickSendTool.exe"
-		],
-		"outputPath": "exec"
 	}
 }
