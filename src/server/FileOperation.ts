@@ -13,7 +13,7 @@ export class FileOperation {
                 if (err) {
                     console.log('删除文件失败' + err);
                 } else {
-                    console.log('删除文件成功' + filePath);
+                    // console.log('删除文件成功' + filePath);
                 }
             });
         }

@@ -48,7 +48,7 @@ export class HtmlControl {
         `
 
     /**进度条的class */
-    static readonly Progress =
+    static readonly myProgress =
         `
         <dialog close id = "myProgress">
             <article id = "myProgressCard">
@@ -58,7 +58,7 @@ export class HtmlControl {
         </dialog>
     `;
     /**提示框的class */
-    static readonly Alert =
+    static readonly myAlert =
         `
         <dialog close id = "myAlert">
             <article>
@@ -76,7 +76,7 @@ export class HtmlControl {
         </dialog>
         `;
     /**对话框的class */
-    static readonly Dialog =
+    static readonly myDialog =
         `
         <dialog close id = "myDialog">
             <article>
@@ -149,5 +149,55 @@ export class HtmlControl {
             <button type="button" class="deleteMsg">删除</button>
         </div>
     </form>
-    `
+    `;
+
+    /**图片预览节点 */
+    static readonly alertImgPreview =
+        `
+    <dialog close id = "alertImgPreview">
+        <article id = "alertImgPreviewArticle">
+            <header id = "alertImgPreviewHeader">
+                <button aria-label="Close" rel="prev"></button>
+                <p>
+                    <strong>图片预览</strong>
+                </p>
+            </header>
+            <img id="imgPreview">
+        </article>
+    </dialog>
+    `;
+
+
+    /**视频预览节点 */
+    static readonly alertVideoPreview =
+        `
+    <dialog close id = "alertVideoPreview">
+        <article id = "alertVideoPreviewArticle">
+            <header id = "alertVideoPreviewHeader">
+                <button aria-label="Close" rel="prev"></button>
+                <p>
+                    <strong>视频预览</strong>
+                </p>
+            </header>
+            <video controls id="videoPreview"></video>
+        </article>
+    </dialog>
+    `;
+
+
+    /**音频预览节点 */
+    static readonly alertAudioPreview =
+        `
+    <dialog close id = "alertAudioPreview">
+        <article>
+            <header id = "alertAudioPreviewHeader">
+                <button aria-label="Close" rel="prev"></button>
+                <p>
+                    <strong>音频预览</strong>
+                </p>
+            </header>
+            <audio controls id="audioPreview"></audio>
+        </article>
+    </dialog>
+    `;
 }

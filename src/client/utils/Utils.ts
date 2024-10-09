@@ -133,4 +133,59 @@ export class Utils {
             document.body.style.minWidth = "980px";
         }
     }
+
+
+
+    /**文件类型的后缀 */
+    static readonly fileType2Sfx:{ [key: string]: string[] } = {
+        img: [
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".gif",
+            ".bmp",
+            ".webp",
+            ".svg",
+            ".ico",
+        ],
+        video: [
+            ".mp4",
+            ".webm",
+            ".ogg",
+            ".avi",
+            ".wmv",
+            ".rmvb",
+            ".flv",
+            ".mov",
+            ".3gp",
+        ],
+        audio: [
+            ".mp3",
+            ".wav",
+            ".flac",
+            ".ape",
+            ".wma",
+            ".aac",
+            ".ogg",
+        ],
+    }
+
+    /**后缀的文件类型 */
+    static suffix2Type: { [key: string]: string };
+
+    /**是否为常见的文件 */
+    static isCommonFile(sfx: string): string {
+        if (!this.suffix2Type) {
+            this.suffix2Type = {};
+            for (let key in this.fileType2Sfx) {
+                let arr = this.fileType2Sfx[key];
+                arr.forEach((sfx:string) => {
+                    this.suffix2Type[sfx] = key;
+                })
+            }
+        }
+        return this.suffix2Type[sfx] ? this.suffix2Type[sfx] : "other";
+    }
+
+
 }

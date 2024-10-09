@@ -13,66 +13,96 @@ export class TipsMgr {
     }
 
 
-    private static _myAlert: Alert;
+    private static myAlert: Alert;
 
-    private static _myDialog: Dialog;
+    private static myDialog: Dialog;
 
-    private static _myTips: Notice;
+    private static myTips: Notice;
 
-    private static _myProgress: Progress;
+    private static myProgress: Progress;
+
+    private static imgPreview: ImgPreview;
+
+    private static videoPreview: VideoPreview;
+
+    private static audioPreview: AudioPreview;
+
+    /**预览音频 */
+    static showAudioPreview(audioUrl: string) {
+        if (!this.audioPreview) {
+            this.audioPreview = new AudioPreview(this.body);
+        }
+        this.audioPreview.show(audioUrl);
+    }
+
+    /**预览一张图片 */
+    static showImgPreview(imgUrl: string) {
+        if (!this.imgPreview) {
+            this.imgPreview = new ImgPreview(this.body);
+        }
+        this.imgPreview.show(imgUrl);
+    }
+
+    /**预览视频 */
+    static showVideoPreview(videoUrl: string) {
+        if (!this.videoPreview) {
+            this.videoPreview = new VideoPreview(this.body);
+        }
+        this.videoPreview.show(videoUrl);
+    }
 
 
     /**显示一个提示 */
     static showNotice(msg: string) {
-        if (!this._myTips) {
-            this._myTips = new Notice(this.body);
+        if (!this.myTips) {
+            this.myTips = new Notice(this.body);
         }
-        this._myTips.show(msg);
+        this.myTips.show(msg);
     }
 
     /**显示一个对话框 */
     static showDialog(content: string, caller: any, sure: Function | null, cancel: Function | null, title: string = "提示", onlySure: boolean = false) {
-        if (!this._myDialog) {
-            this._myDialog = new Dialog(this.body);
+        if (!this.myDialog) {
+            this.myDialog = new Dialog(this.body);
         }
         this.hideAll();
-        this._myDialog.show(content, caller, sure, cancel, title, onlySure);
+        this.myDialog.show(content, caller, sure, cancel, title, onlySure);
     }
 
     /**隐藏对话框 */
     static hideDialog() {
-        if (this._myDialog) {
-            this._myDialog.close();
+        if (this.myDialog) {
+            this.myDialog.close();
         }
     }
 
     /**显示一个提示框 */
     static showAlert(content: string, title: string = "提示", type: AlertType = AlertType.text, caller: any = null, callback: Function | null = null) {
-        if (!this._myAlert) {
-            this._myAlert = new Alert(this.body);
+        if (!this.myAlert) {
+            this.myAlert = new Alert(this.body);
         }
-        this._myAlert.show(content, title, type);
+        this.myAlert.show(content, title, type);
     }
 
     /**隐藏提示框 */
     static hideAlert() {
-        if (this._myAlert) {
-            this._myAlert.close();
+        if (this.myAlert) {
+            this.myAlert.close();
         }
     }
 
     /**显示进度条 */
     static showProgress(value: number, autoClose: boolean = false) {
-        if (!this._myProgress) {
-            this._myProgress = new Progress(this.body);
+        if (!this.myProgress) {
+            this.myProgress = new Progress(this.body);
         }
-        this._myProgress.show(value, autoClose);
+        this.myProgress.show(value, autoClose);
     }
 
     /**隐藏进度条 */
     static hideProgress() {
-        if (this._myProgress) {
-            this._myProgress.close();
+        if (this.myProgress) {
+            this.myProgress.close();
         }
     }
 
@@ -108,7 +138,7 @@ class Dialog extends UIControl {
         this.init();
     }
     init() {
-        this.dialog = Utils.createConnonControl(this.parent, HtmlControl.Dialog, "myDialog") as HTMLDialogElement;
+        this.dialog = Utils.createConnonControl(this.parent, HtmlControl.myDialog, "myDialog") as HTMLDialogElement;
 
         this.dialogTitle = this.dialog.querySelector("article header p strong")!;
         this.dialogContent = this.dialog.querySelectorAll("article p")[1]! as HTMLParagraphElement;
@@ -182,7 +212,7 @@ class Alert extends UIControl {
         this.init();
     }
     init() {
-        this.dialog = Utils.createConnonControl(this.parent, HtmlControl.Alert, "myAlert") as HTMLDialogElement;
+        this.dialog = Utils.createConnonControl(this.parent, HtmlControl.myAlert, "myAlert") as HTMLDialogElement;
 
         this.qrcodeDiv = this.dialog.querySelector('#qrcodeDiv') as HTMLImageElement;
         this.imgQrCode = this.dialog.querySelector("#qrcodeImg") as HTMLImageElement;
@@ -303,7 +333,7 @@ class Progress extends UIControl {
         this.init();
     }
     init() {
-        this.progress = Utils.createConnonControl(this.parent, HtmlControl.Progress, "myProgress") as HTMLDialogElement;
+        this.progress = Utils.createConnonControl(this.parent, HtmlControl.myProgress, "myProgress") as HTMLDialogElement;
 
         this.progressCard = this.progress.querySelector('#myProgressCard') as HTMLDListElement;
         this.progressValue = this.progress.querySelector('#myProgressValue') as HTMLProgressElement;
@@ -335,5 +365,151 @@ class Progress extends UIControl {
         this.myProgressText.textContent = "0%";
         this.progressValue.value = 0;
         this.progress.close();
+    }
+}
+
+
+class ImgPreview extends UIControl {
+
+    private parent: HTMLElement;
+    private dialog: HTMLDialogElement;
+
+    private img: HTMLImageElement;
+
+    private dialogCloseButton: HTMLButtonElement;
+
+    constructor(parent: HTMLElement) {
+        super();
+        this.parent = parent;
+        this.init();
+    }
+    init() {
+        this.dialog = Utils.createConnonControl(this.parent, HtmlControl.alertImgPreview, "alertImgPreview") as HTMLDialogElement;
+
+        this.img = this.dialog.querySelector('#imgPreview') as HTMLImageElement;
+
+
+
+        this.dialogCloseButton = this.dialog.querySelector("article header button")!;
+
+        this.dialogCloseButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.dialog.close();
+        });
+
+        this.img.onload = () => {
+            this.img.style.maxWidth = window.innerWidth * 0.8 + "px";
+            this.img.style.maxHeight = window.innerHeight * 0.8 + "px";
+        }
+    }
+    show(imgUrl: string) {
+
+
+
+        this.img.src = imgUrl;
+        if (this.dialog.open) {
+            this.dialog.close();
+        }
+        this.dialog.showModal();
+    }
+
+    close() {
+        this.dialog.close();
+    }
+}
+
+
+class VideoPreview extends UIControl {
+
+    private parent: HTMLElement;
+    private dialog: HTMLDialogElement;
+
+    private video: HTMLVideoElement;
+
+    private dialogCloseButton: HTMLButtonElement;
+
+    constructor(parent: HTMLElement) {
+        super();
+        this.parent = parent;
+        this.init();
+    }
+    init() {
+        this.dialog = Utils.createConnonControl(this.parent, HtmlControl.alertVideoPreview, "alertVideoPreview") as HTMLDialogElement;
+
+        this.video = this.dialog.querySelector('#videoPreview') as HTMLVideoElement;
+
+        this.dialogCloseButton = this.dialog.querySelector("article header button")!;
+
+        this.dialogCloseButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.dialog.close();
+        });
+
+
+        this.video.onloadedmetadata = () => {
+            // 设置视频的最大宽度和高度为窗口的80%
+            this.video.style.maxWidth = window.innerWidth * 0.8 + "px";
+            this.video.style.maxHeight = window.innerHeight * 0.8 + "px";
+        };
+
+    }
+    show(videoUrl: string) {
+        this.video.src = videoUrl;
+        this.video.play();
+
+
+
+        if (this.dialog.open) {
+            this.dialog.close();
+        }
+        this.dialog.showModal();
+    }
+
+    close() {
+        this.video.currentTime = 0;
+        this.video.pause();
+        this.dialog.close();
+    }
+}
+
+
+class AudioPreview extends UIControl {
+
+    private parent: HTMLElement;
+    private dialog: HTMLDialogElement;
+
+    private audio: HTMLAudioElement;
+
+    private dialogCloseButton: HTMLButtonElement;
+
+    constructor(parent: HTMLElement) {
+        super();
+        this.parent = parent;
+        this.init();
+    }
+    init() {
+        this.dialog = Utils.createConnonControl(this.parent, HtmlControl.alertAudioPreview, "alertAudioPreview") as HTMLDialogElement;
+
+        this.audio = this.dialog.querySelector('#audioPreview') as HTMLAudioElement;
+
+        this.dialogCloseButton = this.dialog.querySelector("article header button")!;
+
+        this.dialogCloseButton.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.dialog.close();
+        });
+    }
+    show(audioUrl: string) {
+        this.audio.src = audioUrl;
+        if (this.dialog.open) {
+            this.dialog.close();
+        }
+        this.dialog.showModal();
+    }
+
+    close() {
+        this.audio.currentTime = 0;
+        this.audio.pause();
+        this.dialog.close();
     }
 }

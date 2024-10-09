@@ -35,13 +35,13 @@ body {
 @font-face {
 	font-family: "JetBrains Mono NL Medium";
 	src: url("../font/JetBrainsMonoNL-Medium.ttf") format("truetype");
-    font-display: swap;
+	font-display: swap;
 }
 
 @font-face {
 	font-family: "Source Han Serif CN Medium";
 	src: url("../font/SourceHanSerifCN-Medium.otf") format("opentype");
-    font-display: swap;
+	font-display: swap;
 }
 
 dialog article {
@@ -140,12 +140,6 @@ dialog article {
 	#uploadForm {
 		background-color: #fff;
 	}
-	.qrcodeButton {
-		background-color: #fff;
-	}
-	.themeButton {
-		background-color: #fff;
-	}
 }
 
 #fileList {
@@ -177,6 +171,14 @@ dialog article {
 		flex: 0 1 auto;
 	}
 }
+
+#alertVideoPreviewArticle,
+#alertImgPreviewArticle {
+	height: auto;
+	max-width: 100%;
+	object-fit: contain; /* 确保内容按比例缩放 */
+}
+
 
 // /* 媒体查询，当设备宽度大于 600px 时，使用以下样式 */
 // @media (min-width: 800px) {

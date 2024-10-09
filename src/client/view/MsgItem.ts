@@ -3,6 +3,7 @@ import { EventMgr } from "../../common/EventMgr";
 import { BtnEvent } from "../config/ClientDefine";
 import { HtmlControl } from "../config/HtmlControl";
 import { Utils } from "../utils/Utils";
+import { TipsMgr } from "./TipsMgr";
 
 export class MsgItem {
     private form: HTMLFormElement;
@@ -41,8 +42,25 @@ export class MsgItem {
         this.btnDel.removeEventListener('click', this.deleteData);
     }
 
+    /**是否为常见的文件 */
+    isCommonFile(fileName: string): string {
+        let sfx = fileName.slice(fileName.lastIndexOf('.'));
+        return Utils.isCommonFile(sfx);
+    }
+
+
     downloadFile = () => {
-        EventMgr.emit(BtnEvent.downloadFile, this.data!.url, this.data!.fileName);
+        let fileName = this.data!.fileName!;
+        let type = this.isCommonFile(fileName);
+        if (type === 'img') {
+            TipsMgr.showImgPreview(this.data!.url!);
+        } else if (type === 'video') {
+            TipsMgr.showVideoPreview(this.data!.url!);
+        } else if (type === 'audio') {
+            TipsMgr.showAudioPreview(this.data!.url!);
+        } else {
+            EventMgr.emit(BtnEvent.downloadFile, this.data!.url, this.data!.fileName);
+        }
     }
 
     copyData = () => {
@@ -82,6 +100,15 @@ export class MsgItem {
                 }
             }
             this.txtNameOrText.textContent = str;
+
+
+            let type = this.isCommonFile(data.fileName);
+            if (type === 'img' || type === 'video' || type === 'audio') {
+                this.btnDownload.innerText = '预览';
+            } else {
+                this.btnDownload.innerText = '下载';
+            }
+
         } else {
             let str = data.text!;
             if (str.length > this.maxTextLength) {
