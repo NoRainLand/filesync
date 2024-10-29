@@ -137,7 +137,7 @@ export class Utils {
 
 
     /**文件类型的后缀 */
-    static readonly fileType2Sfx:{ [key: string]: string[] } = {
+    static readonly fileType2Sfx: { [key: string]: string[] } = {
         img: [
             ".jpg",
             ".jpeg",
@@ -179,7 +179,7 @@ export class Utils {
             this.suffix2Type = {};
             for (let key in this.fileType2Sfx) {
                 let arr = this.fileType2Sfx[key];
-                arr.forEach((sfx:string) => {
+                arr.forEach((sfx: string) => {
                     this.suffix2Type[sfx] = key;
                 })
             }
@@ -187,5 +187,30 @@ export class Utils {
         return this.suffix2Type[sfx] ? this.suffix2Type[sfx] : "other";
     }
 
+
+    /**判断运行平台 */
+    static getPlatform(): string {
+        let u = window.navigator.userAgent;
+        if (u.indexOf('Windows') > -1) {
+            return 'Windows';
+        } else if (u.indexOf('Macintosh') > -1) {
+            return 'Macintosh';
+        } else if (u.indexOf('Linux') > -1) {
+            return 'Linux';
+        } else if (u.indexOf('Android') > -1) {
+            return 'Android';
+        } else if (u.indexOf('iPhone') > -1) {
+            return 'iPhone';
+        } else if (u.indexOf('iPad') > -1) {
+            return 'iPad';
+        } else {
+            return 'other';
+        }
+    }
+
+    /**是否为windows平台 */
+    static isWin(): boolean {
+        return this.getPlatform() === 'Windows';
+    }
 
 }

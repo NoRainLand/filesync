@@ -8,8 +8,10 @@ export class RunButton {
     private static runButton: HTMLElement
     static init(pageParent: HTMLElement) {
         this.pageParent = pageParent;
-        this.setUI();
-        this.addEvent();
+        if (Utils.isWin()) {
+            this.setUI();
+            this.addEvent();
+        }
     }
     private static setUI() {
         this.runButton = Utils.createConnonControl(this.pageParent!, HtmlControl.runButton, "runButton");
