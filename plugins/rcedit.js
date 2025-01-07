@@ -4,15 +4,15 @@ const options = {
 	"version-string": {
 		ProductName: "filesync",
 		FileDescription: "基于node开发的一个多端文件/文字同步工具",
-		FileVersion: "5.4.3",
-		ProductVersion: "5.4.3",
+		FileVersion: "5.4.4",
+		ProductVersion: "5.4.4",
 		OriginalFilename: "filesync.exe",
 		InternalName: "filesync.exe",
 		CompanyName: "unknownmothergoose",
 		LegalCopyright: "Copyright © 2023-2024 NoRain",
 	},
 	"file-version": "3.14159.26535.897.932.384.626",
-	"product-version": "5.4.3",
+	"product-version": "5.4.4",
 	icon: "./logo/fs.ico",
 };
 

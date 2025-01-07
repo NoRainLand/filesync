@@ -49,7 +49,8 @@ export class MsgItem {
     }
 
 
-    downloadFile = () => {
+    downloadFile = (evt: MouseEvent) => {
+        evt.stopImmediatePropagation();
         let fileName = this.data!.fileName!;
         let type = this.isCommonFile(fileName);
         if (type === 'img') {
@@ -63,7 +64,7 @@ export class MsgItem {
         }
     }
 
-    copyData = () => {
+    copyData = (evt: MouseEvent) => {
         // if (this.data) {
         //     if (this.data.fileName) {
         //         Utils.copyText(this.data.fileName);
@@ -71,13 +72,15 @@ export class MsgItem {
         //         Utils.copyText(this.data.text!);
         //     }
         // }
+        evt.stopImmediatePropagation();
         if (this.data) {
             const text = (this.data.text || this.data.url)!.toString();
             this.btnCopy.setAttribute('data-clipboard-text', text);
         }
     }
 
-    deleteData = () => {
+    deleteData = (evt: MouseEvent) => {
+        evt.stopImmediatePropagation();
         if (this.data?.fileOrTextHash) {
             EventMgr.emit(BtnEvent.deleteItem, this.data.fileOrTextHash);
         }

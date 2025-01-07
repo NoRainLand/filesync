@@ -146,6 +146,13 @@ dialog article {
 	margin-top: 20px;
 }
 
+.copyMsg,
+.deleteMsg,
+.deleteMsg {
+	min-width: 110px;
+	max-width: 130px;
+}
+
 .item {
 	display: flex;
 	flex-direction: row;

@@ -1,6 +1,6 @@
 {
 	"name": "file-sync",
-	"version": "5.4.3",
+	"version": "5.4.4",
 	"description": "基于node开发的一个多端文件/文字同步工具",
 	"author": "NoRain",
 	"bin": "dist/server/index.js",

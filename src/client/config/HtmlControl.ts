@@ -140,7 +140,7 @@ export class HtmlControl {
     /**文件列表 */
     static readonly fileItem =
         `
-    <form class="item" role="group">
+    <form class="item" class="grid">
         <p class="NameOrText"></p>
         <div>
             <small class="msgDate"></small>
