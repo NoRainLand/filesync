@@ -72,7 +72,6 @@ export class MsgItem {
         //         Utils.copyText(this.data.text!);
         //     }
         // }
-        evt.stopImmediatePropagation();
         if (this.data) {
             const text = (this.data.text || this.data.url)!.toString();
             this.btnCopy.setAttribute('data-clipboard-text', text);
