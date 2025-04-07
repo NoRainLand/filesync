@@ -1,64 +1,81 @@
 const path = require("path");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const fs = require("fs");
+const { url } = require("inspector");
 const nodeExternals = require("webpack-node-externals");
-const { copyCache, deleteCache } = require("./plugins/copyFile");
-const TerserPlugin = require("terser-webpack-plugin");
-const WebpackObfuscator = require("webpack-obfuscator");
 
-module.exports = [
-	{
-		entry: "./dist/client_temp/client/index.js",
-		output: {
-			path: path.resolve(__dirname, "dist/client"),
-			filename: "index.js",
-		},
-		mode: "production",// "development" | "production" | "none"
-		module: {
-			rules: [
-				{
-					test: /\.s[ac]ss$/i,
-					use: ["style-loader", "css-loader", "sass-loader"],
-				},
-			],
-		},
-		optimization: {
-			minimize: true,
-			minimizer: [
-				new TerserPlugin({
-					terserOptions: {
-						compress: {
-							drop_console: false,//是否移除console
-						},
-					},
-				}),
-			],
-		},
-		plugins: [
-			new WebpackObfuscator(
-				{
-					rotateStringArray: true,
-				},
-				[]
-			),
+// 创建客户端配置
+const clientConfig = {
+	name: "client",
+	entry: {
+		client: "./src/client/index.ts",
+	},
+	output: {
+		filename: "[name].js",
+		path: path.resolve(__dirname, "bin/client"),
+	},
+	resolve: {
+		extensions: [".ts", ".js"],
+	},
+	module: {
+		rules: [
 			{
-				apply: (compiler) => {
-					compiler.hooks.beforeRun.tapPromise("CopyFilesPlugin", async () => {
-						await copyCache();
-					});
-					compiler.hooks.done.tapPromise("DeleteFilesPlugin", async () => {
-						await deleteCache();
-					});
+				test: /\.ts$/,
+				include: [path.resolve(__dirname, "src/client"), path.resolve(__dirname, "src/common"), path.resolve(__dirname, "src/ProjectConfig.ts")],
+				use: {
+					loader: "ts-loader",
+					options: {
+						configFile: "tsconfig.client.json",
+					},
 				},
+			},
+			{
+				test: /\.scss$/,
+				use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
 			},
 		],
 	},
-	{
-		entry: "./dist/server_temp/server/index.js",
-		output: {
-			path: path.resolve(__dirname, "dist/server"),
-			filename: "index.js",
-		},
-		externals: [nodeExternals()],
-		mode: "production",
-		target: "node",
+	plugins: [
+		new MiniCssExtractPlugin({
+			filename: "[name].css",
+		}),
+	],
+};
+
+// 创建服务器配置
+const serverConfig = {
+	name: "server",
+	entry: {
+		server: "./src/server/index.ts",
 	},
-];
+	output: {
+		filename: "[name].js",
+		path: path.resolve(__dirname, "bin/server"),
+	},
+	target: "node",
+	resolve: {
+		extensions: [".ts", ".js"],
+	},
+	performance: {
+		hints: false,
+	},
+	module: {
+		rules: [
+			{
+				test: /\.ts$/,
+				include: [path.resolve(__dirname, "src/server"), path.resolve(__dirname, "src/common"), path.resolve(__dirname, "src/ProjectConfig.ts")],
+				use: {
+					loader: "ts-loader",
+					options: {
+						configFile: "tsconfig.server.json",
+					},
+				},
+			},
+		],
+		exprContextCritical: false,
+	},
+	externals: [nodeExternals()],
+};
+
+// 导出配置数组
+module.exports = (env, argv) => [clientConfig, serverConfig];
