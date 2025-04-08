@@ -1,24 +1,20 @@
 {
 	"name": "file-sync",
-	"version": "5.4.4",
+	"version": "5.5.0",
 	"description": "基于node开发的一个多端文件/文字同步工具",
 	"author": "NoRain",
-	"bin": "dist/server/index.js",
-	"main": "dist/server/index.js",
+	"bin": "src/server/index.ts",
+	"main": "src/server/index.ts",
 	"scripts": {
-		"build": "npx webpack --mode development",
-		"copy": "node ./plugins/copyFile.js",
+		"build": "npx webpack --mode production",
+		"watch": "npx webpack --mode development --watch",
+        "start": "node ./bin/server/server.js --trace-warnings",
 		"rcedit": "node ./plugins/rcedit.js",
 		"exec": "node ./plugins/pkg.js",
-		"up": "node ./plugins/changeVersion.js",
-		"clean": "node ./plugins/cleanCache.js"
+		"up": "node ./plugins/changeVersion.js"
 	},
 	"keywords": [
 		"fileSnyc",
-		"file",
-		"sync",
-		"server",
-		"text",
 		"textSync",
 		"textSyncServer",
 		"fileSyncServer",

@@ -9,7 +9,6 @@ export default class index {
     constructor() {
         this.init();
     }
-
     async init() {
         ServerConfig.serverIp = Utils.getLocalIP();
         ServerConfigMgr.readConfig(ServerConfig.serverConfigPath);

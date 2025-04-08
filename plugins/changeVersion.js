@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const oldVersion = "5.4.4";
+const oldVersion = "5.5.0";
 
 const fileList = ["./package.json", "./src/ProjectConfig.ts", "./plugins/rcedit.js", "./plugins/changeVersion.js"];
 

@@ -3,6 +3,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const fs = require("fs");
 const { url } = require("inspector");
 const nodeExternals = require("webpack-node-externals");
+const CopyFilePlugin = require("./plugins/CopyFilePlugin.js");
 
 // 创建客户端配置
 const clientConfig = {
@@ -39,6 +40,7 @@ const clientConfig = {
 		new MiniCssExtractPlugin({
 			filename: "[name].css",
 		}),
+        new CopyFilePlugin()
 	],
 };
 
