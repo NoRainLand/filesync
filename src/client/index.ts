@@ -1,4 +1,4 @@
-import "../../client/css/style.scss"; //引入样式 这个是copy到client文件之后的路径
+import "../html/css/style.scss"; //引入样式 这个是copy到client文件之后的路径
 import { ProjectConfig } from "../ProjectConfig";
 import { ServerClientOperate, ServerInfo, SocketMsg } from "../common/CommonDefine";
 import { EventMgr } from "../common/EventMgr";
