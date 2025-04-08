@@ -8,7 +8,7 @@
 	"scripts": {
 		"build": "npx webpack --mode production",
 		"watch": "npx webpack --mode development --watch",
-        "start": "node ./bin/server/server.js --trace-warnings",
+        "start": "node ./bin/server/server.js",
 		"rcedit": "node ./plugins/rcedit.js",
 		"exec": "node ./plugins/pkg.js",
 		"up": "node ./plugins/changeVersion.js"
