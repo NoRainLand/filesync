@@ -1,0 +1,173 @@
+@import "./comon.scss";
+
+
+dialog article {
+	width: auto;
+	.dialogContent {
+		display: flex;
+		align-items: center; // 使内容在容器中垂直居中
+		justify-content: center; // 可选，如果你也想水平居中文本
+		min-width: 360px;
+		min-height: 130px;
+		text-align: center;
+	}
+}
+
+.qrcodeButton {
+	position: fixed;
+	bottom: 60px;
+	left: 10px;
+	z-index: 1000;
+	width: 40px;
+	height: 40px;
+}
+
+.themeButton {
+	position: fixed;
+	bottom: 10px;
+	left: 10px;
+	z-index: 1000;
+	width: 40px;
+	height: 40px;
+}
+
+.runButton {
+	position: fixed;
+	bottom: 110px;
+	left: 10px;
+	z-index: 1000;
+	width: 40px;
+	height: 40px;
+}
+
+#showQrcodeDiv {
+	display: block;
+	width: 160px;
+	height: 160px;
+	margin-top: 15px;
+}
+
+#qrcode {
+	width: 100%;
+	height: 100%;
+}
+
+#hideQrcodeDiv {
+	display: none;
+	width: 0px;
+	height: 0px;
+	margin-top: 15px;
+}
+
+#uploadForm {
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+	gap: 10px;
+	max-width: $maxWidth;
+	position: sticky;
+	top: 0;
+	z-index: 99;
+}
+
+.tips {
+	position: fixed;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	transition: all 1s ease-in-out;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+	opacity: 0.75;
+}
+
+/* Dark color scheme (Forced) */
+/* Enabled if forced with data-theme="dark" */
+[data-theme="dark"] {
+	#uploadForm {
+		background-color: #13171f;
+	}
+	.qrcodeButton {
+		background-color: #13171f;
+	}
+	.themeButton {
+		background-color: #13171f;
+	}
+}
+[data-theme="light"] {
+	#uploadForm {
+		background-color: #fff;
+	}
+}
+
+#fileList {
+	margin-top: 20px;
+}
+
+.copyMsg,
+.deleteMsg,
+.deleteMsg {
+	min-width: 110px;
+	max-width: 130px;
+}
+
+.item {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+	min-width: $itemMinWidth;
+	max-width: $maxWidth;
+	div {
+		display: flex;
+		gap: 10px;
+		justify-content: flex-end;
+		.msgDate {
+			margin-top: 10px;
+			width: 140px;
+		}
+		min-width: 340px;
+	}
+	.NameOrText {
+		display: inline-block;
+		width: auto;
+		white-space: nowrap;
+		flex: 0 1 auto;
+	}
+}
+
+#alertVideoPreviewArticle,
+#alertImgPreviewArticle {
+	height: auto;
+	max-width: 100%;
+	object-fit: contain; /* 确保内容按比例缩放 */
+	min-width: 10%;
+}
+
+#videoPreview,
+#imgPreview {
+	max-width: 80vw;
+	max-height: 80vh;
+}
+
+// /* 媒体查询，当设备宽度大于 600px 时，使用以下样式 */
+// @media (min-width: 800px) {
+// 	#uploadForm {
+// 		flex-direction: row; /* 在非移动端，将元素排成一行 */
+// 		align-items: center; /* 对齐到中间 */
+// 	}
+
+// 	.item {
+// 		flex-direction: row; /* 在非移动端，将元素排成一行 */
+// 		align-items: center; /* 对齐到中间 */
+// 	}
+// }
+
+#copyRight {
+	position: fixed;
+	bottom: 10px;
+	right: 10px;
+	z-index: 1000;
+	text-decoration: none;
+	color: inherit;
+}

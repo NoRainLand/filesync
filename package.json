@@ -7,8 +7,11 @@
 	"main": "src/server/index.ts",
 	"scripts": {
 		"build": "npx webpack --mode production",
+		"build:css": "webpack --mode production --env target=css",
+		"build:client": "webpack --mode production --env target=client",
+		"build:server": "webpack --mode production --env target=server",
 		"watch": "npx webpack --mode development --watch",
-        "start": "node ./bin/server/server.js",
+		"start": "node ./bin/server/server.js",
 		"rcedit": "node ./plugins/rcedit.js",
 		"exec": "node ./plugins/pkg.js",
 		"up": "node ./plugins/changeVersion.js"
