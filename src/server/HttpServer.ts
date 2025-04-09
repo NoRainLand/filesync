@@ -248,6 +248,7 @@ export class HttpServer {
             });
         }
 
+        //根目录文件
         this.appExpress.get('/:file', (req: Request, res: Response) => {
             const filePath = path.join(__dirname, '../client/', req.params.file);
             res.sendFile(filePath, (err) => {
@@ -260,6 +261,21 @@ export class HttpServer {
                 }
             });
         });
+
+        //第三方库文件
+        this.appExpress.get('/libs/:file', (req: Request, res: Response) => {
+            const filePath = path.join(__dirname, '../client/libs/', req.params.file);
+            res.sendFile(filePath, (err) => {
+                if (err) {
+                    let msg = `File not found: ${req.params.file}`;
+                    console.log(msg);
+                    if (!res.headersSent) {
+                        res.status(404).send(msg);
+                    }
+                }
+            });
+        });
+
     }
 
     /**获取上传文件 */

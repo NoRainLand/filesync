@@ -12,6 +12,7 @@ class CopyFilePlugin {
 			{ source: path.resolve(__dirname, "./src/html/favicon.ico"), target: path.resolve(__dirname, "./bin/client") },
 			{ source: path.resolve(__dirname, "./src/html/index.html"), target: path.resolve(__dirname, "./bin/client") },
 			{ source: path.resolve(__dirname, "./tool/QuickSendTool.exe"), target: path.resolve(__dirname, "./bin/tool") },
+			{ source: path.resolve(__dirname, "./src/html/libs/vconsole.min.js"), target: path.resolve(__dirname, "./bin/client/libs") },
 		];
 	}
 

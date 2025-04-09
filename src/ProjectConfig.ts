@@ -4,7 +4,7 @@ export class ProjectConfig {
     /**项目作者 */
     static readonly author: string = 'NoRain';
     /**版本号 */
-    static readonly versionStr: string = '5.5.0';
+    static readonly versionStr: string = '5.5.1';
     /**描述 */
     static readonly description: string = '一个简单的文件/文字同步服务器';
     /**前端页面是否屏蔽输出 */
