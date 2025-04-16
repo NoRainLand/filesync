@@ -20,13 +20,13 @@ $maxWidth: 1400px;
 
 @font-face {
 	font-family: "JetBrains Mono NL Medium";
-	src: url("../font/JetBrainsMonoNL-Medium.woff2") format("woff2");
+	src: url("@html/font/JetBrainsMonoNL-Medium.woff2") format("woff2");
 	font-display: swap;
 }
 
 @font-face {
 	font-family: "Source Han Serif CN Medium";
-	src: url("../font/SourceHanSerifCN-Medium.woff2") format("woff2");
+	src: url("@html/font/SourceHanSerifCN-Medium.woff2") format("woff2");
 	font-display: swap;
 }
 
@@ -47,23 +47,27 @@ body {
 // 所有的自定义深度必须在这里注册
 // 名字：深度
 $z-layers: (
-	//-----基础-------
-	"mainPage": 1,
-	"sidebar": 2,
+	//----页面主体----
+	"container": 100,
 
-	//-----固定角标-------
-	"toggleSidebar": 101,
-	"changeLang": 102,
-	"btnShowMsg": 103,
+	"uploadForm": 101,
 
-	//-----弹出窗口-------
-	"overlay": 201,
-	"tips": 202,
+	"fileList": 102,
 
-	//-----顶级弹窗-------
-	"loadingMask": 301,
+	//----提示按钮----
+	"runButton": 201,
+	"qrcodeButton": 202,
+	"themeButton": 203,
 
-	//-----杂七杂八-------
+	//----弹窗----
+	"myAlert": 301,
+	"myDialog": 302,
+	"alertImgPreview": 303,
+	"alertVideoPreview": 304,
+	"alertAudioPreview": 305,
+
+	//----提示信息----
+	"tips": 401
 );
 
 @function z($key) {

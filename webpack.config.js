@@ -50,9 +50,14 @@ class DeleteFilePlugin {
 
 // css配置
 const cssConfig = {
+    resolve: {
+        alias: {
+            '@html': path.resolve(__dirname, 'src/html')
+        }
+    },
 	entry: {
-		desktop: "./src/html/css/desktop.scss", // desktop.scss 入口
-		mobile: "./src/html/css/mobile.scss", // mobile.scss 入口
+		desktop: "./src/html/css/desktop/index.scss", // desktop.scss 入口
+		mobile: "./src/html/css/mobile/index.scss", // mobile.scss 入口
 	},
 	module: {
 		rules: [

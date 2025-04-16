@@ -1,5 +1,4 @@
-@import "./comon.scss";
-
+@import "../comon.scss";
 
 dialog article {
 	width: auto;
@@ -150,18 +149,6 @@ dialog article {
 	max-height: 80vh;
 }
 
-// /* 媒体查询，当设备宽度大于 600px 时，使用以下样式 */
-// @media (min-width: 800px) {
-// 	#uploadForm {
-// 		flex-direction: row; /* 在非移动端，将元素排成一行 */
-// 		align-items: center; /* 对齐到中间 */
-// 	}
-
-// 	.item {
-// 		flex-direction: row; /* 在非移动端，将元素排成一行 */
-// 		align-items: center; /* 对齐到中间 */
-// 	}
-// }
 
 #copyRight {
 	position: fixed;
