@@ -73,12 +73,12 @@
 - 修改目录下的plugins/rcedit.js中的options配置
 - 执行```pnpm run rcedit```进行修补
 - 把这两个文件放到你的.pgk-cache目录下，这个目录通常在 C:\Users\你的名字\.pkg-cache\你的版本 下
-- 执行```pnpm run exec``` 完成打包
+- 执行```pnpm run pkg``` 完成打包
 
 #### 一些说明
 
 - 第一次运行提示乱七八糟的,能运行就别管.
-- 数据库安装失败,多执行```npm install```几次试试，实在不行就下载[我打包好的文件](https://github.com/NoRainLand/filesync/releases/tag/untagged-effc87f7dee701d8da7f)，但是你解压之后还是要执行一次```npm install```（并且记得不要把package-lock.json，package.json两个文件给覆盖了），因为我后面有添加了新的库（主要是sqlite3库下载可能会出问题）
+- 数据库安装失败,多执行```pnpm install```几次试试，实在不行就下载[我打包好的文件](https://github.com/NoRainLand/filesync/releases/tag/untagged-effc87f7dee701d8da7f)，但是你解压之后还是要执行一次```pnpm install```（并且记得不要把package-lock.json，package.json两个文件给覆盖了），因为我后面有添加了新的库（主要是sqlite3库下载可能会出问题）
 - 如果打包报错类似如下所示的话，可以参考[这里](https://segmentfault.com/a/1190000041958374),项目目录下提供了我下载好的文件。
 
 ```txt
@@ -91,6 +91,8 @@
 [0] > Fetching Node.js source archive from nodejs.org...
 [0] > Error! AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
 ```
+
+[PKG的下载地址](https://github.com/vercel/pkg-fetch/releases)
 
 pkgx打包体积理论上会很小，但是据说会有一些问题，我没试过，可以参考[这里](https://bjun.tech/blog/xphp/225)
 

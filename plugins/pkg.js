@@ -1,20 +1,41 @@
 const { execSync } = require("child_process");
 const path = require("path");
-
-const pkg = {
-	assets: ["../bin/client/**/*", "../bin/server/**/*", "../node_modules/sqlite3/build/Release/node_sqlite3.node", "../bin/tool/QuickSendTool.exe"],
-	outputPath: "../exec",
+// 配置选项
+const CONFIG = {
+	cache: path.resolve(__dirname, "../.pkg-cache"),
+	pkg: path.resolve(__dirname, "../package.json"),
+	output: path.resolve(__dirname, "../exec"),
+	target: "win",
+	compression: "GZip",
 };
 
-// 设置临时缓存目录
-const cachePath = path.resolve(__dirname, "../.pkg-cache");
-process.env.PKG_CACHE_PATH = cachePath;
+// 执行打包
+function buildPackage() {
+	// 设置缓存路径
+	process.env.PKG_CACHE_PATH = CONFIG.cache;
 
-// 运行 pkg 命令
-try {
-	const pkgCommand = ["pkg", "-t", "win", "package.json", "--compress", "GZip", "--out-path", pkg.outputPath, ...pkg.assets.map((asset) => `--assets ${asset}`)].join(" ");
-	execSync(pkgCommand, { stdio: "inherit" });
-	console.log("pkg 打包成功");
-} catch (error) {
-	console.error("pkg 打包失败", error);
+	try {
+		const pkgCommand = ["pkg", "-t", CONFIG.target, CONFIG.pkg, "--compress", CONFIG.compression, "--out-path", CONFIG.output].join(" ");
+		console.log("开始打包...");
+		execSync(pkgCommand, {
+			stdio: "inherit",
+			encoding: "utf8",
+		});
+		console.log("打包成功");
+		return true;
+	} catch (error) {
+		console.error("打包失败:", error.message);
+		return false;
+	}
 }
+
+function main() {
+	try {
+		return buildPackage();
+	} catch (error) {
+		console.error("程序执行失败:", error.message);
+		return false;
+	}
+}
+
+process.exit(main() ? 0 : 1);
