@@ -2,7 +2,7 @@ const { execSync } = require("child_process");
 const path = require("path");
 
 const pkg = {
-	assets: ["../dist/client/**/*", "../dist/server/**/*", "../node_modules/sqlite3/build/Release/node_sqlite3.node", "../dist/tool/QuickSendTool.exe"],
+	assets: ["../bin/client/**/*", "../bin/server/**/*", "../node_modules/sqlite3/build/Release/node_sqlite3.node", "../bin/tool/QuickSendTool.exe"],
 	outputPath: "../exec",
 };
 

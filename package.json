@@ -3,8 +3,8 @@
 	"version": "5.5.1",
 	"description": "基于node开发的一个多端文件/文字同步工具",
 	"author": "NoRain",
-	"bin": "src/server/index.ts",
-	"main": "src/server/index.ts",
+	"bin": "./bin/server/server.js",
+	"main": "./bin/server/server.js",
 	"scripts": {
 		"build": "npx webpack --mode production",
 		"build:css": "webpack --mode production --env target=css",
