@@ -67,8 +67,13 @@
 
 #### 打包
 
+- 执行```pnpm run rcedit```进行修补（修补的配置自行去plugins\rcedit.js）修改
+- 执行```pnpm run pkg``` 完成打包
+
+以下是旧的内容
+
 - 以下内容可以参看这里[这个链接](https://blog.csdn.net/weixin_68397463/article/details/132533284)
-- 直接执行```pnpm run exec```，这时候会提示你正在下载某个文件……，这个下载速度极慢，所以你可以直接到[github地址](https://github.com/vercel/pkg-fetch/releases)下载你对应的版本，也就是刚才你控制台打印的版本。
+- 直接执行```pnpm run pkg```，这时候会提示你正在下载某个文件……，这个下载速度极慢，所以你可以直接到[github地址](https://github.com/vercel/pkg-fetch/releases)下载你对应的版本，也就是刚才你控制台打印的版本。
 - 放到任意目录，然后复制出来两份，分别名为 fetched-你的版本-你的平台-x64  built-你的版本-你的平台-x64
 - 修改目录下的plugins/rcedit.js中的options配置
 - 执行```pnpm run rcedit```进行修补

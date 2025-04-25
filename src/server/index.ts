@@ -10,6 +10,8 @@ export default class index {
         this.init();
     }
     async init() {
+        console.log(ServerConfig.asciiArt);
+        console.log('欢迎使用文件服务器...(*￣０￣)ノ');
         ServerConfig.serverIp = Utils.getLocalIP();
         ServerConfigMgr.readConfig(ServerConfig.serverConfigPath);
         await DatabaseOperation.openDatabase(ServerConfig.sqlDbPath, ServerConfig.tableName);
