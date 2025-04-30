@@ -67,7 +67,7 @@ export class InputMgr {
         this.addEvent();
     }
     private static setUI() {
-        let uploadForm: HTMLFormElement = Utils.createConnonControl(this.pageParent, HtmlControl.uploadComponent, "uploadForm") as HTMLFormElement;
+        let uploadForm: HTMLFormElement = Utils.createConnonControl(this.pageParent, Utils.isMobile ? HtmlControl.uploadComponent2 : HtmlControl.uploadComponent, "uploadForm") as HTMLFormElement;
         this.fileInput = uploadForm.querySelector('#fileInput') as HTMLInputElement;
         this.textInput = uploadForm.querySelector('#textInput') as HTMLInputElement;
         this.uploadButton = uploadForm.querySelector('#uploadButton') as HTMLInputElement;

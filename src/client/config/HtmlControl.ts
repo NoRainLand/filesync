@@ -134,6 +134,18 @@ export class HtmlControl {
 			</form>
         `;
 
+    /**上传组件 临时 */
+    static readonly uploadComponent2 =
+        `
+        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+            <fieldset role="group">
+                <input type="file" id="fileInput" name="file" value="浏览" />
+                <input type="text" id="textInput" name="text" placeholder="输入文本..." />
+                <input type="button" value="发送" id="uploadButton" />
+            </fieldset>
+        </form>
+        `;
+
     /**复制节点按钮的class */
     static readonly copyNodeButton = ".copyMsg";
 

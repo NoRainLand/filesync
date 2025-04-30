@@ -8,7 +8,7 @@ export class RunButton {
     private static runButton: HTMLElement
     static init(pageParent: HTMLElement) {
         this.pageParent = pageParent;
-        if (Utils.isWin()) {
+        if (!Utils.isMobile) {
             this.setUI();
             this.addEvent();
         }

@@ -1,6 +1,10 @@
 import Clipboard from "clipboard";
 import QRCode from "qrcode";
 
+declare var isMobile: {
+    tablet: boolean,
+    phone: boolean,
+};
 export class Utils {
     /**文件尺寸转换 */
     static formatSize(size: number): string {
@@ -34,29 +38,7 @@ export class Utils {
         });
     }
 
-    /**复制文本到剪切板 */
-    static copyText(text: string) {
-        const input = document.createElement('input');
-        input.value = text;
-        document.body.appendChild(input);
-        input.select();
-        document.execCommand('copy');
-        document.body.removeChild(input);
-    }
 
-    /**复制文本到剪切板 ES6 还没普及呢 */
-    static copyTextES6(text: string) {
-        navigator.clipboard.writeText(text).then(() => {
-            console.log('复制成功');
-        }).catch(() => {
-            console.log('复制失败');
-        });
-    }
-
-    /**从剪切板读取文本 */
-    static readText(): Promise<string> {
-        return navigator.clipboard.readText();
-    }
 
 
     private static canvasElement: HTMLCanvasElement;
@@ -188,29 +170,11 @@ export class Utils {
     }
 
 
-    /**判断运行平台 */
-    static getPlatform(): string {
-        let u = window.navigator.userAgent;
-        if (u.indexOf('Windows') > -1) {
-            return 'Windows';
-        } else if (u.indexOf('Macintosh') > -1) {
-            return 'Macintosh';
-        } else if (u.indexOf('Linux') > -1) {
-            return 'Linux';
-        } else if (u.indexOf('Android') > -1) {
-            return 'Android';
-        } else if (u.indexOf('iPhone') > -1) {
-            return 'iPhone';
-        } else if (u.indexOf('iPad') > -1) {
-            return 'iPad';
-        } else {
-            return 'other';
-        }
-    }
-
-    /**是否为windows平台 */
-    static isWin(): boolean {
-        return this.getPlatform() === 'Windows';
+    /**是否为桌面端平台 */
+    static get isMobile(): boolean {
+        return isMobile.phone;//平板也当作是桌面端
     }
 
 }
+
+(window as any)["Utils"] = Utils;

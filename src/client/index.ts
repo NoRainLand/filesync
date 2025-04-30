@@ -16,7 +16,7 @@ import { ThemeMgr } from "./view/ThemeMgr";
 import { TipsMgr } from "./view/TipsMgr";
 export class index {
 
-    pageParent: HTMLElement;
+    pageParent!: HTMLElement;
     constructor() {
         this.init();
     }
