@@ -1,72 +1,137 @@
 import { Pool } from "./Pool";
 
+/**
+ * 处理器类，用于管理回调函数的执行
+ */
 export class Handler {
+    private static readonly pool: Pool<Handler> = new Pool<Handler>(() => new Handler());
 
-    static createHandler(caller: any, callback: Function, isOnce: boolean = true): Handler {
-        let hd = this.getHandler();
-        hd = this.setHandler(caller, callback, hd, isOnce);
-        return hd;
+    private _caller: unknown = null;
+    private _callback: Function | null = null;
+    private _isOnce: boolean = true;
+    private _isRecover: boolean = true;
+
+    /**
+     * 创建一个新的处理器
+     */
+    static createHandler(caller: unknown, callback: Function, isOnce: boolean = true): Handler {
+        if (typeof callback !== 'function') {
+            throw new Error('callback must be a function');
+        }
+
+        const handler = this.getHandler();
+        return this.setHandler(caller, callback, handler, isOnce);
     }
-    private static pool: Pool<Handler> = new Pool<Handler>(() => new Handler());
-    static getHandler(): Handler {
-        let hd = this.pool.get();
-        hd._isRecover = false;
-        return hd;
+
+    /**
+     * 从对象池获取一个处理器
+     */
+    private static getHandler(): Handler {
+        const handler = this.pool.get();
+        handler._isRecover = false;
+        return handler;
     }
-    static setHandler(caller: any, callback: Function, handler: Handler, isOnce: boolean = true) {
+
+    /**
+     * 设置处理器的属性
+     */
+    private static setHandler(
+        caller: unknown,
+        callback: Function,
+        handler: Handler,
+        isOnce: boolean = true
+    ): Handler {
         handler._caller = caller;
         handler._callback = callback;
         handler._isOnce = isOnce;
         return handler;
     }
-    static recoverHandler(handler: Handler) {
-        if (handler && handler instanceof Handler && handler.isRecover == false) {
-            handler._reset();
-            this.pool.recycle(handler);
+
+    /**
+     * 回收处理器到对象池
+     */
+    static recoverHandler(handler: Handler): void {
+        if (!(handler instanceof Handler) || handler.isRecover) {
+            return;
         }
+
+        handler._reset();
+        this.pool.recycle(handler);
     }
 
-
-    //------self------
-
-    private _reset() {
+    /**
+     * 重置处理器状态
+     */
+    private _reset(): void {
         this._caller = null;
         this._callback = null;
         this._isOnce = true;
         this._isRecover = true;
     }
-    private _caller: any;
-    private _callback: Function | null;
-    private _isOnce: boolean = true;
-    private _isRecover: boolean = true;
-    get isOnce() {
+
+    /**
+     * 获取是否为一次性处理器
+     */
+    get isOnce(): boolean {
         return this._isOnce;
     }
-    get isRecover() {
+
+    /**
+     * 获取是否已被回收
+     */
+    get isRecover(): boolean {
         return this._isRecover;
     }
-    run() {
-        if (!this._isRecover) {
-            this._callback?.call(this._caller);
-            if (this._isOnce) {
-                Handler.recoverHandler(this);
-            }
+
+    /**
+     * 执行处理器
+     */
+    run(): void {
+        if (this._isRecover || !this._callback) {
+            return;
         }
-    }
-    runWith(parms: any) {
-        if (!this._isRecover) {
-            this._callback?.apply(this._caller, parms);
+
+        try {
+            this._callback.call(this._caller);
+        } catch (error) {
+            console.error('Error in handler execution:', error);
+        } finally {
             if (this._isOnce) {
                 Handler.recoverHandler(this);
             }
         }
     }
 
-    isMe(caller: any, callback: Function) {
-        return this._caller == caller && this._callback == callback;
+    /**
+     * 使用参数执行处理器
+     */
+    runWith(params: unknown[]): void {
+        if (this._isRecover || !this._callback) {
+            return;
+        }
+
+        try {
+            this._callback.apply(this._caller, params);
+        } catch (error) {
+            console.error('Error in handler execution with params:', error);
+        } finally {
+            if (this._isOnce) {
+                Handler.recoverHandler(this);
+            }
+        }
     }
 
-    isCaller(caller: any) {
-        return this._caller == caller;
+    /**
+     * 检查是否为指定的调用者和回调
+     */
+    isMe(caller: unknown, callback: Function): boolean {
+        return this._caller === caller && this._callback === callback;
+    }
+
+    /**
+     * 检查是否为指定的调用者
+     */
+    isCaller(caller: unknown): boolean {
+        return this._caller === caller;
     }
 }

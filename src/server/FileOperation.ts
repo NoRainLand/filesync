@@ -1,21 +1,29 @@
-import fs from 'fs';
+import fs from 'fs/promises';  // 使用 promises API
+import { existsSync } from 'fs';
 import { Utils } from './Utils';
 
 export class FileOperation {
-    /**删除文件 */
-    static async deleteFile(filePath: string) {
-        filePath = Utils.getRelativePath(filePath);
-        //判断文件是否存在
-        if (!filePath || !fs.existsSync(filePath)) {
-            console.log('文件不存在' + filePath);
-        } else {
-            fs.unlink(filePath, (err) => {
-                if (err) {
-                    console.log('删除文件失败' + err);
-                } else {
-                    // console.log('删除文件成功' + filePath);
-                }
-            });
+    /**
+     * 删除文件
+     * @param {string} filePath 要删除的文件路径
+     * @throws {Error} 当文件删除失败时抛出错误
+     * @returns {Promise<void>}
+     */
+    static async deleteFile(filePath: string): Promise<void> {
+        if (!filePath) {
+            throw new Error('文件路径不能为空');
+        }
+
+        if (!existsSync(filePath)) {
+            throw new Error(`文件不存在: ${filePath}`);
+        }
+
+        try {
+            await fs.unlink(filePath);
+            // console.log(`文件删除成功: ${resolvedPath}`);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            throw new Error(`删除文件失败: ${errorMessage}`);
         }
     }
 }

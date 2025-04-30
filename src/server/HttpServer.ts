@@ -14,88 +14,138 @@ import { EventName } from './ServerDefine';
 import { Utils } from './Utils';
 
 export class HttpServer {
-
-    private static fileName2HashNameMap: Map<string, string>;
-    private static hashName2FileNameMap: Map<string, string>;
-
-    private static hash2FileNameMap: Map<string, string>;
-
+    private static fileName2HashNameMap: Map<string, string> = new Map();
+    private static hashName2FileNameMap: Map<string, string> = new Map();
+    private static hash2FileNameMap: Map<string, string> = new Map();
 
     private static appExpress: express.Express;
     private static server: http.Server;
     private static storageEngine: multer.StorageEngine;
     private static uploadMulter: multer.Multer;
 
-    private static savePath: string = "";
-    private static toolPath: string = "";
+    private static isRunning: boolean = false;
 
-    /**开启服务器 */
-    static async startServer(port: number) {
-        await DatabaseOperation.getFileName2HashNameMap().then((map) => {
-            this.fileName2HashNameMap = map;
-            this.hashName2FileNameMap = new Map();
-            if (this.fileName2HashNameMap) {
-                this.fileName2HashNameMap.forEach((value, key) => {//转换map，读写加快
-                    this.hashName2FileNameMap.set(value, key);
+    /**
+     * 开启服务器
+     */
+    static async startServer(port: number): Promise<void> {
+        if (this.isRunning) {
+            console.warn('HTTP 服务器已经在运行中');
+            return;
+        }
+
+        try {
+            await this.initializeMaps();
+            await this.setupServer(port);
+            this.isRunning = true;
+        } catch (error) {
+            console.error('启动 HTTP 服务器失败:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * 停止服务器
+     */
+    static async stop(): Promise<void> {
+        if (!this.isRunning) {
+            return;
+        }
+
+        return new Promise((resolve, reject) => {
+            try {
+                this.removeEvent();
+                this.server.close((err) => {
+                    if (err) {
+                        console.error('关闭 HTTP 服务器出错:', err);
+                        reject(err);
+                        return;
+                    }
+                    this.isRunning = false;
+                    console.log('HTTP 服务器已安全关闭');
+                    resolve();
                 });
+            } catch (error) {
+                reject(error);
             }
-        });
-
-        await DatabaseOperation.getFileHashAndFileNameMap().then((map) => {
-            this.hash2FileNameMap = map;
-        });
-
-        await new Promise((resolve, reject) => {
-            this.savePath = Utils.getRelativePath(ServerConfig.uploadFileSavePath);
-            this.toolPath = Utils.getRelativePath(ServerConfig.toolPath);
-            this.initServer();
-            resolve(this.startHttpServer(this.server, port));
         });
     }
 
-    /**初始化服务器框架 */
-    private static initServer() {
-        Utils.checkDirExist(this.savePath);
+    /**
+     * 初始化数据映射
+     */
+    private static async initializeMaps(): Promise<void> {
+        const [fileNameMap, hashMap] = await Promise.all([
+            DatabaseOperation.getFileName2HashNameMap(),
+            DatabaseOperation.getFileHashAndFileNameMap()
+        ]);
+
+        this.fileName2HashNameMap = fileNameMap;
+        this.hash2FileNameMap = hashMap;
+
+        // 构建反向映射
+        this.hashName2FileNameMap.clear();
+        this.fileName2HashNameMap.forEach((value, key) => {
+            this.hashName2FileNameMap.set(value, key);
+        });
+    }
+
+    /**
+     * 设置服务器
+     */
+    private static async setupServer(port: number): Promise<void> {
+        Utils.checkDirExist(ServerConfig.uploadFileSavePath);
+        this.initializeExpress();
+        return this.startHttpServer(port);
+    }
+
+    /**
+     * 初始化 Express 应用
+     */
+    private static initializeExpress(): void {
         this.appExpress = express();
-        this.appExpress.use(compression());//开启gzip压缩
+        this.appExpress.use(compression());
         this.server = http.createServer(this.appExpress);
+
         this.storageEngine = multer.diskStorage({
-            destination: (req, file, cb) => {
-                cb(null, this.savePath);
-            },
+            destination: (req, file, cb) => cb(null, ServerConfig.uploadFileSavePath),
             filename: (req, file, cb) => {
-                let uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-                cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+                const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+                cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
             }
         });
+
         this.uploadMulter = multer({ storage: this.storageEngine });
     }
 
-    /**开启http服务器 */
-    private static async startHttpServer(server: http.Server, port: number) {
-        await new Promise((resolve, reject) => {
-            server.listen(port)
-                .on('listening', () => {
+    /**
+     * 启动 HTTP 服务器
+     */
+    private static async startHttpServer(port: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const handleError = (err: any) => {
+                if (err.code === 'EADDRINUSE') {
+                    const newPort = port + 10;
+                    console.warn(`端口 ${port} 已被占用，尝试使用端口 ${newPort}`);
+                    this.server.removeAllListeners();
+                    ServerConfig.httpPort = newPort;
+                    this.startHttpServer(newPort).then(resolve).catch(reject);
+                } else {
+                    reject(err);
+                }
+            };
+
+            this.server.listen(port)
+                .once('listening', () => {
                     this.addEvent();
                     this.initHttpServerApi();
-                    console.log("http服务器已启动：");
-                    console.log(`http://${ServerConfig.serverIp}:${ServerConfig.httpPort}`);
-                    resolve(null);
+                    console.log(`HTTP 服务器已启动: http://${ServerConfig.serverIp}:${port}`);
+                    resolve();
                 })
-                .on('error', (err: any) => {
-                    if (err.code === 'EADDRINUSE') {
-                        console.warn(`http服务器请求的端口${port}已被占用，尝试使用端口${port + 10}`);
-                        server.removeAllListeners('listening');
-                        server.removeAllListeners('error');
-                        ServerConfig.httpPort = port + 10;
-                        resolve(this.startHttpServer(server, port + 10));
-                    } else {
-                        reject(err);
-                        console.error(err);
-                    }
-                });
+                .once('error', handleError);
         });
     }
+
 
 
     /**添加监听 */
@@ -282,7 +332,7 @@ export class HttpServer {
     private static initGetUploadFileApi() {
         let self = this;
         this.appExpress.get('/uploadFile/:filename', (req, res) => {
-            const file = `${self.savePath}/${req.params.filename}`;
+            const file = `${ServerConfig.uploadFileSavePath}/${req.params.filename}`;
             const fileName = self.hashName2FileNameMap.get(req.params.filename);
             res.download(file, fileName!, (err) => {
                 if (err) {
@@ -299,7 +349,8 @@ export class HttpServer {
     private static initGetToolApi() {
         let self = this;
         this.appExpress.get('/tool/:filename', (req, res) => {
-            res.download(path.join(__dirname, '../tool/' + req.params.filename), req.params.filename!, (err) => {
+            const file = `${ServerConfig.toolPath}/${req.params.filename}`;
+            res.download(file, req.params.filename!, (err) => {
                 if (err) {
                     console.error(err);
                     if (!res.headersSent) {
