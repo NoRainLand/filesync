@@ -72,6 +72,7 @@ const cssConfig = {
 			filename: "[name].css",
 		}),
 		new DeleteFilePlugin(),
+        new CopyFilePlugin(),
 	],
 	output: {
 		path: path.resolve(__dirname, "bin/client"),
@@ -113,7 +114,6 @@ const clientConfig = {
 		new MiniCssExtractPlugin({
 			filename: "[name].css",
 		}),
-		new CopyFilePlugin(),
 	],
 };
 

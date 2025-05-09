@@ -13,11 +13,10 @@ export class FileOperation {
         if (!filePath) {
             throw new Error('文件路径不能为空');
         }
-
+        filePath = Utils.getRelativePath(filePath);
         if (!existsSync(filePath)) {
             throw new Error(`文件不存在: ${filePath}`);
         }
-
         try {
             await fs.unlink(filePath);
             // console.log(`文件删除成功: ${resolvedPath}`);

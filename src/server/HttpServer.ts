@@ -104,6 +104,12 @@ export class HttpServer {
      */
     private static initializeExpress(): void {
         this.appExpress = express();
+        this.appExpress.use((req, res, next) => {
+            res.header('Access-Control-Allow-Origin', '*');
+            res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+            res.header('Access-Control-Allow-Headers', 'Content-Type');
+            next();
+        });
         this.appExpress.use(compression());
         this.server = http.createServer(this.appExpress);
 
@@ -210,7 +216,7 @@ export class HttpServer {
                         return res.status(409).send('文件已存在：' + name);
                     }
                 }
-                let savePath = `${ServerConfig.uploadFileSavePath}/${req.file!.filename}`;
+                let savePath = `${ServerConfig.uploadFileDbPath}/${req.file!.filename}`;
                 const msg: MsgData = {
                     msgType: "file",
                     fileOrTextHash: fileHash,
@@ -332,9 +338,11 @@ export class HttpServer {
     private static initGetUploadFileApi() {
         let self = this;
         this.appExpress.get('/uploadFile/:filename', (req, res) => {
-            const file = `${ServerConfig.uploadFileSavePath}/${req.params.filename}`;
+            const filePath = `${ServerConfig.uploadFileSavePath}/${req.params.filename}`;
             const fileName = self.hashName2FileNameMap.get(req.params.filename);
-            res.download(file, fileName!, (err) => {
+            console.warn(fileName);
+            console.warn(filePath);
+            res.download(filePath, fileName!, (err) => {
                 if (err) {
                     console.error(err);
                     if (!res.headersSent) {

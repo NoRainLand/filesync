@@ -45,7 +45,8 @@ export class index {
                 Config.projectName = socketInfo.projectName;
                 NetMgr.initSocket();
                 this.printMsg();
-            }).catch((e) => {
+            })
+            .catch((e) => {
                 Logger.error(e);
             });
     }

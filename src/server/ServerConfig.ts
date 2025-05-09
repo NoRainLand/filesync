@@ -20,6 +20,8 @@ export class ServerConfig {
     //以下路径不需要path，因为使用的时候会内部处理
     /**上传文件保存路径 */
     public static readonly uploadFileSavePath: string = Utils.getRelativePath('../uploadFile');
+    /**数据库保持需要相对路径 */
+    public static readonly uploadFileDbPath: string = '../uploadFile';
     /**工具路径 */
     public static readonly toolPath: string = Utils.getRelativePath('../tool');
     /**服务器数据保存路径 */
