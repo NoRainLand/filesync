@@ -1,3 +1,13 @@
+
+项目现已重生为[filesyncEX](https://github.com/NoRainLand/filesyncEX)，欢迎使用。
+
+
+
+---
+
+
+
+
 # 文件/文件同步工具
 
 ## *by NoRain*
